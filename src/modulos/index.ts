@@ -26,6 +26,7 @@ export namespace index {
 
         private onRecibirComandoString(){
             bot.onText(/^\/start$/, (msg: Message, match: any) => {
+                console.log("msg received " + msg.chat.id);
                 botSender.enviarMensajeHTML(msg, `Hola desde main`);
             });
         }

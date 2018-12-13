@@ -13,6 +13,7 @@ var index;
         };
         Main.prototype.onRecibirComandoString = function () {
             initBot_1.bot.onText(/^\/start$/, function (msg, match) {
+                console.log("msg received " + msg.chat.id);
                 botSender.enviarMensajeHTML(msg, "Hola desde main");
             });
         };
