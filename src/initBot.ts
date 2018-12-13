@@ -3,32 +3,19 @@ import {
 } from './bot/TelegramBot';
 
 import {
-  token as tokenDev
-} from './initBotTokenDev';
-
-import {
-  token as tokenDist
-} from './initBotTokenDist';
+  token
+} from './initBotToken';
 
 const TelegramBot = require('node-telegram-bot-api');
 
-// replace the value below with the Telegram token you receive from @BotFather
-let token = '';
-
-let bot = null;
+let bot:any = null;
 
 declare const process: any;
 if (process.env.NODE_ENV.trim() == 'development') {
 
   console.log('dev stage');
-
-  token = tokenDev;
+  
   // Create a bot that uses 'polling' to fetch new updates
-  const prodOptions = {
-    webHook: {
-      port: process.env.PORT || 5000
-    }
-  };
 
   const devOptions = {
     polling: true
@@ -39,8 +26,6 @@ if (process.env.NODE_ENV.trim() == 'development') {
 } else {
 
   console.log('prod stage');
-
-  token = tokenDist;
 
   // Create a bot that uses 'polling' to fetch new updates
   const prodOptions = {

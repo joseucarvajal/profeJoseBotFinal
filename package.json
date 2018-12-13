@@ -1,5 +1,5 @@
 {
-  "name": "kodefest8",
+  "name": "profeJoseBotFinal",
   "version": "0.0.1",
   "engines": {
     "node": "6.11.1"
@@ -16,7 +16,7 @@
     "express": "^4.15.2",
     "firebase": "^4.2.0",
     "node-schedule": "^1.2.3",
-    "node-telegram-bot-api": "^0.27.1"    
+    "node-telegram-bot-api": "^0.27.1"
   },
   "devDependencies": {
     "@types/firebase": "^2.4.31",
@@ -28,7 +28,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/joseucarvajal/kodefest8"
+    "url": "https://github.com/joseucarvajal/profeJoseBotFinal"
   },
   "keywords": [
     "node",

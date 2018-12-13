@@ -3,6 +3,7 @@ import * as Data from '../data';
 
 import { Message } from "../bot/Message";
 import { SendMessageOptions } from "../bot/SendMessageOptions";
+import { BotSender } from "./bot/BotSender";
 
 import { ChatModel } from "../core/models";
 import {
@@ -15,6 +16,26 @@ import { index as paginaInicialIndex } from './pagina-inicial';
 
 export namespace index {
 
+    let botSender: BotSender = new BotSender();
+
+    class Main {
+
+        public escucharMensajesBot(){
+            this.onRecibirComandoString();
+        }
+
+        private onRecibirComandoString(){
+            bot.onText(/^\/start$/, (msg: Message, match: any) => {
+                botSender.enviarMensajeHTML(msg, `Hola desde main`);
+            });
+        }
+    }
+
+    let main:Main = new Main();
+    main.escucharMensajesBot();
+}
+
+    /*
     export namespace Metodos {
 
         export const sendMessage = (msg: Message) => {
@@ -25,7 +46,7 @@ export namespace index {
 
             bot.sendMessage(
                 msg.chat.id,
-                `Hola <b>${msg.from.first_name}</b>, bienvenido al banco KodeFest8, por favor ingresa tu identificación`,
+                `Hola estudiante`,
                 messageOptions
             );
         };
@@ -48,6 +69,7 @@ export namespace index {
 
             bot.onText(/^\/start$/, (msg: Message, match: any) => {
 
+                botSender.enviarMensajeHTML(msg, `Hola desde messenger`);
                 Data.Chats.actualizarChat(msg.chat.id, Contextos.PaginaInicial.index, Comandos.PaginaInicial.Index.getUsuario).then(() => {
                     Metodos.sendMessage(msg);
                 });
@@ -78,3 +100,4 @@ export namespace index {
 }
 
 index.eventHandlers.listen();
+*/

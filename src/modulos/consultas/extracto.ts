@@ -196,8 +196,6 @@ export namespace Extracto {
 
 <b>${msg.from.first_name}:</b>, ${fechaHoy}
 
-<b>Has elegido: ${nombresMeses[mes]}</b>
-
 ${datosMovimientos}`;
 
                             bot.editMessageText(textoMensaje, messageOptions);
