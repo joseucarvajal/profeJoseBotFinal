@@ -36,7 +36,7 @@ if (process.env.NODE_ENV.trim() == 'development') {
   
   bot = new TelegramBot(token, prodOptions);
 
-  const url = 'https://kodefest8.herokuapp.com/dist/index.js';
+  const url = 'https://evening-headland-56271.herokuapp.com/dist/index.js';
 
   bot.setWebHook(`${url}/bot${token}`);
 }

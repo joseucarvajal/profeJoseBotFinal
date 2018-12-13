@@ -21,6 +21,6 @@ else {
         }
     };
     exports.bot = bot = new TelegramBot(initBotToken_1.token, prodOptions);
-    var url = 'https://kodefest8.herokuapp.com/dist/index.js';
+    var url = 'https://evening-headland-56271.herokuapp.com/dist/index.js';
     bot.setWebHook(url + "/bot" + initBotToken_1.token);
 }
