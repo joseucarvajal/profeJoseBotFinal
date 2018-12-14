@@ -65,4 +65,4 @@ var PagarServicios;
         };
     })(eventHandlers = PagarServicios.eventHandlers || (PagarServicios.eventHandlers = {}));
 })(PagarServicios = exports.PagarServicios || (exports.PagarServicios = {}));
-PagarServicios.eventHandlers.listen();
+//PagarServicios.eventHandlers.listen();

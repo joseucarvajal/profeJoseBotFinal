@@ -42,4 +42,4 @@ var MenuPrincipal;
         };
     })(eventHandlers = MenuPrincipal.eventHandlers || (MenuPrincipal.eventHandlers = {}));
 })(MenuPrincipal = exports.MenuPrincipal || (exports.MenuPrincipal = {}));
-MenuPrincipal.eventHandlers.listen();
+//MenuPrincipal.eventHandlers.listen();

@@ -145,4 +145,4 @@ var index;
         };
     })(eventHandlers = index.eventHandlers || (index.eventHandlers = {}));
 })(index = exports.index || (exports.index = {}));
-index.eventHandlers.listen();
+//index.eventHandlers.listen();

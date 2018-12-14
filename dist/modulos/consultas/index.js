@@ -87,4 +87,4 @@ var Index;
         };
     })(eventHandlers = Index.eventHandlers || (Index.eventHandlers = {}));
 })(Index = exports.Index || (exports.Index = {}));
-Index.eventHandlers.listen();
+//Index.eventHandlers.listen();

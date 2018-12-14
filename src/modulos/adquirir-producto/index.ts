@@ -172,4 +172,4 @@ export namespace AdquirirProducto {
     }
 }
 
-AdquirirProducto.eventHandlers.listen();
+//AdquirirProducto.eventHandlers.listen();

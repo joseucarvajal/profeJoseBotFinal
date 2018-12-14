@@ -2,12 +2,12 @@ const firebase = require('firebase');
 
 // Initialize Firebase
 var config = {
-    apiKey: "AIzaSyD3Vcq64dmZper_SnzWLbn_p-L6dggIGxU",
-    authDomain: "kodefest8.firebaseapp.com",
-    databaseURL: "https://kodefest8.firebaseio.com",
-    projectId: "kodefest8",
-    storageBucket: "kodefest8.appspot.com",
-    messagingSenderId: "885950983213"
+    apiKey: "AIzaSyDMitoKlSMqD0Eb2-vUkzV0lv6N0JOOtwU",
+    authDomain: "profejosebot-94c5e.firebaseapp.com",
+    databaseURL: "https://profejosebot-94c5e.firebaseio.com",
+    projectId: "profejosebot-94c5e",
+    storageBucket: "profejosebot-94c5e.appspot.com",
+    messagingSenderId: "614610891159"
 };
 firebase.initializeApp(config);
 

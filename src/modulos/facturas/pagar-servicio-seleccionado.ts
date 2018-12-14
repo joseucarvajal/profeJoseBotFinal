@@ -119,4 +119,4 @@ export namespace PagarServicioSeleccionado {
     }
 }
 
-PagarServicioSeleccionado.eventHandlers.listen();
+//PagarServicioSeleccionado.eventHandlers.listen();

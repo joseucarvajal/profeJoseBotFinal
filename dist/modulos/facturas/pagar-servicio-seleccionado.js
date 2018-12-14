@@ -83,4 +83,4 @@ var PagarServicioSeleccionado;
         };
     })(eventHandlers = PagarServicioSeleccionado.eventHandlers || (PagarServicioSeleccionado.eventHandlers = {}));
 })(PagarServicioSeleccionado = exports.PagarServicioSeleccionado || (exports.PagarServicioSeleccionado = {}));
-PagarServicioSeleccionado.eventHandlers.listen();
+//PagarServicioSeleccionado.eventHandlers.listen();

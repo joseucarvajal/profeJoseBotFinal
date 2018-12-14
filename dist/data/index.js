@@ -8,3 +8,5 @@ __export(require("./clientes"));
 __export(require("./productos"));
 __export(require("./empresaServicio"));
 __export(require("./movimientos"));
+__export(require("./settings"));
+__export(require("./estudiantes"));

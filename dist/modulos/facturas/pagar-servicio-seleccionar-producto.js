@@ -100,4 +100,4 @@ var PagarServiciosSeleccionarProducto;
         };
     })(eventHandlers = PagarServiciosSeleccionarProducto.eventHandlers || (PagarServiciosSeleccionarProducto.eventHandlers = {}));
 })(PagarServiciosSeleccionarProducto = exports.PagarServiciosSeleccionarProducto || (exports.PagarServiciosSeleccionarProducto = {}));
-PagarServiciosSeleccionarProducto.eventHandlers.listen();
+//PagarServiciosSeleccionarProducto.eventHandlers.listen();

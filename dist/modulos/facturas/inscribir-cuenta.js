@@ -71,4 +71,4 @@ var InscribirCuentaServicio;
         };
     })(eventHandlers = InscribirCuentaServicio.eventHandlers || (InscribirCuentaServicio.eventHandlers = {}));
 })(InscribirCuentaServicio = exports.InscribirCuentaServicio || (exports.InscribirCuentaServicio = {}));
-InscribirCuentaServicio.eventHandlers.listen();
+//InscribirCuentaServicio.eventHandlers.listen();

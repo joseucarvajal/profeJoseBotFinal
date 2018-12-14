@@ -117,4 +117,4 @@ export namespace Index {
     }
 }
 
-Index.eventHandlers.listen();
+//Index.eventHandlers.listen();

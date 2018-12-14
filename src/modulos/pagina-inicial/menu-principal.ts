@@ -62,4 +62,4 @@ export namespace MenuPrincipal {
     }
 }
 
-MenuPrincipal.eventHandlers.listen();
+//MenuPrincipal.eventHandlers.listen();

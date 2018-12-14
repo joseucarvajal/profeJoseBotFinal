@@ -141,4 +141,4 @@ export namespace PagarServiciosSeleccionarProducto {
     }
 }
 
-PagarServiciosSeleccionarProducto.eventHandlers.listen();
+//PagarServiciosSeleccionarProducto.eventHandlers.listen();

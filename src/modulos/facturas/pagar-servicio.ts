@@ -95,4 +95,4 @@ export namespace PagarServicios {
     }
 }
 
-PagarServicios.eventHandlers.listen();
+//PagarServicios.eventHandlers.listen();

@@ -105,4 +105,4 @@ export namespace InscribirCuentaServicio {
     }
 }
 
-InscribirCuentaServicio.eventHandlers.listen();
+//InscribirCuentaServicio.eventHandlers.listen();

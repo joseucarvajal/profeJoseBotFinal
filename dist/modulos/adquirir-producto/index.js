@@ -126,4 +126,4 @@ var AdquirirProducto;
         };
     })(eventHandlers = AdquirirProducto.eventHandlers || (AdquirirProducto.eventHandlers = {}));
 })(AdquirirProducto = exports.AdquirirProducto || (exports.AdquirirProducto = {}));
-AdquirirProducto.eventHandlers.listen();
+//AdquirirProducto.eventHandlers.listen();
