@@ -1,19 +1,19 @@
-import { bot } from "../../initBot";
 import { Message } from "../../bot/Message";
-import { SendMessageOptions } from "../../bot/SendMessageOptions";
-
-import { BotSender } from "../bot/BotSender";
 import { BotReceiver } from "../bot/BotReceiver";
 import { KeyboardButton } from "../../bot/KeyboardButton";
-
-import * as Data from "../../data";
-import { EstadoGlobal, InformacionContexto } from "../../core";
+import { EstadoGlobal, InformacionContexto, Estudiante } from "../../core";
 import { IndexMain } from "../indexContracts";
 import { MenuPrincipal } from "../menuPrincipal/MenuPrincipalReceiver";
 
 export namespace AccesoEstudiante {
   export namespace Comandos {
     export const IngresarCodigoProfesor = `❓Para empezar, ingresa el código provisto por el profesor`;
+
+    export const SolicitarCelular = "SolicitarCelular";
+
+    export enum SolicitarCelularOpts {
+      SolicitarCelular = "✅ Autorizo compartir mi nro. celular"
+    }
   }
 
   let nombreContexto = "AccesoEstudianteReceiver";
@@ -21,47 +21,54 @@ export namespace AccesoEstudiante {
   export class AccesoEstudianteReceiver extends BotReceiver {
     nombreContexto = nombreContexto;
 
+    solicitarCelularOpts: Array<Array<KeyboardButton>> = [
+      [
+        {
+          text: Comandos.SolicitarCelularOpts.SolicitarCelular,
+          request_contact: true
+        }
+      ]
+    ];
+
     constructor(estadoGlobal: EstadoGlobal, indexMain: IndexMain) {
       super(estadoGlobal, indexMain, nombreContexto);
     }
 
-    private onRecibirComandoStart(msg: Message) {      
-
+    private onRecibirComandoStart(msg: Message) {
       let defaultEstudiante = {
-        codigo:"",
+        codigo: "",
         nombre: "",
         email: "",
         comando: Comandos.IngresarCodigoProfesor,
-        contexto: this.nombreContexto,        
+        contexto: this.nombreContexto
       };
 
-      this.estadoGlobal.infoUsuarioMensaje.estudiante = {...defaultEstudiante, ...this.estadoGlobal.infoUsuarioMensaje.estudiante};
+      let estudiante: Estudiante = {
+        ...this.estadoGlobal.infoUsuarioMensaje.estudiante
+      };
 
-      Data.Estudiantes.actualizarChat(
+      this.estadoGlobal.infoUsuarioMensaje.estudiante = defaultEstudiante;
+      this.estadoGlobal.infoUsuarioMensaje.estudiante = { ...estudiante };
+      this.estadoGlobal.infoUsuarioMensaje.estudiante.comando =
+        Comandos.SolicitarCelular;
+      this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto = this.nombreContexto;
+
+      this.enviarMensajeKeyboardMarkup(
         msg,
-        this.estadoGlobal,
-        this.estadoGlobal.infoUsuarioMensaje.estudiante
-      ).then(
-        () => {
-          this.botSender.responderMensajeHTML(
-            msg,
-            `Hola ${msg.from.first_name}, soy el asistente del profe Jose`
-          ).then(()=>{
-            this.botSender.responderMensajeHTML(
-              msg,
-              Comandos.IngresarCodigoProfesor
-            );  
-          });
-        },
-        () => {
-          console.error("AccesoEstudianteReceiver/onRecibirComandoStart");
-        }
+        "Haz click en el botón aceptar si estás de acuerdo en compartir tu nro. celular",
+        this.solicitarCelularOpts, 
+        Comandos.SolicitarCelular
       );
     }
 
     protected onRecibirMensaje(msg: Message) {
+
+      console.log("On recibir mensaje", msg);
+
       if (msg.text == "/start") {
         this.onRecibirComandoStart(msg);
+      } else if (this.estaComandoEnContexto(Comandos.SolicitarCelular)) {
+        console.log("celular msg", msg.contact.phone_number);
       } else if (this.estaComandoEnContexto(Comandos.IngresarCodigoProfesor)) {
         if (msg.text != this.estadoGlobal.settings.codigoAccesoEstudiante) {
           this.botSender.responderMensajeErrorHTML(
