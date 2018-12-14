@@ -75,6 +75,11 @@ export interface Estudiante extends InformacionContexto {
     email:string;    
 }
 
+export interface CelularUsuario {
+  idUsuario:string; //Id usuario en Telegram
+  tipoUsuario:string; //"e" (estudiante) | "p" (profesor)
+}
+
 export interface InfoUsuarioMensaje{
     estudiante:Estudiante;
 }

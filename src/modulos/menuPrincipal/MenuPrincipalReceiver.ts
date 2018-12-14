@@ -1,56 +1,67 @@
-import { bot } from '../../initBot';
+import { bot } from "../../initBot";
 import { Message } from "../../bot/Message";
 import { SendMessageOptions } from "../../bot/SendMessageOptions";
 
 import { BotSender } from "../bot/BotSender";
 import { BotReceiver } from "../bot/BotReceiver";
-import { KeyboardButton } from '../../bot/KeyboardButton';
+import { KeyboardButton } from "../../bot/KeyboardButton";
 
-import * as Data from '../../data';
-import { EstadoGlobal } from '../../core';
-import { IndexMain } from '../indexContracts';
+import * as Data from "../../data";
+import { EstadoGlobal } from "../../core";
+import { IndexMain } from "../indexContracts";
 
 export namespace MenuPrincipal {
+  export namespace Comandos {
+    export const MenuPrincipalEstudiante = "menuPrincipalEstudiante";
 
-    export namespace Comandos {
-
-        export const MenuPrincipal = "menuPrincipal";
-
-        export enum MenuPrincipalOpts {
-            RegistrarAsistencia = "⏱ Registrar asistencia",
-            RegistrarAsignatura = "📚 Inscribir asignatura",
-            DesInscribirAsignatura = "❌ Des-inscribir asignatura",
-            EditarInfoBasica = "✏️ Editar información básica",
-        }    
+    export enum MenuPrincipalEstudianteOpts {
+      RegistrarAsistencia = "⏱ Registrar asistencia",
+      RegistrarAsignatura = "📚 Inscribir asignatura",
+      DesInscribirAsignatura = "❌ Des-inscribir asignatura",
+      EditarInfoBasica = "✏️ Editar información básica"
     }
-    
-    let nombreContexto = "MenuPrincipalReceiver";
-    export class MenuPrincipalReceiver extends BotReceiver {
-              
-        nombreContexto = nombreContexto;
-                 
-        constructor(estadoGlobal:EstadoGlobal, indexMain: IndexMain){  
+  }
 
-            super(estadoGlobal, indexMain, nombreContexto);
+  let nombreContexto = "MenuPrincipalReceiver";
+  export class MenuPrincipalReceiver extends BotReceiver {
+    nombreContexto = nombreContexto;
 
-            this.responderMenuPrincipal = this.responderMenuPrincipal.bind(this);
-        }
+    constructor(estadoGlobal: EstadoGlobal, indexMain: IndexMain) {
+      super(estadoGlobal, indexMain, nombreContexto);
 
-        startResponse:Array<Array<KeyboardButton>> = [
-            [{ text: Comandos.MenuPrincipalOpts.RegistrarAsistencia }],
-            [{ text: Comandos.MenuPrincipalOpts.RegistrarAsignatura }],
-            [{ text: Comandos.MenuPrincipalOpts.DesInscribirAsignatura }],
-            [{ text: Comandos.MenuPrincipalOpts.EditarInfoBasica }],
-        ];
-    
-        public responderMenuPrincipal(msg: Message){
-            this.botSender.responderKeyboardMarkup(msg, `Selecciona una opción`, this.startResponse);
-        }
-
-        protected onRecibirMensaje(msg: Message){
-            if (this.estaComandoEnContexto(Comandos.MenuPrincipalOpts.EditarInfoBasica)) {
-                
-            }
-        }        
+      this.responderMenuPrincipalEstudiante = this.responderMenuPrincipalEstudiante.bind(
+        this
+      );
     }
+
+    startResponse: Array<Array<KeyboardButton>> = [
+      [{ text: Comandos.MenuPrincipalEstudianteOpts.RegistrarAsistencia }],
+      [{ text: Comandos.MenuPrincipalEstudianteOpts.RegistrarAsignatura }],
+      [{ text: Comandos.MenuPrincipalEstudianteOpts.DesInscribirAsignatura }],
+      [{ text: Comandos.MenuPrincipalEstudianteOpts.EditarInfoBasica }]
+    ];
+
+    public responderMenuPrincipalEstudiante(msg: Message) {
+      this.botSender.responderKeyboardMarkup(
+        msg,
+        `Selecciona una opción`,
+        this.startResponse
+      );
+    }
+
+    protected onRecibirMensaje(msg: Message) {
+      if (
+        this.estaComandoEnContexto(Comandos.MenuPrincipalEstudiante) &&
+        msg.text == Comandos.MenuPrincipalEstudianteOpts.EditarInfoBasica
+      ) {
+        this.enviarMensajeAReceiver(
+          this.indexMain.editarInformacionBasicaReceiver,
+          this.indexMain.editarInformacionBasicaReceiver
+            .responderEditarInformacionBasica,
+          msg,
+          MenuPrincipal.Comandos.MenuPrincipalEstudianteOpts.EditarInfoBasica
+        );
+      }
+    }
+  }
 }

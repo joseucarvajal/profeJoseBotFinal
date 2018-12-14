@@ -1,6 +1,7 @@
 import { MenuPrincipal } from './menuPrincipal/MenuPrincipalReceiver';
-import { AccesoEstudiante } from './accesoEstudiante/AccesoEstudianteReceiver';
+import { EditarInformacionBasica } from './EditarInformacionBasica/EditarInformacionBasicaReceiver';
 
 export interface IndexMain {
     menuPrincipalReceiver:MenuPrincipal.MenuPrincipalReceiver;
+    editarInformacionBasicaReceiver:EditarInformacionBasica.EditarInformacionBasicaReceiver;
 }

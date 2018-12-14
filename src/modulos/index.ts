@@ -2,20 +2,14 @@ import { bot } from "../initBot";
 import * as Data from "../data";
 
 import { Message } from "../bot/Message";
-import { SendMessageOptions } from "../bot/SendMessageOptions";
-import { BotSender } from "./bot/BotSender";
 
 import {
-  ChatModel,
   EstadoGlobal,
   Settings,
   Estudiante,
   InfoUsuarioMensaje
 } from "../core/models";
-import { Contextos, Comandos } from "../core";
-import { Validaciones } from "../utils";
 
-import { index as paginaInicialIndex } from "./pagina-inicial";
 import { MenuPrincipal } from "./menuPrincipal/MenuPrincipalReceiver";
 import { AccesoEstudiante } from "./accesoEstudiante/AccesoEstudianteReceiver";
 import { IndexMain } from "./indexContracts";
@@ -65,6 +59,9 @@ export namespace index {
   }
 
   bot.on("message", (msg: Message) => {
+
+    //console.log("index msg: ", msg);
+
     Data.Settings.getSettings().then((settings: Settings) => {
       let estadoGlobal = {
         settings: settings
@@ -72,6 +69,14 @@ export namespace index {
 
       Data.Estudiantes.getEstudianteByChatId(msg, estadoGlobal).then(
         (estudiante: Estudiante) => {
+
+          if(estudiante == null){
+            estudiante = {
+              comando : AccesoEstudiante.Comandos.SolicitarCelular,
+              contexto : AccesoEstudiante.nombreContexto
+            } as Estudiante;
+          }
+
           estadoGlobal.infoUsuarioMensaje = {
             estudiante: estudiante
           } as InfoUsuarioMensaje;

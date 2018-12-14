@@ -27,6 +27,7 @@ export class BotSender {
     opcionesKeyboard: Array<Array<KeyboardButton>>
   ): Promise<any> {
     const messageOptions = {
+      parse_mode: "HTML",
       reply_markup: {
         remove_keyboard: true,
         one_time_keyboard: true,

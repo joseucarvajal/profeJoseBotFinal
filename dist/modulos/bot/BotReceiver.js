@@ -12,12 +12,15 @@ var BotReceiver = /** @class */ (function () {
         };
     }
     BotReceiver.prototype.onRecibirMensajeBase = function (msg) {
-        if (!msg.text) {
+        if (!msg.text && !msg.contact) {
             return;
         }
         this.onRecibirMensaje(msg);
     };
     BotReceiver.prototype.estaEnContextoActual = function (contexto) {
+        if (!this.estadoGlobal.infoUsuarioMensaje.estudiante) {
+            return false;
+        }
         if (contexto) {
             return (contexto == this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto);
         }
@@ -42,6 +45,15 @@ var BotReceiver = /** @class */ (function () {
         this.estadoGlobal.infoUsuarioMensaje.estudiante.comando = comando;
         Data.Estudiantes.actualizarChat(msg, this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante).then(function () {
             return _this.botSender.responderMensajeHTML(msg, html);
+        });
+        return new Promise(function () { });
+    };
+    BotReceiver.prototype.enviarMensajeKeyboardMarkup = function (msg, label, opcionesKeyboard, comando) {
+        var _this = this;
+        this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto = this.nombreContexto;
+        this.estadoGlobal.infoUsuarioMensaje.estudiante.comando = comando;
+        Data.Estudiantes.actualizarChat(msg, this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante).then(function () {
+            return _this.botSender.responderKeyboardMarkup(msg, label, opcionesKeyboard);
         });
         return new Promise(function () { });
     };

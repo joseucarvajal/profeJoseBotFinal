@@ -8,6 +8,13 @@ import { User } from "./User";
 import { Chat } from "./Chat";
 import { Location } from "./Location";
 
+export interface Contact {
+    phone_number:string;
+    first_name:string;
+    last_name:string;
+    user_id:string;
+}
+
 export interface Message {
     message_id: number;
     from: User;
@@ -15,4 +22,5 @@ export interface Message {
     chat: Chat;
     text: string;
     location: Location;
+    contact: Contact;
 }

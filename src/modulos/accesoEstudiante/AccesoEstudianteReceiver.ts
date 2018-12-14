@@ -1,14 +1,14 @@
 import { Message } from "../../bot/Message";
 import { BotReceiver } from "../bot/BotReceiver";
 import { KeyboardButton } from "../../bot/KeyboardButton";
-import { EstadoGlobal, InformacionContexto, Estudiante } from "../../core";
+import { EstadoGlobal, Estudiante, CelularUsuario } from "../../core";
 import { IndexMain } from "../indexContracts";
+
+import * as Data from "../../data";
 import { MenuPrincipal } from "../menuPrincipal/MenuPrincipalReceiver";
 
 export namespace AccesoEstudiante {
   export namespace Comandos {
-    export const IngresarCodigoProfesor = `❓Para empezar, ingresa el código provisto por el profesor`;
-
     export const SolicitarCelular = "SolicitarCelular";
 
     export enum SolicitarCelularOpts {
@@ -16,7 +16,7 @@ export namespace AccesoEstudiante {
     }
   }
 
-  let nombreContexto = "AccesoEstudianteReceiver";
+  export let nombreContexto = "AccesoEstudianteReceiver";
 
   export class AccesoEstudianteReceiver extends BotReceiver {
     nombreContexto = nombreContexto;
@@ -35,11 +35,103 @@ export namespace AccesoEstudiante {
     }
 
     private onRecibirComandoStart(msg: Message) {
+
+      this.inicializarDatosEstudianteContexto();
+
+      this.botSender
+        .responderMensajeHTML(
+          msg,
+          `Bienvenido <b>${
+            msg.from.first_name
+          }!</b>. Soy el asistente del profe Jose Ubaldo Carvajal`
+        )
+        .then(() => {
+          this.enviarMensajeKeyboardMarkup(
+            msg,
+            `Para empezar, haz click en el botón <b>"${
+              Comandos.SolicitarCelularOpts.SolicitarCelular
+            }"</b> si estás de acuerdo con esto.`,
+            this.solicitarCelularOpts,
+            Comandos.SolicitarCelular
+          );
+        });
+    }
+
+    protected onRecibirMensaje(msg: Message) {
+      if (msg.text == "/start") {
+        this.onRecibirComandoStart(msg);
+      } else if (this.estaComandoEnContexto(Comandos.SolicitarCelular)) {
+        this.enviarMenuAUsuario(msg);
+      }
+      return;
+    }
+
+    private enviarMenuAUsuario(msg: Message) {
+      Data.CelularesUsuario.getCelularUsuario(msg, this.estadoGlobal).then(
+        (celularUsuario: CelularUsuario) => {          
+          if (celularUsuario == null) {
+            this.enviarErrorUsuarioNoEncontrado(msg);
+          } else {
+            this.crearChatYEnviarMenu(msg, celularUsuario);
+          }
+        }
+      );
+    }
+
+    private enviarErrorUsuarioNoEncontrado(msg: Message){      
+      this.botSender.responderMensajeErrorHTML(
+        msg,
+        `No puedo encontrarte en los registros de estudiante, pídele al profe que te registre`
+      );
+      Data.Estudiantes.elminarChat(msg, this.estadoGlobal);
+    }
+
+    private crearChatYEnviarMenu(msg: Message, celularUsuario: CelularUsuario) {
+      this.botSender.responderMensajeHTML(msg, `Por favor espera un momento, estoy registrando tus datos...`);      
+      Data.Estudiantes.actualizarChat(
+        msg,
+        this.estadoGlobal,
+        this.estadoGlobal.infoUsuarioMensaje.estudiante
+      ).then(() => {
+        celularUsuario.idUsuario = msg.contact.user_id;
+        Data.CelularesUsuario.actualizarCelularUsuario(
+          msg,
+          this.estadoGlobal,
+          msg.contact.phone_number,
+          celularUsuario
+        ).then(() => {
+          switch (celularUsuario.tipoUsuario) {
+            case "e":
+              this.enviarMenuAUsuarioEstudiante(msg);
+              break;
+
+            case "p":
+              this.enviarMenuAUsuarioProfesor(msg);
+              break;
+          }
+        });
+      });
+    }
+
+    private enviarMenuAUsuarioEstudiante(msg: Message) {
+      this.enviarMensajeAReceiver(
+        this.indexMain.menuPrincipalReceiver,
+        this.indexMain.menuPrincipalReceiver.responderMenuPrincipalEstudiante,
+        msg,
+        MenuPrincipal.Comandos.MenuPrincipalEstudiante
+      );
+    }
+
+    private enviarMenuAUsuarioProfesor(msg: Message) {
+      return;
+    }
+
+    private inicializarDatosEstudianteContexto() {
       let defaultEstudiante = {
         codigo: "",
         nombre: "",
         email: "",
-        comando: Comandos.IngresarCodigoProfesor,
+        comando: Comandos.SolicitarCelular,
         contexto: this.nombreContexto
       };
 
@@ -49,44 +141,10 @@ export namespace AccesoEstudiante {
 
       this.estadoGlobal.infoUsuarioMensaje.estudiante = defaultEstudiante;
       this.estadoGlobal.infoUsuarioMensaje.estudiante = { ...estudiante };
+
       this.estadoGlobal.infoUsuarioMensaje.estudiante.comando =
         Comandos.SolicitarCelular;
       this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto = this.nombreContexto;
-
-      this.enviarMensajeKeyboardMarkup(
-        msg,
-        "Haz click en el botón aceptar si estás de acuerdo en compartir tu nro. celular",
-        this.solicitarCelularOpts, 
-        Comandos.SolicitarCelular
-      );
-    }
-
-    protected onRecibirMensaje(msg: Message) {
-
-      console.log("On recibir mensaje", msg);
-
-      if (msg.text == "/start") {
-        this.onRecibirComandoStart(msg);
-      } else if (this.estaComandoEnContexto(Comandos.SolicitarCelular)) {
-        console.log("celular msg", msg.contact.phone_number);
-      } else if (this.estaComandoEnContexto(Comandos.IngresarCodigoProfesor)) {
-        if (msg.text != this.estadoGlobal.settings.codigoAccesoEstudiante) {
-          this.botSender.responderMensajeErrorHTML(
-            msg,
-            `Has ingresado un código de acceso incorrecto`
-          );
-          return;
-        }
-
-        this.enviarMensajeAReceiver(
-          this.indexMain.menuPrincipalReceiver,
-          this.indexMain.menuPrincipalReceiver.responderMenuPrincipal,
-          msg,
-          MenuPrincipal.Comandos.MenuPrincipal
-        );
-      }
-
-      return;
     }
   }
 }

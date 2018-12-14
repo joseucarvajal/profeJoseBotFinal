@@ -10,3 +10,4 @@ __export(require("./empresaServicio"));
 __export(require("./movimientos"));
 __export(require("./settings"));
 __export(require("./estudiantes"));
+__export(require("./celularesUsuario"));

@@ -15,18 +15,18 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var BotReceiver_1 = require("../bot/BotReceiver");
 var MenuPrincipal;
-(function (MenuPrincipal_1) {
+(function (MenuPrincipal) {
     var Comandos;
     (function (Comandos) {
-        Comandos.MenuPrincipal = "menuPrincipal";
-        var MenuPrincipalOpts;
-        (function (MenuPrincipalOpts) {
-            MenuPrincipalOpts["RegistrarAsistencia"] = "\u23F1 Registrar asistencia";
-            MenuPrincipalOpts["RegistrarAsignatura"] = "\uD83D\uDCDA Inscribir asignatura";
-            MenuPrincipalOpts["DesInscribirAsignatura"] = "\u274C Des-inscribir asignatura";
-            MenuPrincipalOpts["EditarInfoBasica"] = "\u270F\uFE0F Editar informaci\u00F3n b\u00E1sica";
-        })(MenuPrincipalOpts = Comandos.MenuPrincipalOpts || (Comandos.MenuPrincipalOpts = {}));
-    })(Comandos = MenuPrincipal_1.Comandos || (MenuPrincipal_1.Comandos = {}));
+        Comandos.MenuPrincipalEstudiante = "menuPrincipalEstudiante";
+        var MenuPrincipalEstudianteOpts;
+        (function (MenuPrincipalEstudianteOpts) {
+            MenuPrincipalEstudianteOpts["RegistrarAsistencia"] = "\u23F1 Registrar asistencia";
+            MenuPrincipalEstudianteOpts["RegistrarAsignatura"] = "\uD83D\uDCDA Inscribir asignatura";
+            MenuPrincipalEstudianteOpts["DesInscribirAsignatura"] = "\u274C Des-inscribir asignatura";
+            MenuPrincipalEstudianteOpts["EditarInfoBasica"] = "\u270F\uFE0F Editar informaci\u00F3n b\u00E1sica";
+        })(MenuPrincipalEstudianteOpts = Comandos.MenuPrincipalEstudianteOpts || (Comandos.MenuPrincipalEstudianteOpts = {}));
+    })(Comandos = MenuPrincipal.Comandos || (MenuPrincipal.Comandos = {}));
     var nombreContexto = "MenuPrincipalReceiver";
     var MenuPrincipalReceiver = /** @class */ (function (_super) {
         __extends(MenuPrincipalReceiver, _super);
@@ -34,22 +34,25 @@ var MenuPrincipal;
             var _this = _super.call(this, estadoGlobal, indexMain, nombreContexto) || this;
             _this.nombreContexto = nombreContexto;
             _this.startResponse = [
-                [{ text: Comandos.MenuPrincipalOpts.RegistrarAsistencia }],
-                [{ text: Comandos.MenuPrincipalOpts.RegistrarAsignatura }],
-                [{ text: Comandos.MenuPrincipalOpts.DesInscribirAsignatura }],
-                [{ text: Comandos.MenuPrincipalOpts.EditarInfoBasica }],
+                [{ text: Comandos.MenuPrincipalEstudianteOpts.RegistrarAsistencia }],
+                [{ text: Comandos.MenuPrincipalEstudianteOpts.RegistrarAsignatura }],
+                [{ text: Comandos.MenuPrincipalEstudianteOpts.DesInscribirAsignatura }],
+                [{ text: Comandos.MenuPrincipalEstudianteOpts.EditarInfoBasica }]
             ];
-            _this.responderMenuPrincipal = _this.responderMenuPrincipal.bind(_this);
+            _this.responderMenuPrincipalEstudiante = _this.responderMenuPrincipalEstudiante.bind(_this);
             return _this;
         }
-        MenuPrincipalReceiver.prototype.responderMenuPrincipal = function (msg) {
+        MenuPrincipalReceiver.prototype.responderMenuPrincipalEstudiante = function (msg) {
             this.botSender.responderKeyboardMarkup(msg, "Selecciona una opci\u00F3n", this.startResponse);
         };
         MenuPrincipalReceiver.prototype.onRecibirMensaje = function (msg) {
-            if (this.estaComandoEnContexto(Comandos.MenuPrincipalOpts.EditarInfoBasica)) {
+            if (this.estaComandoEnContexto(Comandos.MenuPrincipalEstudiante) &&
+                msg.text == Comandos.MenuPrincipalEstudianteOpts.EditarInfoBasica) {
+                this.enviarMensajeAReceiver(this.indexMain.editarInformacionBasicaReceiver, this.indexMain.editarInformacionBasicaReceiver
+                    .responderEditarInformacionBasica, msg, MenuPrincipal.Comandos.MenuPrincipalEstudianteOpts.EditarInfoBasica);
             }
         };
         return MenuPrincipalReceiver;
     }(BotReceiver_1.BotReceiver));
-    MenuPrincipal_1.MenuPrincipalReceiver = MenuPrincipalReceiver;
+    MenuPrincipal.MenuPrincipalReceiver = MenuPrincipalReceiver;
 })(MenuPrincipal = exports.MenuPrincipal || (exports.MenuPrincipal = {}));

@@ -18,6 +18,7 @@ var BotSender = /** @class */ (function () {
     };
     BotSender.prototype.responderKeyboardMarkup = function (msg, label, opcionesKeyboard) {
         var messageOptions = {
+            parse_mode: "HTML",
             reply_markup: {
                 remove_keyboard: true,
                 one_time_keyboard: true,

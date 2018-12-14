@@ -31,46 +31,98 @@ var AccesoEstudiante;
 (function (AccesoEstudiante) {
     var Comandos;
     (function (Comandos) {
-        Comandos.IngresarCodigoProfesor = "\u2753Para empezar, ingresa el c\u00F3digo provisto por el profesor";
+        Comandos.SolicitarCelular = "SolicitarCelular";
+        var SolicitarCelularOpts;
+        (function (SolicitarCelularOpts) {
+            SolicitarCelularOpts["SolicitarCelular"] = "\u2705 Autorizo compartir mi nro. celular";
+        })(SolicitarCelularOpts = Comandos.SolicitarCelularOpts || (Comandos.SolicitarCelularOpts = {}));
     })(Comandos = AccesoEstudiante.Comandos || (AccesoEstudiante.Comandos = {}));
-    var nombreContexto = "AccesoEstudianteReceiver";
+    AccesoEstudiante.nombreContexto = "AccesoEstudianteReceiver";
     var AccesoEstudianteReceiver = /** @class */ (function (_super) {
         __extends(AccesoEstudianteReceiver, _super);
         function AccesoEstudianteReceiver(estadoGlobal, indexMain) {
-            var _this = _super.call(this, estadoGlobal, indexMain, nombreContexto) || this;
-            _this.nombreContexto = nombreContexto;
+            var _this = _super.call(this, estadoGlobal, indexMain, AccesoEstudiante.nombreContexto) || this;
+            _this.nombreContexto = AccesoEstudiante.nombreContexto;
+            _this.solicitarCelularOpts = [
+                [
+                    {
+                        text: Comandos.SolicitarCelularOpts.SolicitarCelular,
+                        request_contact: true
+                    }
+                ]
+            ];
             return _this;
         }
         AccesoEstudianteReceiver.prototype.onRecibirComandoStart = function (msg) {
             var _this = this;
-            var defaultEstudiante = {
-                codigo: "",
-                nombre: "",
-                email: "",
-                comando: Comandos.IngresarCodigoProfesor,
-                contexto: this.nombreContexto,
-            };
-            this.estadoGlobal.infoUsuarioMensaje.estudiante = __assign({}, defaultEstudiante, this.estadoGlobal.infoUsuarioMensaje.estudiante);
-            Data.Estudiantes.actualizarChat(msg, this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante).then(function () {
-                _this.botSender.responderMensajeHTML(msg, "Hola " + msg.from.first_name + ", soy el asistente del profe Jose").then(function () {
-                    _this.botSender.responderMensajeHTML(msg, Comandos.IngresarCodigoProfesor);
-                });
-            }, function () {
-                console.error("AccesoEstudianteReceiver/onRecibirComandoStart");
+            this.inicializarDatosEstudianteContexto();
+            this.botSender
+                .responderMensajeHTML(msg, "Bienvenido <b>" + msg.from.first_name + "!</b>. Soy el asistente del profe Jose Ubaldo Carvajal")
+                .then(function () {
+                _this.enviarMensajeKeyboardMarkup(msg, "Para empezar, haz click en el bot\u00F3n <b>\"" + Comandos.SolicitarCelularOpts.SolicitarCelular + "\"</b> si est\u00E1s de acuerdo con esto.", _this.solicitarCelularOpts, Comandos.SolicitarCelular);
             });
         };
         AccesoEstudianteReceiver.prototype.onRecibirMensaje = function (msg) {
             if (msg.text == "/start") {
                 this.onRecibirComandoStart(msg);
             }
-            else if (this.estaComandoEnContexto(Comandos.IngresarCodigoProfesor)) {
-                if (msg.text != this.estadoGlobal.settings.codigoAccesoEstudiante) {
-                    this.botSender.responderMensajeErrorHTML(msg, "Has ingresado un c\u00F3digo de acceso incorrecto");
-                    return;
-                }
-                this.enviarMensajeAReceiver(this.indexMain.menuPrincipalReceiver, this.indexMain.menuPrincipalReceiver.responderMenuPrincipal, msg, MenuPrincipalReceiver_1.MenuPrincipal.Comandos.MenuPrincipal);
+            else if (this.estaComandoEnContexto(Comandos.SolicitarCelular)) {
+                this.enviarMenuAUsuario(msg);
             }
             return;
+        };
+        AccesoEstudianteReceiver.prototype.enviarMenuAUsuario = function (msg) {
+            var _this = this;
+            Data.CelularesUsuario.getCelularUsuario(msg, this.estadoGlobal).then(function (celularUsuario) {
+                if (celularUsuario == null) {
+                    _this.enviarErrorUsuarioNoEncontrado(msg);
+                }
+                else {
+                    _this.crearChatYEnviarMenu(msg, celularUsuario);
+                }
+            });
+        };
+        AccesoEstudianteReceiver.prototype.enviarErrorUsuarioNoEncontrado = function (msg) {
+            this.botSender.responderMensajeErrorHTML(msg, "No puedo encontrarte en los registros de estudiante, p\u00EDdele al profe que te registre");
+            Data.Estudiantes.elminarChat(msg, this.estadoGlobal);
+        };
+        AccesoEstudianteReceiver.prototype.crearChatYEnviarMenu = function (msg, celularUsuario) {
+            var _this = this;
+            this.botSender.responderMensajeHTML(msg, "Por favor espera un momento, estoy registrando tus datos...");
+            Data.Estudiantes.actualizarChat(msg, this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante).then(function () {
+                celularUsuario.idUsuario = msg.contact.user_id;
+                Data.CelularesUsuario.actualizarCelularUsuario(msg, _this.estadoGlobal, msg.contact.phone_number, celularUsuario).then(function () {
+                    switch (celularUsuario.tipoUsuario) {
+                        case "e":
+                            _this.enviarMenuAUsuarioEstudiante(msg);
+                            break;
+                        case "p":
+                            _this.enviarMenuAUsuarioProfesor(msg);
+                            break;
+                    }
+                });
+            });
+        };
+        AccesoEstudianteReceiver.prototype.enviarMenuAUsuarioEstudiante = function (msg) {
+            this.enviarMensajeAReceiver(this.indexMain.menuPrincipalReceiver, this.indexMain.menuPrincipalReceiver.responderMenuPrincipalEstudiante, msg, MenuPrincipalReceiver_1.MenuPrincipal.Comandos.MenuPrincipalEstudiante);
+        };
+        AccesoEstudianteReceiver.prototype.enviarMenuAUsuarioProfesor = function (msg) {
+            return;
+        };
+        AccesoEstudianteReceiver.prototype.inicializarDatosEstudianteContexto = function () {
+            var defaultEstudiante = {
+                codigo: "",
+                nombre: "",
+                email: "",
+                comando: Comandos.SolicitarCelular,
+                contexto: this.nombreContexto
+            };
+            var estudiante = __assign({}, this.estadoGlobal.infoUsuarioMensaje.estudiante);
+            this.estadoGlobal.infoUsuarioMensaje.estudiante = defaultEstudiante;
+            this.estadoGlobal.infoUsuarioMensaje.estudiante = __assign({}, estudiante);
+            this.estadoGlobal.infoUsuarioMensaje.estudiante.comando =
+                Comandos.SolicitarCelular;
+            this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto = this.nombreContexto;
         };
         return AccesoEstudianteReceiver;
     }(BotReceiver_1.BotReceiver));

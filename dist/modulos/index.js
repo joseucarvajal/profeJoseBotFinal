@@ -27,11 +27,18 @@ var index;
         return Main;
     }());
     initBot_1.bot.on("message", function (msg) {
+        //console.log("index msg: ", msg);
         Data.Settings.getSettings().then(function (settings) {
             var estadoGlobal = {
                 settings: settings
             };
             Data.Estudiantes.getEstudianteByChatId(msg, estadoGlobal).then(function (estudiante) {
+                if (estudiante == null) {
+                    estudiante = {
+                        comando: AccesoEstudianteReceiver_1.AccesoEstudiante.Comandos.SolicitarCelular,
+                        contexto: AccesoEstudianteReceiver_1.AccesoEstudiante.nombreContexto
+                    };
+                }
                 estadoGlobal.infoUsuarioMensaje = {
                     estudiante: estudiante
                 };

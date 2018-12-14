@@ -25,12 +25,18 @@ var Estudiantes;
             console.log("Estudiantes/getEstudianteByChatId" + error);
         });
     };
-    Estudiantes.elminarChat = function (msg, estadoGlobal) {
+    Estudiantes.getCelularUsuario = function (msg, estadoGlobal) {
         return initDatabase_1.dataBase
             .ref("periodosAcademicos/" +
             estadoGlobal.settings.periodoActual +
-            "/estudiantes/" +
-            msg.chat.id)
-            .remove();
+            "/celularesUsuario/" +
+            msg.contact.phone_number)
+            .once("value")
+            .then(function (snapshot) {
+            return snapshot.val();
+        })
+            .catch(function (error) {
+            console.log("Estudiantes/getEstudianteByChatId" + error);
+        });
     };
 })(Estudiantes = exports.Estudiantes || (exports.Estudiantes = {}));

@@ -11,6 +11,7 @@ import {
 
 import * as Data from "../../data";
 import { IndexMain } from "../indexContracts";
+import { KeyboardButton } from "../../bot/KeyboardButton";
 
 export abstract class BotReceiver {
   informacionContexto: InformacionContexto;
@@ -33,7 +34,7 @@ export abstract class BotReceiver {
   }
 
   public onRecibirMensajeBase(msg: Message) {
-    if (!msg.text) {
+    if (!msg.text && !msg.contact) {
       return;
     }
 
@@ -41,6 +42,11 @@ export abstract class BotReceiver {
   }
 
   private estaEnContextoActual(contexto?: string): boolean {
+
+    if(!this.estadoGlobal.infoUsuarioMensaje.estudiante){
+      return false;
+    }
+
     if (contexto) {
       return (
         contexto == this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto
@@ -92,6 +98,29 @@ export abstract class BotReceiver {
       this.estadoGlobal.infoUsuarioMensaje.estudiante
     ).then(() => {
       return this.botSender.responderMensajeHTML(msg, html);
+    });
+
+    return new Promise<any>(() => {});
+  }
+
+  protected enviarMensajeKeyboardMarkup(
+    msg: Message,
+    label: string,
+    opcionesKeyboard: Array<Array<KeyboardButton>>,
+    comando: string
+  ): Promise<any> {
+    this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto = this.nombreContexto;
+    this.estadoGlobal.infoUsuarioMensaje.estudiante.comando = comando;
+    Data.Estudiantes.actualizarChat(
+      msg,
+      this.estadoGlobal,
+      this.estadoGlobal.infoUsuarioMensaje.estudiante
+    ).then(() => {
+      return this.botSender.responderKeyboardMarkup(
+        msg,
+        label,
+        opcionesKeyboard
+      );
     });
 
     return new Promise<any>(() => {});

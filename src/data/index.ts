@@ -5,3 +5,4 @@ export * from './empresaServicio';
 export * from './movimientos';
 export * from './settings';
 export * from './estudiantes';
+export * from './celularesUsuario';

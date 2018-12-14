@@ -38,16 +38,8 @@ export namespace EditarInformacionBasica {
       );
     }
 
-    protected onRecibirMensaje(msg: Message) {
-      if (
-        this.estaComandoEnContexto(
-          MenuPrincipal.Comandos.MenuPrincipal,
-          this.indexMain.menuPrincipalReceiver.nombreContexto
-        ) &&
-        msg.text == MenuPrincipal.Comandos.MenuPrincipalOpts.EditarInfoBasica
-      ) {
-        this.responderEditarInformacionBasica(msg);
-      } else if (this.estaComandoEnContexto(Comandos.IngresaTuCodigo)) {
+    protected onRecibirMensaje(msg: Message) {      
+      if (this.estaComandoEnContexto(Comandos.IngresaTuCodigo)) {
         this.actualizarCodigo(msg);
       }
     }
