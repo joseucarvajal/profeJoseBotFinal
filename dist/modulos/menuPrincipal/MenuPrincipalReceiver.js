@@ -46,9 +46,14 @@ var MenuPrincipal;
             this.botSender.responderKeyboardMarkup(msg, "Selecciona una opci\u00F3n", this.startResponse);
         };
         MenuPrincipalReceiver.prototype.onRecibirMensaje = function (msg) {
-            if (Object
-                .values(Comandos.MenuPrincipalEstudianteOpts)
-                .includes(msg.text)) {
+            var esOpcionMenuPpalEstudiante = false;
+            for (var i = 0; i < this.startResponse.length; i++) {
+                if (this.startResponse[i][0].text == msg.text) {
+                    esOpcionMenuPpalEstudiante = true;
+                    break;
+                }
+            }
+            if (esOpcionMenuPpalEstudiante) {
                 switch (msg.text) {
                     case Comandos.MenuPrincipalEstudianteOpts.EditarInfoBasica:
                         this.goToEditarInformacionBasica(msg);

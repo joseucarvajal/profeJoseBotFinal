@@ -51,11 +51,16 @@ export namespace MenuPrincipal {
     }
 
     protected onRecibirMensaje(msg: Message & ApiMessage) {
-      if (
-        (<any>Object)
-          .values(Comandos.MenuPrincipalEstudianteOpts)
-          .includes(msg.text)
-      ) {
+
+      let esOpcionMenuPpalEstudiante = false;
+      for(let i=0; i<this.startResponse.length; i++){
+        if(this.startResponse[i][0].text == msg.text){
+          esOpcionMenuPpalEstudiante = true;
+          break;
+        }
+      }
+
+      if (esOpcionMenuPpalEstudiante) {
         switch (msg.text) {
           case Comandos.MenuPrincipalEstudianteOpts.EditarInfoBasica:
             this.goToEditarInformacionBasica(msg);
