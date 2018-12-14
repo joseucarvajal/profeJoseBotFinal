@@ -50,7 +50,7 @@ export namespace AccesoEstudiante {
             msg,
             `Para empezar, haz click en el botón <b>"${
               Comandos.SolicitarCelularOpts.SolicitarCelular
-            }"</b> si estás de acuerdo con esto.`,
+            }"</b> si estás de acuerdo.`,
             this.solicitarCelularOpts,
             Comandos.SolicitarCelular
           );
@@ -87,7 +87,6 @@ export namespace AccesoEstudiante {
     }
 
     private crearChatYEnviarMenu(msg: Message, celularUsuario: CelularUsuario) {
-      this.botSender.responderMensajeHTML(msg, `Por favor espera un momento, estoy registrando tus datos...`);      
       Data.Estudiantes.actualizarChat(
         msg,
         this.estadoGlobal,

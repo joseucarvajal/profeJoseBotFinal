@@ -59,7 +59,7 @@ var AccesoEstudiante;
             this.botSender
                 .responderMensajeHTML(msg, "Bienvenido <b>" + msg.from.first_name + "!</b>. Soy el asistente del profe Jose Ubaldo Carvajal")
                 .then(function () {
-                _this.enviarMensajeKeyboardMarkup(msg, "Para empezar, haz click en el bot\u00F3n <b>\"" + Comandos.SolicitarCelularOpts.SolicitarCelular + "\"</b> si est\u00E1s de acuerdo con esto.", _this.solicitarCelularOpts, Comandos.SolicitarCelular);
+                _this.enviarMensajeKeyboardMarkup(msg, "Para empezar, haz click en el bot\u00F3n <b>\"" + Comandos.SolicitarCelularOpts.SolicitarCelular + "\"</b> si est\u00E1s de acuerdo.", _this.solicitarCelularOpts, Comandos.SolicitarCelular);
             });
         };
         AccesoEstudianteReceiver.prototype.onRecibirMensaje = function (msg) {
@@ -88,7 +88,6 @@ var AccesoEstudiante;
         };
         AccesoEstudianteReceiver.prototype.crearChatYEnviarMenu = function (msg, celularUsuario) {
             var _this = this;
-            this.botSender.responderMensajeHTML(msg, "Por favor espera un momento, estoy registrando tus datos...");
             Data.Estudiantes.actualizarChat(msg, this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante).then(function () {
                 celularUsuario.idUsuario = msg.contact.user_id;
                 Data.CelularesUsuario.actualizarCelularUsuario(msg, _this.estadoGlobal, msg.contact.phone_number, celularUsuario).then(function () {

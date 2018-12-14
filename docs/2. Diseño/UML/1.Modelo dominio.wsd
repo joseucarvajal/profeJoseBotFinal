@@ -1,0 +1,86 @@
+@startuml
+
+class Settings {
+    codigoRegistroEstudiante:string
+}
+
+class Inscripcion {
+    codigoAsignatura:string
+    fechaInscripcion:Date
+}
+
+Inscripcion --> "1" Asignatura
+
+class Estudiante {
+    idChat:string
+    codigo:string
+    nombre:string
+    email:string
+}
+
+Estudiante -right-> "*" Inscripcion
+Estudiante --> "1" Chat
+
+class Horario {
+    id:int
+    dia:string
+    aula:string
+    coordenadasAula:string
+}
+
+class Chat {
+    id:string
+}
+
+class Asistente {
+    idChat:string
+}
+
+Asistente --> "1" Chat
+
+class RegistroAsistencia {
+    id:string
+    coordenadas:string
+    hora:string
+}
+
+Asistente --> "*" RegistroAsistencia
+
+class Asignatura {
+    codigo:string
+    nombre:string
+    grupo:string
+}
+
+Asignatura -left-> "*" Horario
+Asignatura -right-> "*" Asistente
+
+class Docente {
+    nroCelular:string
+    nombre:string    
+}
+
+class Asignacion {
+    nroCelularDocente:string
+}
+
+Asignacion --> "*" Asignatura
+Asignacion --> "*" Docente
+
+class PeriodoAcademico {
+    id:string
+    año:int
+    periodo:int
+}
+
+PeriodoAcademico --> "*" Estudiante
+PeriodoAcademico --> "*" Asignacion
+
+class Bot {
+    
+}
+
+Bot -->"1" Settings
+Bot -->"*" PeriodoAcademico
+
+@enduml

@@ -1,0 +1,107 @@
+{
+  "settings": {
+    "codigoAccesoEstudiante": "4867",
+    "periodoActual":"2018-03"
+  },
+  "periodosAcademicos": {
+    "2018-03": {
+	  "celularesUsuario":{
+		  "nro-celular-1":{
+			  "idUsuario":"aaaa",
+			  "tipoUsuario":"e(estudiante)||p(profesor)"
+		  }
+		  "nro-celular-2":{
+			  "idUsuario":"bbb",
+			  "tipoUsuario":"e(estudiante)||p(profesor)"			 
+		  }
+	  }
+      "año": 2018,
+      "periodo": 3,
+      "estudiantes": {
+        "[id-chat-1]": {
+          "codigo": "01-XXXXX",
+          "nombre": "Pepito Pérez",
+          "email": "pepito@universidad.edu.co",
+          "inscripciones":{
+            "[cod-asignatura-1]":{
+              "fechaInscripcion":"21/06/2018"
+            },
+            "[cod-asignatura-2]":{
+              "fechaInscripcion":"23/06/2018"
+            }            
+          }
+        },
+        "[id-chat-2]": {
+          "codigo": "02-YYYYYYY",
+          "nombre": "Miguelito Sanchez",
+          "email": "miguelito@universidad.edu.co"
+        }
+      },
+      "asignacion": {
+        "[# celular-docente]": {
+          "nombre": "Jose Ubaldo Carvajal",
+          "asignaturas": {
+            "[cod-asignatura-1]": {
+              "nombre": "Estructuras de datos",
+              "grupo": "2",
+              "horarios": {
+                "[auto-number-1]": {
+                  "dia": "lunes",
+                  "horario": "8:00 a 10:00",
+                  "aula": "D402 - Edificio central",
+                  "coordenadasAula": "[x1];[y1];[x2];[y2]"
+                },
+                "[auto-number-2]": {
+                  "dia": "miércoles",
+                  "horario": "16:00 a 17:00",
+                  "aula": "C204",
+                  "coordenadasAula": "[x1];[y1];[x2];[y2]"
+                }
+              },
+              "asistentes": {
+                "[id-chat-1]": {
+                  "asistencias": {
+                    "[aaaammdd]-1": {
+                      "coordenadas": "[x];[y]",
+                      "hora":"8:10"
+                    },
+                    "[aaaammdd]-2": {
+                      "coordenadas": "[x];[y]",
+                      "hora":"19:05"
+                    }
+                  }
+                },
+                "[id-chat-2]": {
+                  "asistencias": {
+                    "[aaaammdd]-2": {
+                      "coordenadas": "[x];[y]",
+                      "hora":"17:20"
+                    }
+                  }
+                }
+              }
+            },
+            "[cod-asignatura-2]": {
+              "nombre": "Programación Orientada a Objetos",
+              "grupo": "1",
+              "horarios": {
+                "[auto-number-1]": {
+                  "dia": "viernes",
+                  "horario": "18:30 a 20:30",
+                  "aula": "D405",
+                  "coordenadasAula": "[x1];[y1];[x2];[y2]"
+                },
+                "[auto-number-2]": {
+                  "dia": "sábado",
+                  "horario": "8:00 a 10:00",
+                  "aula": "D405",
+                  "coordenadasAula": "[x1];[y1];[x2];[y2]"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
