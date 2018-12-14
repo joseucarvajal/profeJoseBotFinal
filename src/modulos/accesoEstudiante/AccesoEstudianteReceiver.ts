@@ -6,6 +6,7 @@ import { IndexMain } from "../indexContracts";
 
 import * as Data from "../../data";
 import { MenuPrincipal } from "../menuPrincipal/MenuPrincipalReceiver";
+import { ApiMessage } from "../../api/ApiMessage";
 
 export namespace AccesoEstudiante {
   export namespace Comandos {
@@ -34,7 +35,7 @@ export namespace AccesoEstudiante {
       super(estadoGlobal, indexMain, nombreContexto);
     }
 
-    private onRecibirComandoStart(msg: Message) {
+    private onRecibirComandoStart(msg: Message & ApiMessage) {
 
       this.inicializarDatosEstudianteContexto();
 
@@ -57,16 +58,16 @@ export namespace AccesoEstudiante {
         });
     }
 
-    protected onRecibirMensaje(msg: Message) {
+    protected onRecibirMensaje(msg: Message & ApiMessage) {
       if (msg.text == "/start") {
         this.onRecibirComandoStart(msg);
-      } else if (this.estaComandoEnContexto(Comandos.SolicitarCelular)) {
+      } else if (this.estaComandoEnContexto(Comandos.SolicitarCelular)) {        
         this.enviarMenuAUsuario(msg);
       }
       return;
     }
 
-    private enviarMenuAUsuario(msg: Message) {
+    private enviarMenuAUsuario(msg: Message & ApiMessage) {
       Data.CelularesUsuario.getCelularUsuario(msg, this.estadoGlobal).then(
         (celularUsuario: CelularUsuario) => {          
           if (celularUsuario == null) {
@@ -78,7 +79,7 @@ export namespace AccesoEstudiante {
       );
     }
 
-    private enviarErrorUsuarioNoEncontrado(msg: Message){      
+    private enviarErrorUsuarioNoEncontrado(msg: Message & ApiMessage){      
       this.botSender.responderMensajeErrorHTML(
         msg,
         `No puedo encontrarte en los registros de estudiante, pídele al profe que te registre`
@@ -86,7 +87,7 @@ export namespace AccesoEstudiante {
       Data.Estudiantes.elminarChat(msg, this.estadoGlobal);
     }
 
-    private crearChatYEnviarMenu(msg: Message, celularUsuario: CelularUsuario) {
+    private crearChatYEnviarMenu(msg: Message & ApiMessage, celularUsuario: CelularUsuario) {
       Data.Estudiantes.actualizarChat(
         msg,
         this.estadoGlobal,
@@ -112,7 +113,7 @@ export namespace AccesoEstudiante {
       });
     }
 
-    private enviarMenuAUsuarioEstudiante(msg: Message) {
+    private enviarMenuAUsuarioEstudiante(msg: Message & ApiMessage) {
       this.enviarMensajeAReceiver(
         this.indexMain.menuPrincipalReceiver,
         this.indexMain.menuPrincipalReceiver.responderMenuPrincipalEstudiante,
@@ -121,17 +122,17 @@ export namespace AccesoEstudiante {
       );
     }
 
-    private enviarMenuAUsuarioProfesor(msg: Message) {
+    private enviarMenuAUsuarioProfesor(msg: Message & ApiMessage) {
       return;
     }
 
     private inicializarDatosEstudianteContexto() {
-      let defaultEstudiante = {
+      let defaultEstudiante:Estudiante = {
         codigo: "",
         nombre: "",
         email: "",
         comando: Comandos.SolicitarCelular,
-        contexto: this.nombreContexto
+        contexto: this.nombreContexto,        
       };
 
       let estudiante: Estudiante = {

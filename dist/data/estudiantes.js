@@ -16,7 +16,7 @@ var Estudiantes;
             .ref("periodosAcademicos/" +
             estadoGlobal.settings.periodoActual +
             "/estudiantes/" +
-            msg.chat.id)
+            estadoGlobal.idUsuarioChat)
             .once("value")
             .then(function (snapshot) {
             return snapshot.val();

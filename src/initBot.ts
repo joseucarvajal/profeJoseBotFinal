@@ -1,8 +1,4 @@
 import {
-  TelegramBot as TelegramBotModel
-} from './bot/TelegramBot';
-
-import {
   token
 } from './initBotToken';
 
@@ -44,4 +40,3 @@ if (process.env.NODE_ENV.trim() == 'development') {
 export {
   bot,
 }
-

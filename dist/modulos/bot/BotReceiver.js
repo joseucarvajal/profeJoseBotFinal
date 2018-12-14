@@ -17,6 +17,14 @@ var BotReceiver = /** @class */ (function () {
         }
         this.onRecibirMensaje(msg);
     };
+    BotReceiver.prototype.onRecibirInlineQueryBase = function (msg) {
+        this.onRecibirInlineQuery(msg);
+    };
+    BotReceiver.prototype.onRecibirInlineQuery = function (msg) { };
+    BotReceiver.prototype.onChosenInlineResultBase = function (msg) {
+        this.onChosenInlineResult(msg);
+    };
+    BotReceiver.prototype.onChosenInlineResult = function (msg) { };
     BotReceiver.prototype.estaEnContextoActual = function (contexto) {
         if (!this.estadoGlobal.infoUsuarioMensaje.estudiante) {
             return false;
@@ -31,10 +39,10 @@ var BotReceiver = /** @class */ (function () {
         return (this.estaEnContextoActual(contexto) &&
             this.estadoGlobal.infoUsuarioMensaje.estudiante.comando == comando);
     };
-    BotReceiver.prototype.enviarMensajeAReceiver = function (instanciaReceiver, fn, msg, comando) {
+    BotReceiver.prototype.enviarMensajeAReceiver = function (instanciaReceiver, fn, msg, comandoARegistrarEstudiante) {
         this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto =
             instanciaReceiver.nombreContexto;
-        this.estadoGlobal.infoUsuarioMensaje.estudiante.comando = comando;
+        this.estadoGlobal.infoUsuarioMensaje.estudiante.comando = comandoARegistrarEstudiante;
         Data.Estudiantes.actualizarChat(msg, this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante).then(function () {
             fn(msg);
         });
@@ -48,6 +56,17 @@ var BotReceiver = /** @class */ (function () {
         });
         return new Promise(function () { });
     };
+    BotReceiver.prototype.actualizarContextoComando = function (msg, comando) {
+        this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto = this.nombreContexto;
+        this.estadoGlobal.infoUsuarioMensaje.estudiante.comando = comando;
+        return Data.Estudiantes.actualizarChat(msg, this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante);
+    };
+    BotReceiver.prototype.goToAndGuardarContextoComando = function (instanciaReceiver, fn, msg, comando) {
+        var _this = this;
+        this.actualizarContextoComando(msg, comando).then(function () {
+            _this.enviarMensajeAReceiver(instanciaReceiver, fn, msg, comando);
+        });
+    };
     BotReceiver.prototype.enviarMensajeKeyboardMarkup = function (msg, label, opcionesKeyboard, comando) {
         var _this = this;
         this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto = this.nombreContexto;
@@ -56,6 +75,9 @@ var BotReceiver = /** @class */ (function () {
             return _this.botSender.responderKeyboardMarkup(msg, label, opcionesKeyboard);
         });
         return new Promise(function () { });
+    };
+    BotReceiver.prototype.seHaSeleccionadoOpcionDeMenu = function (msg, opcion) {
+        return this.estaEnContextoActual() && msg.text == opcion;
     };
     return BotReceiver;
 }());

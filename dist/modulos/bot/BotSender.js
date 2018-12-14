@@ -8,7 +8,8 @@ var BotSender = /** @class */ (function () {
         var messageOptions = {
             parse_mode: "HTML"
         };
-        return initBot_1.bot.sendMessage(msgEntrante.chat.id, htmlText, messageOptions);
+        var chatId = msgEntrante.chat ? msgEntrante.chat.id : msgEntrante.from.id;
+        return initBot_1.bot.sendMessage(chatId, htmlText, messageOptions);
     };
     BotSender.prototype.responderMensajeErrorHTML = function (msgEntrante, htmlText) {
         var messageOptions = {
@@ -26,6 +27,20 @@ var BotSender = /** @class */ (function () {
             }
         };
         return initBot_1.bot.sendMessage(msg.chat.id, label, messageOptions);
+    };
+    BotSender.prototype.responderInlineKeyboard = function (msg, label, opcionesKeyboard) {
+        var messageOptions = {
+            parse_mode: "HTML",
+            reply_markup: {
+                inline_keyboard: opcionesKeyboard
+            }
+        };
+        return initBot_1.bot.sendMessage(msg.chat.id, label, messageOptions);
+    };
+    BotSender.prototype.responderInLineQuery = function (msg, coleccionElementos) {
+        return initBot_1.bot.answerInlineQuery(msg.id, coleccionElementos, {
+            cache_time: "0",
+        });
     };
     return BotSender;
 }());

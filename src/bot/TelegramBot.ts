@@ -12,7 +12,7 @@ export interface TelegramBot {
      * https://core.telegram.org/bots/api#message
      * @param chatId 
      * @param text 
-     * @param options 
+     * @param options.
      */
 
     sendMessage(chatId: number | string, text: string, options?: SendMessageOptions): Promise<any>;

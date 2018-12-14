@@ -3,7 +3,7 @@
  * See {@link https://core.telegram.org/bots/api#inlinekeyboardbutton}
  */
 
- export interface InlineKeyboardButton {
+export interface InlineKeyboardButton {
     text:string;
     url?:string;
     callback_data?:string;

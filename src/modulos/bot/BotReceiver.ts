@@ -1,17 +1,14 @@
-import { bot } from "../../initBot";
 import { Message } from "../../bot/Message";
-import { SendMessageOptions } from "../../bot/SendMessageOptions";
 import { BotSender } from "./BotSender";
 import {
   EstadoGlobal,
-  Estudiante,
-  InfoUsuarioMensaje,
   InformacionContexto
 } from "../../core";
 
 import * as Data from "../../data";
 import { IndexMain } from "../indexContracts";
 import { KeyboardButton } from "../../bot/KeyboardButton";
+import { ApiMessage } from "../../api/ApiMessage";
 
 export abstract class BotReceiver {
   informacionContexto: InformacionContexto;
@@ -41,9 +38,18 @@ export abstract class BotReceiver {
     this.onRecibirMensaje(msg);
   }
 
-  private estaEnContextoActual(contexto?: string): boolean {
+  public onRecibirInlineQueryBase(msg: ApiMessage){
+    this.onRecibirInlineQuery(msg);
+  }
+  onRecibirInlineQuery(msg: ApiMessage){}
 
-    if(!this.estadoGlobal.infoUsuarioMensaje.estudiante){
+  public onChosenInlineResultBase(msg: ApiMessage){
+    this.onChosenInlineResult(msg);
+  }
+  onChosenInlineResult(msg: ApiMessage){}
+
+  private estaEnContextoActual(contexto?: string): boolean {
+    if (!this.estadoGlobal.infoUsuarioMensaje.estudiante) {
       return false;
     }
 
@@ -68,13 +74,13 @@ export abstract class BotReceiver {
 
   protected enviarMensajeAReceiver(
     instanciaReceiver: BotReceiver,
-    fn: (msg: Message) => void,
-    msg: Message,
-    comando: string
+    fn: (msg: Message & ApiMessage) => void,
+    msg: Message & ApiMessage,
+    comandoARegistrarEstudiante: string
   ) {
     this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto =
       instanciaReceiver.nombreContexto;
-    this.estadoGlobal.infoUsuarioMensaje.estudiante.comando = comando;
+    this.estadoGlobal.infoUsuarioMensaje.estudiante.comando = comandoARegistrarEstudiante;
 
     Data.Estudiantes.actualizarChat(
       msg,
@@ -86,7 +92,7 @@ export abstract class BotReceiver {
   }
 
   protected enviarMensajeHTML(
-    msg: Message,
+    msg: Message & ApiMessage,
     comando: string,
     html: string
   ): Promise<any> {
@@ -101,6 +107,30 @@ export abstract class BotReceiver {
     });
 
     return new Promise<any>(() => {});
+  }
+
+  protected actualizarContextoComando(
+    msg: Message,
+    comando: string
+  ): Promise<any> {
+    this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto = this.nombreContexto;
+    this.estadoGlobal.infoUsuarioMensaje.estudiante.comando = comando;
+    return Data.Estudiantes.actualizarChat(
+      msg,
+      this.estadoGlobal,
+      this.estadoGlobal.infoUsuarioMensaje.estudiante
+    );
+  }
+
+  protected goToAndGuardarContextoComando(
+    instanciaReceiver: BotReceiver,
+    fn: (msg: Message) => void,
+    msg: Message & ApiMessage,
+    comando: string,
+  ) {
+    this.actualizarContextoComando(msg, comando).then(() => {
+      this.enviarMensajeAReceiver(instanciaReceiver, fn, msg, comando);
+    });
   }
 
   protected enviarMensajeKeyboardMarkup(
@@ -124,6 +154,13 @@ export abstract class BotReceiver {
     });
 
     return new Promise<any>(() => {});
+  }
+
+  protected seHaSeleccionadoOpcionDeMenu(
+    msg: Message,
+    opcion: string
+  ): boolean {
+    return this.estaEnContextoActual() && msg.text == opcion;
   }
 
   protected abstract onRecibirMensaje(msg: Message): void;

@@ -10,6 +10,7 @@ import * as Data from "../../data";
 import { EstadoGlobal, Estudiante } from "../../core";
 import { IndexMain } from "../indexContracts";
 import { MenuPrincipal } from "../menuPrincipal/MenuPrincipalReceiver";
+import { ApiMessage } from "../../api/ApiMessage";
 
 export namespace EditarInformacionBasica {
   export namespace Comandos {
@@ -32,11 +33,11 @@ export namespace EditarInformacionBasica {
       );
     }
 
-    public responderEditarInformacionBasica(msg: Message) {
+    public responderEditarInformacionBasica(msg: Message & ApiMessage) {
       this.solicitarCodigo(msg);
     }
 
-    private solicitarCodigo(msg:Message){
+    private solicitarCodigo(msg: Message & ApiMessage) {
       this.enviarMensajeHTML(
         msg,
         Comandos.IngresaTuCodigo,
@@ -44,19 +45,19 @@ export namespace EditarInformacionBasica {
       );
     }
 
-    protected onRecibirMensaje(msg: Message) {
+    protected onRecibirMensaje(msg: Message & ApiMessage) {
       if (this.estaComandoEnContexto(Comandos.IngresaTuCodigo)) {
         this.actualizarCodigo(msg);
       } else if (this.estaComandoEnContexto(Comandos.VerificaTuCodigo)) {
         this.verificarCodigo(msg);
       } else if (this.estaComandoEnContexto(Comandos.IngresaTuNombreCompleto)) {
         this.actualizarNombre(msg);
-      }else if (this.estaComandoEnContexto(Comandos.IngresaTuEmail)) {
+      } else if (this.estaComandoEnContexto(Comandos.IngresaTuEmail)) {
         this.actualizarEmail(msg);
       }
     }
 
-    private actualizarCodigo(msg: Message) {
+    private actualizarCodigo(msg: Message & ApiMessage) {
       let estudiante = this.estadoGlobal.infoUsuarioMensaje.estudiante;
       estudiante.codigo = msg.text;
       Data.Estudiantes.actualizarChat(msg, this.estadoGlobal, estudiante).then(
@@ -69,7 +70,7 @@ export namespace EditarInformacionBasica {
       );
     }
 
-    private solicitarVerificarCodigo(msg: Message) {
+    private solicitarVerificarCodigo(msg: Message & ApiMessage) {
       this.enviarMensajeHTML(
         msg,
         Comandos.VerificaTuCodigo,
@@ -77,11 +78,13 @@ export namespace EditarInformacionBasica {
       );
     }
 
-    private verificarCodigo(msg: Message) {
+    private verificarCodigo(msg: Message & ApiMessage) {
       if (this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo != msg.text) {
-        this.botSender.responderMensajeErrorHTML(msg, `Tu código no coincide`).then(()=>{
-          this.solicitarCodigo(msg);
-        });
+        this.botSender
+          .responderMensajeErrorHTML(msg, `Tu código no coincide`)
+          .then(() => {
+            this.solicitarCodigo(msg);
+          });
 
         return;
       }
@@ -89,7 +92,7 @@ export namespace EditarInformacionBasica {
       this.solicitarNombreCompleto(msg);
     }
 
-    private solicitarNombreCompleto(msg: Message) {
+    private solicitarNombreCompleto(msg: Message & ApiMessage) {
       this.enviarMensajeHTML(
         msg,
         Comandos.IngresaTuNombreCompleto,
@@ -97,7 +100,7 @@ export namespace EditarInformacionBasica {
       );
     }
 
-    private actualizarNombre(msg: Message) {
+    private actualizarNombre(msg: Message & ApiMessage) {
       let estudiante = this.estadoGlobal.infoUsuarioMensaje.estudiante;
       estudiante.nombre = msg.text;
       Data.Estudiantes.actualizarChat(msg, this.estadoGlobal, estudiante).then(
@@ -110,7 +113,7 @@ export namespace EditarInformacionBasica {
       );
     }
 
-    private solicitarEmail(msg: Message) {
+    private solicitarEmail(msg: Message & ApiMessage) {
       this.enviarMensajeHTML(
         msg,
         Comandos.IngresaTuEmail,
@@ -118,12 +121,12 @@ export namespace EditarInformacionBasica {
       );
     }
 
-    private actualizarEmail(msg: Message) {
+    private actualizarEmail(msg: Message & ApiMessage) {
       let estudiante = this.estadoGlobal.infoUsuarioMensaje.estudiante;
       estudiante.email = msg.text;
       Data.Estudiantes.actualizarChat(msg, this.estadoGlobal, estudiante).then(
         () => {
-          this.enviarMensajeDatosActualizadosConExito(msg).then(()=>{
+          this.enviarMensajeDatosActualizadosConExito(msg).then(() => {
             this.irAMenuPrincipal(msg);
           });
         },
@@ -133,19 +136,20 @@ export namespace EditarInformacionBasica {
       );
     }
 
-    private enviarMensajeDatosActualizadosConExito(msg:Message):Promise<any>{
-      return this.botSender.responderMensajeHTML(msg, `✅ Has actualizado tus datos con éxito`);
+    private enviarMensajeDatosActualizadosConExito(msg: Message & ApiMessage): Promise<any> {
+      return this.botSender.responderMensajeHTML(
+        msg,
+        `✅ Has actualizado tus datos con éxito`
+      );
     }
 
-    private irAMenuPrincipal(msg:Message){
+    private irAMenuPrincipal(msg: Message & ApiMessage) {
       this.enviarMensajeAReceiver(
         this.indexMain.menuPrincipalReceiver,
-        this.indexMain.menuPrincipalReceiver
-          .responderMenuPrincipalEstudiante,
+        this.indexMain.menuPrincipalReceiver.responderMenuPrincipalEstudiante,
         msg,
         MenuPrincipal.Comandos.MenuPrincipalEstudiante
-      );    
+      );
     }
-
   }
 }

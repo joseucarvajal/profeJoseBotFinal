@@ -70,7 +70,9 @@ var EditarInformacionBasica;
         EditarInformacionBasicaReceiver.prototype.verificarCodigo = function (msg) {
             var _this = this;
             if (this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo != msg.text) {
-                this.botSender.responderMensajeErrorHTML(msg, "Tu c\u00F3digo no coincide").then(function () {
+                this.botSender
+                    .responderMensajeErrorHTML(msg, "Tu c\u00F3digo no coincide")
+                    .then(function () {
                     _this.solicitarCodigo(msg);
                 });
                 return;
@@ -109,8 +111,7 @@ var EditarInformacionBasica;
             return this.botSender.responderMensajeHTML(msg, "\u2705 Has actualizado tus datos con \u00E9xito");
         };
         EditarInformacionBasicaReceiver.prototype.irAMenuPrincipal = function (msg) {
-            this.enviarMensajeAReceiver(this.indexMain.menuPrincipalReceiver, this.indexMain.menuPrincipalReceiver
-                .responderMenuPrincipalEstudiante, msg, MenuPrincipalReceiver_1.MenuPrincipal.Comandos.MenuPrincipalEstudiante);
+            this.enviarMensajeAReceiver(this.indexMain.menuPrincipalReceiver, this.indexMain.menuPrincipalReceiver.responderMenuPrincipalEstudiante, msg, MenuPrincipalReceiver_1.MenuPrincipal.Comandos.MenuPrincipalEstudiante);
         };
         return EditarInformacionBasicaReceiver;
     }(BotReceiver_1.BotReceiver));

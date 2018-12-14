@@ -3,7 +3,7 @@
  * See {@link https://core.telegram.org/bots/api#message}
  */
 
-export interface Location {
+ export interface Location {
     longitude: number;
     latitude: number;
 }

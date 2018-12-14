@@ -4,9 +4,6 @@
  * See {@link https://core.telegram.org/bots/api#message}
  */
 
-import { User } from "./User";
-import { Chat } from "./Chat";
-import { Location } from "./Location";
 import { InlineKeyboardMarkup } from "./InlineKeyboardMarkup";
 
 export interface EditMessageTextOptions {

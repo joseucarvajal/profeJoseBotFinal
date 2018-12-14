@@ -8,5 +8,5 @@ export interface ApiMessage {
     chat_instance: string;
     data: string;
     query: string;
-    result_id: number;
+    result_id: string;
 }

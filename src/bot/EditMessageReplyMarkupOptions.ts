@@ -4,10 +4,6 @@
  * See {@link https://core.telegram.org/bots/api#message}
  */
 
-import { User } from "./User";
-import { Chat } from "./Chat";
-import { Location } from "./Location";
-
 export interface EditMessageReplyMarkupOptions {
     message_id: number | string;
     chat_id: number;    

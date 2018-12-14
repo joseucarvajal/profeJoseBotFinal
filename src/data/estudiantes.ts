@@ -1,14 +1,11 @@
 import { Message } from "../bot/Message";
 import { dataBase } from "../initDatabase";
-import { Settings } from "./settings";
 
 import {
-  ChatModel,
   EstadoGlobal,
-  InformacionContexto,
   Estudiante,
-  CelularUsuario
 } from "../core/models";
+import { ApiMessage } from "../api/ApiMessage";
 
 export namespace Estudiantes {
   export const actualizarChat = (
@@ -27,7 +24,7 @@ export namespace Estudiantes {
   };
 
   export const getEstudianteByChatId = (
-    msg: Message,
+    msg: Message & ApiMessage,
     estadoGlobal: EstadoGlobal
   ): Promise<Estudiante> => {
     return dataBase
@@ -35,7 +32,7 @@ export namespace Estudiantes {
         "periodosAcademicos/" +
           estadoGlobal.settings.periodoActual +
           "/estudiantes/" +
-          msg.chat.id
+          estadoGlobal.idUsuarioChat
       )
       .once("value")
       .then((snapshot: any) => {
@@ -59,5 +56,4 @@ export namespace Estudiantes {
       )
       .remove();      
   };
-
 }

@@ -1,7 +1,5 @@
-import { Message } from "../bot/Message";
 import { dataBase } from '../initDatabase';
-
-import { ChatModel, Settings as SettingsModel } from "../core/models";
+import { Settings as SettingsModel } from '../core/models';
 
 export namespace Settings {
 

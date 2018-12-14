@@ -114,7 +114,7 @@ var AccesoEstudiante;
                 nombre: "",
                 email: "",
                 comando: Comandos.SolicitarCelular,
-                contexto: this.nombreContexto
+                contexto: this.nombreContexto,
             };
             var estudiante = __assign({}, this.estadoGlobal.infoUsuarioMensaje.estudiante);
             this.estadoGlobal.infoUsuarioMensaje.estudiante = defaultEstudiante;
