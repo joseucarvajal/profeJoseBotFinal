@@ -7,32 +7,36 @@ import { InlineKeyboardButton } from "../../bot/InlineKeyboardButton";
 import { ApiMessage } from "../../api/ApiMessage";
 
 export class BotSender {
-  responderMensajeHTML(msgEntrante: Message & ApiMessage, htmlText: string): Promise<any> {
-    const messageOptions = {
-      parse_mode: "HTML"
-    } as SendMessageOptions;
-
-    let chatId = msgEntrante.chat ? msgEntrante.chat.id : msgEntrante.from.id;
-    return bot.sendMessage(chatId, htmlText, messageOptions);
-  }
-
-  responderMensajeErrorHTML(
-    msgEntrante: Message,
+  responderMensajeHTML(
+    msgEntrante: Message & ApiMessage,
     htmlText: string
   ): Promise<any> {
     const messageOptions = {
       parse_mode: "HTML"
     } as SendMessageOptions;
 
-    return bot.sendMessage(
-      msgEntrante.chat.id,
-      `😔 ` + htmlText,
-      messageOptions
-    );
+    let chatUserId = msgEntrante.chat
+      ? msgEntrante.chat.id
+      : msgEntrante.from.id;
+    return bot.sendMessage(chatUserId, htmlText, messageOptions);
+  }
+
+  responderMensajeErrorHTML(
+    msgEntrante: Message & ApiMessage,
+    htmlText: string
+  ): Promise<any> {
+    const messageOptions = {
+      parse_mode: "HTML"
+    } as SendMessageOptions;
+
+    let chatUserId = msgEntrante.chat
+      ? msgEntrante.chat.id
+      : msgEntrante.from.id;
+    return bot.sendMessage(chatUserId, `😔 ` + htmlText, messageOptions);
   }
 
   responderKeyboardMarkup(
-    msg: Message,
+    msgEntrante: Message & ApiMessage,
     label: string,
     opcionesKeyboard: Array<Array<KeyboardButton>>
   ): Promise<any> {
@@ -45,22 +49,29 @@ export class BotSender {
       } as ReplyKeyboardMarkup
     } as SendMessageOptions;
 
-    return bot.sendMessage(msg.chat.id, label, messageOptions);
+    let chatUserId = msgEntrante.chat
+      ? msgEntrante.chat.id
+      : msgEntrante.from.id;
+    return bot.sendMessage(chatUserId, label, messageOptions);
   }
 
   responderInlineKeyboard(
-    msg: Message,
+    msgEntrante: Message & ApiMessage,
     label: string,
-    opcionesKeyboard: Array<Array<InlineKeyboardButton>>
+    opcionesInlineKeyboard: Array<Array<InlineKeyboardButton>>
   ): Promise<any> {
     const messageOptions = {
       parse_mode: "HTML",
       reply_markup: {
-        inline_keyboard: opcionesKeyboard
+        inline_keyboard: opcionesInlineKeyboard,
+        hide_keyboard: true
       } as ReplyKeyboardMarkup
     } as SendMessageOptions;
 
-    return bot.sendMessage(msg.chat.id, label, messageOptions);
+    let chatUserId = msgEntrante.chat
+      ? msgEntrante.chat.id
+      : msgEntrante.from.id;
+    return bot.sendMessage(chatUserId, label, messageOptions);
   }
 
   responderInLineQuery(
@@ -68,7 +79,7 @@ export class BotSender {
     coleccionElementos: Array<any>
   ): Promise<any> {
     return bot.answerInlineQuery(msg.id, coleccionElementos, {
-      cache_time: "0",
+      cache_time: "0"
     });
   }
 }

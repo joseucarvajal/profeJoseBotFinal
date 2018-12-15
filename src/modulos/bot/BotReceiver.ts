@@ -6,9 +6,10 @@ import {
 } from "../../core";
 
 import * as Data from "../../data";
-import { IndexMain } from "../indexContracts";
+import { MainReceiverContract } from "../indexContracts";
 import { KeyboardButton } from "../../bot/KeyboardButton";
 import { ApiMessage } from "../../api/ApiMessage";
+import { InlineKeyboardButton } from "../../bot/InlineKeyboardButton";
 
 export abstract class BotReceiver {
   informacionContexto: InformacionContexto;
@@ -16,11 +17,11 @@ export abstract class BotReceiver {
   protected botSender: BotSender = new BotSender();
   public estadoGlobal: EstadoGlobal;
   protected abstract nombreContexto: string;
-  public indexMain: IndexMain;
+  public indexMain: MainReceiverContract;
 
   constructor(
     estadoGlobal: EstadoGlobal,
-    indexMain: IndexMain,
+    indexMain: MainReceiverContract,
     nombreContexto: string
   ) {
     this.estadoGlobal = estadoGlobal;
@@ -41,12 +42,17 @@ export abstract class BotReceiver {
   public onRecibirInlineQueryBase(msg: ApiMessage){
     this.onRecibirInlineQuery(msg);
   }
-  onRecibirInlineQuery(msg: ApiMessage){}
+  protected onRecibirInlineQuery(msg: ApiMessage){}
 
   public onChosenInlineResultBase(msg: ApiMessage){
     this.onChosenInlineResult(msg);
   }
-  onChosenInlineResult(msg: ApiMessage){}
+  protected onChosenInlineResult(msg: ApiMessage){}
+
+  public onCallbackQueryBase(msg: ApiMessage){
+    this.onCallbackQuery(msg);
+  }
+  protected onCallbackQuery(msg: ApiMessage){}
 
   private estaEnContextoActual(contexto?: string): boolean {
     if (!this.estadoGlobal.infoUsuarioMensaje.estudiante) {
@@ -109,6 +115,24 @@ export abstract class BotReceiver {
     return new Promise<any>(() => {});
   }
 
+  enviarMensajeInlineKeyBoard(
+    msg: Message & ApiMessage,
+    comandoAActualizar:string,
+    label:string,
+    opcionesInlineKeyboard: Array<Array<InlineKeyboardButton>>
+  ){
+    this.actualizarContextoComando(
+      msg,
+      comandoAActualizar
+    ).then(() => {
+      this.botSender.responderInlineKeyboard(
+        msg,
+        label,
+        opcionesInlineKeyboard
+      );
+    });  
+  }
+  
   protected actualizarContextoComando(
     msg: Message,
     comando: string
@@ -134,7 +158,7 @@ export abstract class BotReceiver {
   }
 
   protected enviarMensajeKeyboardMarkup(
-    msg: Message,
+    msg: Message & ApiMessage,
     label: string,
     opcionesKeyboard: Array<Array<KeyboardButton>>,
     comando: string

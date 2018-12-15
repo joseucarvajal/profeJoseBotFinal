@@ -14,20 +14,22 @@ import {
 
 import { MenuPrincipal } from "./menuPrincipal/MenuPrincipalReceiver";
 import { AccesoEstudiante } from "./accesoEstudiante/AccesoEstudianteReceiver";
-import { IndexMain } from "./indexContracts";
+import { MainReceiverContract } from "./indexContracts";
 import { EditarInformacionBasica } from "./EditarInformacionBasica/EditarInformacionBasicaReceiver";
 import { BotReceiver } from "./bot/BotReceiver";
 import { InscribirAsignatura } from "./InscribirAsignatura/InscribirAsignaturaReceiver";
 import { ApiMessage } from "../api/ApiMessage";
+import { RegistrarAsistencia } from "./registrarAsistencia/RegistrarAsistenciaReceiver";
 
 export namespace index {
-  class Main implements IndexMain {
+  class MainReceiver implements MainReceiverContract {
     estadoGlobal: EstadoGlobal;
 
     accesoEstudianteReceiver: AccesoEstudiante.AccesoEstudianteReceiver;
     menuPrincipalReceiver: MenuPrincipal.MenuPrincipalReceiver;
     editarInformacionBasicaReceiver: EditarInformacionBasica.EditarInformacionBasicaReceiver;
     inscribirAsignaturaReceiver: InscribirAsignatura.InscribirAsignaturaReceiver;
+    registrarAsistenciaReceiver:RegistrarAsistencia.RegistrarAsistenciaReceiver;
 
     receiversList: Array<BotReceiver>;
 
@@ -54,16 +56,23 @@ export namespace index {
         this
       );
 
+      this.registrarAsistenciaReceiver = new RegistrarAsistencia.RegistrarAsistenciaReceiver(
+        this.estadoGlobal,
+        this
+      );
+
       this.receiversList = [
         this.accesoEstudianteReceiver,
         this.menuPrincipalReceiver,
         this.editarInformacionBasicaReceiver,
-        this.inscribirAsignaturaReceiver
+        this.inscribirAsignaturaReceiver,
+        this.registrarAsistenciaReceiver
       ];
 
       this.responderAMensaje = this.responderAMensaje.bind(this);
       this.responderAInlineQuery = this.responderAInlineQuery.bind(this);
       this.responderChosenInlineResult = this.responderChosenInlineResult.bind(this);
+      this.responderCallbackQuery = this.responderCallbackQuery.bind(this);      
     }
 
     public responderAMensaje(msg: Message) {
@@ -84,8 +93,15 @@ export namespace index {
       }
     }
 
+    public responderCallbackQuery(msg: ApiMessage){
+      for (let i = 0; i < this.receiversList.length; i++) {
+        this.receiversList[i].onCallbackQueryBase(msg);
+      }
+    }
+
   }
 
+  
   bot.on("message", (msg: Message & ApiMessage) => {
     vincularData(msg, "message");
   });
@@ -94,33 +110,45 @@ export namespace index {
     vincularData(msg, "inline_query");
   });
 
+  bot.on("callback_query", (msg: ApiMessage & Message) => {
+    vincularData(msg, "callback_query");
+  });  
+
   bot.on('chosen_inline_result', (msg: ApiMessage & Message) => {
     vincularData(msg, "chosen_inline_result");
   });
+
+  bot.on("location", (msg: ApiMessage & Message) => {
+    console.log("location", msg);
+  });
+
 
   let vincularData = (msg: Message & ApiMessage, cmd: string) => {
 
     Data.Settings.getSettings().then((settings: Settings) => {
       let estadoGlobal = {
         settings: settings,
-        celularDocente: "573137763601"
       } as EstadoGlobal;
 
-      let mainFn:(msg: Message & ApiMessage)=>void;
-      let main: Main = new Main(estadoGlobal);
+      let mainReceiverFn:(msg: Message & ApiMessage)=>void;
+      let mainReceiver: MainReceiver = new MainReceiver(estadoGlobal);
 
       switch (cmd) {
         case "message":
           estadoGlobal.idUsuarioChat = msg.chat.id.toString();
-          mainFn = main.responderAMensaje;
+          mainReceiverFn = mainReceiver.responderAMensaje;
           break;
         case "inline_query":
           estadoGlobal.idUsuarioChat = msg.from.id.toString();
-          mainFn = main.responderAInlineQuery;
+          mainReceiverFn = mainReceiver.responderAInlineQuery;
+        break;
+        case "callback_query":
+          estadoGlobal.idUsuarioChat = msg.from.id.toString();
+          mainReceiverFn = mainReceiver.responderCallbackQuery;
         break;
         case "chosen_inline_result":
           estadoGlobal.idUsuarioChat = msg.from.id.toString();
-          mainFn = main.responderChosenInlineResult;
+          mainReceiverFn = mainReceiver.responderChosenInlineResult;
         break;        
       }
 
@@ -128,7 +156,7 @@ export namespace index {
         (estudiante: Estudiante) => {
           if (estudiante == null) {
             estudiante = {
-              comando: AccesoEstudiante.Comandos.SolicitarCelular,
+              comando: AccesoEstudiante.Comandos.SolicitarCodigo,
               contexto: AccesoEstudiante.nombreContexto
             } as Estudiante;
           }
@@ -137,7 +165,7 @@ export namespace index {
             estudiante: estudiante
           } as InfoUsuarioMensaje;
 
-          mainFn(msg);
+          mainReceiverFn(msg);
         }
       );
     });

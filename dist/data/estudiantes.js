@@ -7,15 +7,15 @@ var Estudiantes;
         return initDatabase_1.dataBase
             .ref("periodosAcademicos/" +
             estadoGlobal.settings.periodoActual +
-            "/estudiantes/" +
-            msg.chat.id)
+            "/chats/" +
+            estadoGlobal.idUsuarioChat)
             .set(estudiante);
     };
     Estudiantes.getEstudianteByChatId = function (msg, estadoGlobal) {
         return initDatabase_1.dataBase
             .ref("periodosAcademicos/" +
             estadoGlobal.settings.periodoActual +
-            "/estudiantes/" +
+            "/chats/" +
             estadoGlobal.idUsuarioChat)
             .once("value")
             .then(function (snapshot) {
@@ -25,11 +25,28 @@ var Estudiantes;
             console.log("Estudiantes/getEstudianteByChatId" + error);
         });
     };
+    Estudiantes.getEstudianteByCodigoAsignatura = function (msg, estadoGlobal, codigoEstudiante, codigoAsignatura) {
+        return initDatabase_1.dataBase
+            .ref("periodosAcademicos/" +
+            estadoGlobal.settings.periodoActual +
+            "/asignacion/" +
+            estadoGlobal.settings.celularDocente +
+            "/asignatura_estudiante/" +
+            codigoAsignatura + "/" +
+            codigoEstudiante)
+            .once("value")
+            .then(function (snapshot) {
+            return snapshot.val();
+        })
+            .catch(function (error) {
+            console.log("Estudiantes/getEstudianteCodigoAsignatura" + error);
+        });
+    };
     Estudiantes.elminarChat = function (msg, estadoGlobal) {
         return initDatabase_1.dataBase
             .ref("periodosAcademicos/" +
             estadoGlobal.settings.periodoActual +
-            "/estudiantes/" +
+            "/chats/" +
             msg.chat.id)
             .remove();
     };

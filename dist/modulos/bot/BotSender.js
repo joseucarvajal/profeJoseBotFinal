@@ -8,16 +8,21 @@ var BotSender = /** @class */ (function () {
         var messageOptions = {
             parse_mode: "HTML"
         };
-        var chatId = msgEntrante.chat ? msgEntrante.chat.id : msgEntrante.from.id;
-        return initBot_1.bot.sendMessage(chatId, htmlText, messageOptions);
+        var chatUserId = msgEntrante.chat
+            ? msgEntrante.chat.id
+            : msgEntrante.from.id;
+        return initBot_1.bot.sendMessage(chatUserId, htmlText, messageOptions);
     };
     BotSender.prototype.responderMensajeErrorHTML = function (msgEntrante, htmlText) {
         var messageOptions = {
             parse_mode: "HTML"
         };
-        return initBot_1.bot.sendMessage(msgEntrante.chat.id, "\uD83D\uDE14 " + htmlText, messageOptions);
+        var chatUserId = msgEntrante.chat
+            ? msgEntrante.chat.id
+            : msgEntrante.from.id;
+        return initBot_1.bot.sendMessage(chatUserId, "\uD83D\uDE14 " + htmlText, messageOptions);
     };
-    BotSender.prototype.responderKeyboardMarkup = function (msg, label, opcionesKeyboard) {
+    BotSender.prototype.responderKeyboardMarkup = function (msgEntrante, label, opcionesKeyboard) {
         var messageOptions = {
             parse_mode: "HTML",
             reply_markup: {
@@ -26,20 +31,27 @@ var BotSender = /** @class */ (function () {
                 keyboard: opcionesKeyboard
             }
         };
-        return initBot_1.bot.sendMessage(msg.chat.id, label, messageOptions);
+        var chatUserId = msgEntrante.chat
+            ? msgEntrante.chat.id
+            : msgEntrante.from.id;
+        return initBot_1.bot.sendMessage(chatUserId, label, messageOptions);
     };
-    BotSender.prototype.responderInlineKeyboard = function (msg, label, opcionesKeyboard) {
+    BotSender.prototype.responderInlineKeyboard = function (msgEntrante, label, opcionesInlineKeyboard) {
         var messageOptions = {
             parse_mode: "HTML",
             reply_markup: {
-                inline_keyboard: opcionesKeyboard
+                inline_keyboard: opcionesInlineKeyboard,
+                hide_keyboard: true
             }
         };
-        return initBot_1.bot.sendMessage(msg.chat.id, label, messageOptions);
+        var chatUserId = msgEntrante.chat
+            ? msgEntrante.chat.id
+            : msgEntrante.from.id;
+        return initBot_1.bot.sendMessage(chatUserId, label, messageOptions);
     };
     BotSender.prototype.responderInLineQuery = function (msg, coleccionElementos) {
         return initBot_1.bot.answerInlineQuery(msg.id, coleccionElementos, {
-            cache_time: "0",
+            cache_time: "0"
         });
     };
     return BotSender;

@@ -1,14 +1,10 @@
-import { bot } from "../../initBot";
 import { Message } from "../../bot/Message";
-import { SendMessageOptions } from "../../bot/SendMessageOptions";
 
-import { BotSender } from "../bot/BotSender";
 import { BotReceiver } from "../bot/BotReceiver";
 import { KeyboardButton } from "../../bot/KeyboardButton";
 
-import * as Data from "../../data";
 import { EstadoGlobal } from "../../core";
-import { IndexMain } from "../indexContracts";
+import { MainReceiverContract } from "../indexContracts";
 import { ApiMessage } from "../../api/ApiMessage";
 
 export namespace MenuPrincipal {
@@ -27,7 +23,7 @@ export namespace MenuPrincipal {
   export class MenuPrincipalReceiver extends BotReceiver {
     nombreContexto = nombreContexto;
 
-    constructor(estadoGlobal: EstadoGlobal, indexMain: IndexMain) {
+    constructor(estadoGlobal: EstadoGlobal, indexMain: MainReceiverContract) {
       super(estadoGlobal, indexMain, nombreContexto);
 
       this.responderMenuPrincipalEstudiante = this.responderMenuPrincipalEstudiante.bind(
@@ -36,13 +32,11 @@ export namespace MenuPrincipal {
     }
 
     startResponse: Array<Array<KeyboardButton>> = [
-      [{ text: Comandos.MenuPrincipalEstudianteOpts.RegistrarAsistencia }],
-      [{ text: Comandos.MenuPrincipalEstudianteOpts.InscribirAsignatura }],
-      [{ text: Comandos.MenuPrincipalEstudianteOpts.DesInscribirAsignatura }],
+      [{ text: Comandos.MenuPrincipalEstudianteOpts.RegistrarAsistencia, request_location:true }],
       [{ text: Comandos.MenuPrincipalEstudianteOpts.EditarInfoBasica }]
     ];
 
-    public responderMenuPrincipalEstudiante(msg: Message) {
+    public responderMenuPrincipalEstudiante(msg: Message & ApiMessage) {
       this.botSender.responderKeyboardMarkup(
         msg,
         `Selecciona una opción`,

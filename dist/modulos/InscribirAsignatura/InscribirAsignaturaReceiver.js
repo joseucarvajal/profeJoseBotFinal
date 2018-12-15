@@ -57,7 +57,7 @@ var InscribirAsignatura;
         };
         InscribirAsignaturaReceiver.prototype.enviarListadoAsignaturas = function (msg) {
             var _this = this;
-            Data.Asignacion.getAsignaturasXPeriodoAndDocente(msg, this.estadoGlobal, this.estadoGlobal.celularDocente).then(function (listadoAsignaturasXDocente) {
+            Data.Asignacion.getAsignaturasXPeriodoAndDocente(this.estadoGlobal).then(function (listadoAsignaturasXDocente) {
                 var listaAsignaturas = new Array();
                 var asignatura;
                 for (var codigoAsignatura in listadoAsignaturasXDocente) {

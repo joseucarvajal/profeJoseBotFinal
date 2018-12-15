@@ -1,14 +1,8 @@
-import { bot } from "../../initBot";
 import { Message } from "../../bot/Message";
-import { SendMessageOptions } from "../../bot/SendMessageOptions";
-
-import { BotSender } from "../bot/BotSender";
 import { BotReceiver } from "../bot/BotReceiver";
-import { KeyboardButton } from "../../bot/KeyboardButton";
-
 import * as Data from "../../data";
 import { EstadoGlobal, Estudiante } from "../../core";
-import { IndexMain } from "../indexContracts";
+import { MainReceiverContract } from "../indexContracts";
 import { MenuPrincipal } from "../menuPrincipal/MenuPrincipalReceiver";
 import { ApiMessage } from "../../api/ApiMessage";
 
@@ -25,7 +19,7 @@ export namespace EditarInformacionBasica {
   export class EditarInformacionBasicaReceiver extends BotReceiver {
     nombreContexto = nombreContexto;
 
-    constructor(estadoGlobal: EstadoGlobal, indexMain: IndexMain) {
+    constructor(estadoGlobal: EstadoGlobal, indexMain: MainReceiverContract) {
       super(estadoGlobal, indexMain, nombreContexto);
 
       this.responderEditarInformacionBasica = this.responderEditarInformacionBasica.bind(

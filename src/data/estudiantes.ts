@@ -17,8 +17,8 @@ export namespace Estudiantes {
       .ref(
         "periodosAcademicos/" +
           estadoGlobal.settings.periodoActual +
-          "/estudiantes/" +
-          msg.chat.id
+          "/chats/" +
+          estadoGlobal.idUsuarioChat
       )
       .set(estudiante);
   };
@@ -31,7 +31,7 @@ export namespace Estudiantes {
       .ref(
         "periodosAcademicos/" +
           estadoGlobal.settings.periodoActual +
-          "/estudiantes/" +
+          "/chats/" +
           estadoGlobal.idUsuarioChat
       )
       .once("value")
@@ -43,6 +43,31 @@ export namespace Estudiantes {
       });
   };
 
+  export const getEstudianteByCodigoAsignatura = (
+    msg: Message & ApiMessage,
+    estadoGlobal: EstadoGlobal,
+    codigoEstudiante:string,
+    codigoAsignatura:string
+  ): Promise<Estudiante> => {
+    return dataBase
+      .ref(
+        "periodosAcademicos/" +
+          estadoGlobal.settings.periodoActual +
+          "/asignacion/" +
+          estadoGlobal.settings.celularDocente +
+          "/asignatura_estudiante/" +
+          codigoAsignatura + "/" +
+          codigoEstudiante
+      )
+      .once("value")
+      .then((snapshot: any) => {
+        return snapshot.val();
+      })
+      .catch((error: any) => {
+        console.log("Estudiantes/getEstudianteCodigoAsignatura" + error);
+      });
+  };
+
   export const elminarChat = (
     msg: Message,
     estadoGlobal: EstadoGlobal,
@@ -51,7 +76,7 @@ export namespace Estudiantes {
       .ref(
         "periodosAcademicos/" +
           estadoGlobal.settings.periodoActual +
-          "/estudiantes/" +
+          "/chats/" +
           msg.chat.id
       )
       .remove();      

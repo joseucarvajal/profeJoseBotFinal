@@ -34,7 +34,7 @@ var MenuPrincipal;
             var _this = _super.call(this, estadoGlobal, indexMain, nombreContexto) || this;
             _this.nombreContexto = nombreContexto;
             _this.startResponse = [
-                [{ text: Comandos.MenuPrincipalEstudianteOpts.RegistrarAsistencia, request_location: true }],
+                [{ text: Comandos.MenuPrincipalEstudianteOpts.RegistrarAsistencia }],
                 [{ text: Comandos.MenuPrincipalEstudianteOpts.EditarInfoBasica }]
             ];
             _this.responderMenuPrincipalEstudiante = _this.responderMenuPrincipalEstudiante.bind(_this);

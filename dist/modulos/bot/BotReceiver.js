@@ -25,6 +25,10 @@ var BotReceiver = /** @class */ (function () {
         this.onChosenInlineResult(msg);
     };
     BotReceiver.prototype.onChosenInlineResult = function (msg) { };
+    BotReceiver.prototype.onCallbackQueryBase = function (msg) {
+        this.onCallbackQuery(msg);
+    };
+    BotReceiver.prototype.onCallbackQuery = function (msg) { };
     BotReceiver.prototype.estaEnContextoActual = function (contexto) {
         if (!this.estadoGlobal.infoUsuarioMensaje.estudiante) {
             return false;
@@ -55,6 +59,12 @@ var BotReceiver = /** @class */ (function () {
             return _this.botSender.responderMensajeHTML(msg, html);
         });
         return new Promise(function () { });
+    };
+    BotReceiver.prototype.enviarMensajeInlineKeyBoard = function (msg, comandoAActualizar, label, opcionesInlineKeyboard) {
+        var _this = this;
+        this.actualizarContextoComando(msg, comandoAActualizar).then(function () {
+            _this.botSender.responderInlineKeyboard(msg, label, opcionesInlineKeyboard);
+        });
     };
     BotReceiver.prototype.actualizarContextoComando = function (msg, comando) {
         this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto = this.nombreContexto;

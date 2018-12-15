@@ -6,41 +6,50 @@ var MenuPrincipalReceiver_1 = require("./menuPrincipal/MenuPrincipalReceiver");
 var AccesoEstudianteReceiver_1 = require("./accesoEstudiante/AccesoEstudianteReceiver");
 var EditarInformacionBasicaReceiver_1 = require("./EditarInformacionBasica/EditarInformacionBasicaReceiver");
 var InscribirAsignaturaReceiver_1 = require("./InscribirAsignatura/InscribirAsignaturaReceiver");
+var RegistrarAsistenciaReceiver_1 = require("./registrarAsistencia/RegistrarAsistenciaReceiver");
 var index;
 (function (index) {
-    var Main = /** @class */ (function () {
-        function Main(estadoGlobal) {
+    var MainReceiver = /** @class */ (function () {
+        function MainReceiver(estadoGlobal) {
             this.estadoGlobal = estadoGlobal;
             this.accesoEstudianteReceiver = new AccesoEstudianteReceiver_1.AccesoEstudiante.AccesoEstudianteReceiver(this.estadoGlobal, this);
             this.menuPrincipalReceiver = new MenuPrincipalReceiver_1.MenuPrincipal.MenuPrincipalReceiver(this.estadoGlobal, this);
             this.editarInformacionBasicaReceiver = new EditarInformacionBasicaReceiver_1.EditarInformacionBasica.EditarInformacionBasicaReceiver(this.estadoGlobal, this);
             this.inscribirAsignaturaReceiver = new InscribirAsignaturaReceiver_1.InscribirAsignatura.InscribirAsignaturaReceiver(this.estadoGlobal, this);
+            this.registrarAsistenciaReceiver = new RegistrarAsistenciaReceiver_1.RegistrarAsistencia.RegistrarAsistenciaReceiver(this.estadoGlobal, this);
             this.receiversList = [
                 this.accesoEstudianteReceiver,
                 this.menuPrincipalReceiver,
                 this.editarInformacionBasicaReceiver,
-                this.inscribirAsignaturaReceiver
+                this.inscribirAsignaturaReceiver,
+                this.registrarAsistenciaReceiver
             ];
             this.responderAMensaje = this.responderAMensaje.bind(this);
             this.responderAInlineQuery = this.responderAInlineQuery.bind(this);
             this.responderChosenInlineResult = this.responderChosenInlineResult.bind(this);
+            this.responderCallbackQuery = this.responderCallbackQuery.bind(this);
         }
-        Main.prototype.responderAMensaje = function (msg) {
+        MainReceiver.prototype.responderAMensaje = function (msg) {
             for (var i = 0; i < this.receiversList.length; i++) {
                 this.receiversList[i].onRecibirMensajeBase(msg);
             }
         };
-        Main.prototype.responderAInlineQuery = function (msg) {
+        MainReceiver.prototype.responderAInlineQuery = function (msg) {
             for (var i = 0; i < this.receiversList.length; i++) {
                 this.receiversList[i].onRecibirInlineQueryBase(msg);
             }
         };
-        Main.prototype.responderChosenInlineResult = function (msg) {
+        MainReceiver.prototype.responderChosenInlineResult = function (msg) {
             for (var i = 0; i < this.receiversList.length; i++) {
                 this.receiversList[i].onChosenInlineResultBase(msg);
             }
         };
-        return Main;
+        MainReceiver.prototype.responderCallbackQuery = function (msg) {
+            for (var i = 0; i < this.receiversList.length; i++) {
+                this.receiversList[i].onCallbackQueryBase(msg);
+            }
+        };
+        return MainReceiver;
     }());
     initBot_1.bot.on("message", function (msg) {
         vincularData(msg, "message");
@@ -48,42 +57,51 @@ var index;
     initBot_1.bot.on("inline_query", function (msg) {
         vincularData(msg, "inline_query");
     });
+    initBot_1.bot.on("callback_query", function (msg) {
+        vincularData(msg, "callback_query");
+    });
     initBot_1.bot.on('chosen_inline_result', function (msg) {
         vincularData(msg, "chosen_inline_result");
+    });
+    initBot_1.bot.on("location", function (msg) {
+        console.log("location", msg);
     });
     var vincularData = function (msg, cmd) {
         Data.Settings.getSettings().then(function (settings) {
             var estadoGlobal = {
                 settings: settings,
-                celularDocente: "573137763601"
             };
-            var mainFn;
-            var main = new Main(estadoGlobal);
+            var mainReceiverFn;
+            var mainReceiver = new MainReceiver(estadoGlobal);
             switch (cmd) {
                 case "message":
                     estadoGlobal.idUsuarioChat = msg.chat.id.toString();
-                    mainFn = main.responderAMensaje;
+                    mainReceiverFn = mainReceiver.responderAMensaje;
                     break;
                 case "inline_query":
                     estadoGlobal.idUsuarioChat = msg.from.id.toString();
-                    mainFn = main.responderAInlineQuery;
+                    mainReceiverFn = mainReceiver.responderAInlineQuery;
+                    break;
+                case "callback_query":
+                    estadoGlobal.idUsuarioChat = msg.from.id.toString();
+                    mainReceiverFn = mainReceiver.responderCallbackQuery;
                     break;
                 case "chosen_inline_result":
                     estadoGlobal.idUsuarioChat = msg.from.id.toString();
-                    mainFn = main.responderChosenInlineResult;
+                    mainReceiverFn = mainReceiver.responderChosenInlineResult;
                     break;
             }
             Data.Estudiantes.getEstudianteByChatId(msg, estadoGlobal).then(function (estudiante) {
                 if (estudiante == null) {
                     estudiante = {
-                        comando: AccesoEstudianteReceiver_1.AccesoEstudiante.Comandos.SolicitarCelular,
+                        comando: AccesoEstudianteReceiver_1.AccesoEstudiante.Comandos.SolicitarCodigo,
                         contexto: AccesoEstudianteReceiver_1.AccesoEstudiante.nombreContexto
                     };
                 }
                 estadoGlobal.infoUsuarioMensaje = {
                     estudiante: estudiante
                 };
-                mainFn(msg);
+                mainReceiverFn(msg);
             });
         });
     };

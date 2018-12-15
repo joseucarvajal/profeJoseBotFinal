@@ -7,7 +7,7 @@ import {
   ListadoAsignaturas,
   Asignatura
 } from "../../core";
-import { IndexMain } from "../indexContracts";
+import { MainReceiverContract } from "../indexContracts";
 import { InlineKeyboardButton } from "../../bot/InlineKeyboardButton";
 import { ApiMessage } from "../../api/ApiMessage";
 
@@ -34,7 +34,7 @@ export namespace InscribirAsignatura {
       ]
     ];
 
-    constructor(estadoGlobal: EstadoGlobal, indexMain: IndexMain) {
+    constructor(estadoGlobal: EstadoGlobal, indexMain: MainReceiverContract) {
       super(estadoGlobal, indexMain, nombreContexto);
 
       this.mostrarOpcionSeleccionarAsignaturas = this.mostrarOpcionSeleccionarAsignaturas.bind(
@@ -42,7 +42,7 @@ export namespace InscribirAsignatura {
       );
     }
 
-    public mostrarOpcionSeleccionarAsignaturas(msg: Message) {
+    public mostrarOpcionSeleccionarAsignaturas(msg: Message & ApiMessage) {
       this.actualizarContextoComando(
         msg,
         Comandos.SeleccionarAsignaturaOptsEnum.SeleccionarAsignatura
@@ -73,9 +73,7 @@ export namespace InscribirAsignatura {
 
     private enviarListadoAsignaturas(msg: Message & ApiMessage){
       Data.Asignacion.getAsignaturasXPeriodoAndDocente(
-        msg,
-        this.estadoGlobal,
-        this.estadoGlobal.celularDocente
+        this.estadoGlobal
       ).then((listadoAsignaturasXDocente: ListadoAsignaturas) => {
         let listaAsignaturas = new Array<any>();
         let asignatura: Asignatura;

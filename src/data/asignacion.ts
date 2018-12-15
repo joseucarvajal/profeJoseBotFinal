@@ -11,16 +11,14 @@ import { ApiMessage } from "../api/ApiMessage";
 
 export namespace Asignacion {
   export const getAsignaturasXPeriodoAndDocente = (
-    msg: Message,
-    estadoGlobal: EstadoGlobal,
-    celularDocente: string
+    estadoGlobal: EstadoGlobal
   ): Promise<ListadoAsignaturas> => {
     return dataBase
       .ref(
         "periodosAcademicos/" +
           estadoGlobal.settings.periodoActual +
           "/asignacion/" +
-          celularDocente +
+          estadoGlobal.settings.celularDocente +
           "/asignaturas/"
       )
       .once("value")
@@ -41,11 +39,13 @@ export namespace Asignacion {
     return dataBase
       .ref(
         `periodosAcademicos/${estadoGlobal.settings.periodoActual}/asignacion/${
-          estadoGlobal.celularDocente
-        }/asignaturas/${codigoAsignatura}/estudiantes/${estadoGlobal.idUsuarioChat}`
+          estadoGlobal.settings.celularDocente
+        }/asignaturas/${codigoAsignatura}/estudiantes/${
+          estadoGlobal.idUsuarioChat
+        }`
       )
       .set({
-        idUsuarioChat:estadoGlobal.idUsuarioChat
+        idUsuarioChat: estadoGlobal.idUsuarioChat
       });
   };
 
@@ -57,12 +57,40 @@ export namespace Asignacion {
   ): Promise<any> => {
     return dataBase
       .ref(
-        `periodosAcademicos/${estadoGlobal.settings.periodoActual}/estudiantes/${
+        `periodosAcademicos/${
+          estadoGlobal.settings.periodoActual
+        }/estudiantes/${
           estadoGlobal.idUsuarioChat
         }/asignaturas/${codigoAsignatura}`
       )
       .set({
-        codigoAsignatura:codigoAsignatura
+        codigoAsignatura: codigoAsignatura
       });
+  };
+
+  export const getAsignaturasByEstudianteCodigo = (
+    estadoGlobal: EstadoGlobal,
+    codigoEstudiante: string
+  ): Promise<Array<Asignatura>> => {
+    return new Promise<Array<Asignatura>>((resolve, reject) => {
+      getAsignaturasXPeriodoAndDocente(estadoGlobal).then(
+        (listadoAsignaturasXDocente: ListadoAsignaturas) => {
+          let asignatura: Asignatura;
+          let listaAsignaturas = Array<Asignatura>();
+          for (let codigoAsignatura in listadoAsignaturasXDocente) {
+            asignatura = listadoAsignaturasXDocente[codigoAsignatura];
+            if (
+              asignatura.estudiantesMatriculados &&
+              asignatura.estudiantesMatriculados.indexOf(codigoEstudiante) != -1
+            ) {
+              listaAsignaturas.push(
+                listadoAsignaturasXDocente[codigoAsignatura]
+              );
+            }
+          }
+          resolve(listaAsignaturas);
+        }
+      );
+    });
   };
 }
