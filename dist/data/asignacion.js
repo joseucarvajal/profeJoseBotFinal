@@ -25,9 +25,9 @@ var Asignacion;
             idUsuarioChat: estadoGlobal.idUsuarioChat
         });
     };
-    Asignacion.registrarAsignaturaAEstudiante = function (msg, estadoGlobal, estudiante, codigoAsignatura) {
+    Asignacion.registrarAsignaturaAEstudiante = function (msg, estadoGlobal, codigoAsignatura) {
         return initDatabase_1.dataBase
-            .ref("periodosAcademicos/" + estadoGlobal.settings.periodoActual + "/estudiantes/" + estadoGlobal.idUsuarioChat + "/asignaturas/" + codigoAsignatura)
+            .ref("periodosAcademicos/asignacion/" + estadoGlobal.settings.celularDocente + "/estudiante_asignatura/" + estadoGlobal.infoUsuarioMensaje.estudiante.codigo + "/" + codigoAsignatura)
             .set({
             codigoAsignatura: codigoAsignatura
         });
@@ -47,5 +47,14 @@ var Asignacion;
                 resolve(listaAsignaturas);
             });
         });
+    };
+    Asignacion.registrarAsistencia = function (msg, estadoGlobal, codigoAsignatura) {
+        var registroAsistencia = {
+            latitud: msg.location.latitude,
+            longitud: msg.location.longitude
+        };
+        return initDatabase_1.dataBase
+            .ref("periodosAcademicos/" + estadoGlobal.settings.periodoActual + "/asignacion/" + estadoGlobal.settings.celularDocente + "/asistencias_asignatura/" + codigoAsignatura + "/" + msg.date + "/" + estadoGlobal.infoUsuarioMensaje.estudiante.codigo + "/")
+            .set(registroAsistencia);
     };
 })(Asignacion = exports.Asignacion || (exports.Asignacion = {}));

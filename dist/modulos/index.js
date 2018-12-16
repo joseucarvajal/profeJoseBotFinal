@@ -28,6 +28,7 @@ var index;
             this.responderAInlineQuery = this.responderAInlineQuery.bind(this);
             this.responderChosenInlineResult = this.responderChosenInlineResult.bind(this);
             this.responderCallbackQuery = this.responderCallbackQuery.bind(this);
+            this.responderOnLocation = this.responderOnLocation.bind(this);
         }
         MainReceiver.prototype.responderAMensaje = function (msg) {
             for (var i = 0; i < this.receiversList.length; i++) {
@@ -49,6 +50,11 @@ var index;
                 this.receiversList[i].onCallbackQueryBase(msg);
             }
         };
+        MainReceiver.prototype.responderOnLocation = function (msg) {
+            for (var i = 0; i < this.receiversList.length; i++) {
+                this.receiversList[i].onLocationBase(msg);
+            }
+        };
         return MainReceiver;
     }());
     initBot_1.bot.on("message", function (msg) {
@@ -60,16 +66,16 @@ var index;
     initBot_1.bot.on("callback_query", function (msg) {
         vincularData(msg, "callback_query");
     });
-    initBot_1.bot.on('chosen_inline_result', function (msg) {
+    initBot_1.bot.on("chosen_inline_result", function (msg) {
         vincularData(msg, "chosen_inline_result");
     });
     initBot_1.bot.on("location", function (msg) {
-        console.log("location", msg);
+        vincularData(msg, "location");
     });
     var vincularData = function (msg, cmd) {
         Data.Settings.getSettings().then(function (settings) {
             var estadoGlobal = {
-                settings: settings,
+                settings: settings
             };
             var mainReceiverFn;
             var mainReceiver = new MainReceiver(estadoGlobal);
@@ -81,6 +87,10 @@ var index;
                 case "inline_query":
                     estadoGlobal.idUsuarioChat = msg.from.id.toString();
                     mainReceiverFn = mainReceiver.responderAInlineQuery;
+                    break;
+                case "location":
+                    estadoGlobal.idUsuarioChat = msg.chat.id.toString();
+                    mainReceiverFn = mainReceiver.responderOnLocation;
                     break;
                 case "callback_query":
                     estadoGlobal.idUsuarioChat = msg.from.id.toString();

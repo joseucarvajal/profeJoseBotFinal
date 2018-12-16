@@ -33,20 +33,20 @@ var MenuPrincipal;
         function MenuPrincipalReceiver(estadoGlobal, indexMain) {
             var _this = _super.call(this, estadoGlobal, indexMain, nombreContexto) || this;
             _this.nombreContexto = nombreContexto;
-            _this.startResponse = [
-                [{ text: Comandos.MenuPrincipalEstudianteOpts.RegistrarAsistencia, request_location: true }],
+            _this.startKeyboardOpts = [
+                [{ text: Comandos.MenuPrincipalEstudianteOpts.RegistrarAsistencia }],
                 [{ text: Comandos.MenuPrincipalEstudianteOpts.EditarInfoBasica }]
             ];
             _this.responderMenuPrincipalEstudiante = _this.responderMenuPrincipalEstudiante.bind(_this);
             return _this;
         }
         MenuPrincipalReceiver.prototype.responderMenuPrincipalEstudiante = function (msg) {
-            this.botSender.responderKeyboardMarkup(msg, "Selecciona una opci\u00F3n", this.startResponse);
+            this.botSender.responderKeyboardMarkup(msg, "Selecciona una opci\u00F3n", this.startKeyboardOpts);
         };
         MenuPrincipalReceiver.prototype.onRecibirMensaje = function (msg) {
             var esOpcionMenuPpalEstudiante = false;
-            for (var i = 0; i < this.startResponse.length; i++) {
-                if (this.startResponse[i][0].text == msg.text) {
+            for (var i = 0; i < this.startKeyboardOpts.length; i++) {
+                if (this.startKeyboardOpts[i][0].text == msg.text) {
                     esOpcionMenuPpalEstudiante = true;
                     break;
                 }
@@ -56,18 +56,18 @@ var MenuPrincipal;
                     case Comandos.MenuPrincipalEstudianteOpts.EditarInfoBasica:
                         this.goToEditarInformacionBasica(msg);
                         break;
-                    case Comandos.MenuPrincipalEstudianteOpts.InscribirAsignatura:
-                        this.goToInscribirAsignatura(msg);
+                    case Comandos.MenuPrincipalEstudianteOpts.RegistrarAsistencia:
+                        this.gotoRegistrarAsistencia(msg);
                         break;
                 }
             }
         };
         MenuPrincipalReceiver.prototype.goToEditarInformacionBasica = function (msg) {
-            this.enviarMensajeAReceiver(this.indexMain.editarInformacionBasicaReceiver, this.indexMain.editarInformacionBasicaReceiver
-                .responderEditarInformacionBasica, msg, MenuPrincipal.Comandos.MenuPrincipalEstudianteOpts.EditarInfoBasica);
+            this.enviarMensajeAReceiver(this.indexMain.registrarAsistenciaReceiver, this.indexMain.registrarAsistenciaReceiver
+                .registrarAsistencia, msg, MenuPrincipal.Comandos.MenuPrincipalEstudianteOpts.RegistrarAsistencia);
         };
-        MenuPrincipalReceiver.prototype.goToInscribirAsignatura = function (msg) {
-            this.enviarMensajeAReceiver(this.indexMain.inscribirAsignaturaReceiver, this.indexMain.inscribirAsignaturaReceiver.mostrarOpcionSeleccionarAsignaturas, msg, MenuPrincipal.Comandos.MenuPrincipalEstudianteOpts.InscribirAsignatura);
+        MenuPrincipalReceiver.prototype.gotoRegistrarAsistencia = function (msg) {
+            this.enviarMensajeAReceiver(this.indexMain.registrarAsistenciaReceiver, this.indexMain.registrarAsistenciaReceiver.registrarAsistencia, msg, MenuPrincipal.Comandos.MenuPrincipalEstudianteOpts.RegistrarAsistencia);
         };
         return MenuPrincipalReceiver;
     }(BotReceiver_1.BotReceiver));

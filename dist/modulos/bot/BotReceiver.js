@@ -29,6 +29,10 @@ var BotReceiver = /** @class */ (function () {
         this.onCallbackQuery(msg);
     };
     BotReceiver.prototype.onCallbackQuery = function (msg) { };
+    BotReceiver.prototype.onLocationBase = function (msg) {
+        this.onLocation(msg);
+    };
+    BotReceiver.prototype.onLocation = function (msg) { };
     BotReceiver.prototype.estaEnContextoActual = function (contexto) {
         if (!this.estadoGlobal.infoUsuarioMensaje.estudiante) {
             return false;

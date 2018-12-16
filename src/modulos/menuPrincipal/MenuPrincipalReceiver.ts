@@ -31,8 +31,8 @@ export namespace MenuPrincipal {
       );
     }
 
-    startResponse: Array<Array<KeyboardButton>> = [
-      [{ text: Comandos.MenuPrincipalEstudianteOpts.RegistrarAsistencia, request_location:true }],
+    startKeyboardOpts: Array<Array<KeyboardButton>> = [
+      [{ text: Comandos.MenuPrincipalEstudianteOpts.RegistrarAsistencia }],
       [{ text: Comandos.MenuPrincipalEstudianteOpts.EditarInfoBasica }]
     ];
 
@@ -40,15 +40,15 @@ export namespace MenuPrincipal {
       this.botSender.responderKeyboardMarkup(
         msg,
         `Selecciona una opción`,
-        this.startResponse
+        this.startKeyboardOpts
       );
     }
 
     protected onRecibirMensaje(msg: Message & ApiMessage) {
 
       let esOpcionMenuPpalEstudiante = false;
-      for(let i=0; i<this.startResponse.length; i++){
-        if(this.startResponse[i][0].text == msg.text){
+      for(let i=0; i<this.startKeyboardOpts.length; i++){
+        if(this.startKeyboardOpts[i][0].text == msg.text){
           esOpcionMenuPpalEstudiante = true;
           break;
         }
@@ -56,33 +56,34 @@ export namespace MenuPrincipal {
 
       if (esOpcionMenuPpalEstudiante) {
         switch (msg.text) {
+
           case Comandos.MenuPrincipalEstudianteOpts.EditarInfoBasica:
             this.goToEditarInformacionBasica(msg);
             break;
 
-          case Comandos.MenuPrincipalEstudianteOpts.InscribirAsignatura:
-            this.goToInscribirAsignatura(msg);
-            break;
+          case Comandos.MenuPrincipalEstudianteOpts.RegistrarAsistencia:
+            this.gotoRegistrarAsistencia(msg);
+            break;          
         }
       }
     }
-
+    
     private goToEditarInformacionBasica(msg: Message & ApiMessage) {
       this.enviarMensajeAReceiver(
-        this.indexMain.editarInformacionBasicaReceiver,
-        this.indexMain.editarInformacionBasicaReceiver
-          .responderEditarInformacionBasica,
+        this.indexMain.registrarAsistenciaReceiver,
+        this.indexMain.registrarAsistenciaReceiver
+          .registrarAsistencia,
         msg,
-        MenuPrincipal.Comandos.MenuPrincipalEstudianteOpts.EditarInfoBasica
+        MenuPrincipal.Comandos.MenuPrincipalEstudianteOpts.RegistrarAsistencia
       );
     }
 
-    private goToInscribirAsignatura(msg: Message & ApiMessage) {
+    private gotoRegistrarAsistencia(msg: Message & ApiMessage) {
       this.enviarMensajeAReceiver(
-        this.indexMain.inscribirAsignaturaReceiver,
-        this.indexMain.inscribirAsignaturaReceiver.mostrarOpcionSeleccionarAsignaturas,
+        this.indexMain.registrarAsistenciaReceiver,
+        this.indexMain.registrarAsistenciaReceiver.registrarAsistencia,
         msg,
-        MenuPrincipal.Comandos.MenuPrincipalEstudianteOpts.InscribirAsignatura
+        MenuPrincipal.Comandos.MenuPrincipalEstudianteOpts.RegistrarAsistencia
       );
     }
   }

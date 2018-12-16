@@ -5,7 +5,8 @@ import {
   EstadoGlobal,
   Asignatura,
   ListadoAsignaturas,
-  Estudiante
+  Estudiante,
+  RegistroAsistenciaModel
 } from "../core/models";
 import { ApiMessage } from "../api/ApiMessage";
 
@@ -52,16 +53,15 @@ export namespace Asignacion {
   export const registrarAsignaturaAEstudiante = (
     msg: ApiMessage,
     estadoGlobal: EstadoGlobal,
-    estudiante: Estudiante,
     codigoAsignatura: string
   ): Promise<any> => {
     return dataBase
       .ref(
-        `periodosAcademicos/${
-          estadoGlobal.settings.periodoActual
-        }/estudiantes/${
-          estadoGlobal.idUsuarioChat
-        }/asignaturas/${codigoAsignatura}`
+        `periodosAcademicos/asignacion/${
+          estadoGlobal.settings.celularDocente
+        }/estudiante_asignatura/${
+          estadoGlobal.infoUsuarioMensaje.estudiante.codigo
+        }/${codigoAsignatura}`
       )
       .set({
         codigoAsignatura: codigoAsignatura
@@ -92,5 +92,26 @@ export namespace Asignacion {
         }
       );
     });
+  };
+
+  export const registrarAsistencia = (
+    msg: Message,
+    estadoGlobal: EstadoGlobal,
+    codigoAsignatura: string
+  ): Promise<any> => {
+    let registroAsistencia = {
+      latitud: msg.location.latitude,
+      longitud: msg.location.longitude
+    } as RegistroAsistenciaModel;
+
+    return dataBase
+      .ref(
+        `periodosAcademicos/${estadoGlobal.settings.periodoActual}/asignacion/${
+          estadoGlobal.settings.celularDocente
+        }/asistencias_asignatura/${codigoAsignatura}/${msg.date}/${
+          estadoGlobal.infoUsuarioMensaje.estudiante.codigo
+        }/`
+      )
+      .set(registroAsistencia);
   };
 }

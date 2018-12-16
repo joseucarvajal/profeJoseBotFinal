@@ -29,7 +29,7 @@ export namespace index {
     menuPrincipalReceiver: MenuPrincipal.MenuPrincipalReceiver;
     editarInformacionBasicaReceiver: EditarInformacionBasica.EditarInformacionBasicaReceiver;
     inscribirAsignaturaReceiver: InscribirAsignatura.InscribirAsignaturaReceiver;
-    registrarAsistenciaReceiver:RegistrarAsistencia.RegistrarAsistenciaReceiver;
+    registrarAsistenciaReceiver: RegistrarAsistencia.RegistrarAsistenciaReceiver;
 
     receiversList: Array<BotReceiver>;
 
@@ -71,8 +71,11 @@ export namespace index {
 
       this.responderAMensaje = this.responderAMensaje.bind(this);
       this.responderAInlineQuery = this.responderAInlineQuery.bind(this);
-      this.responderChosenInlineResult = this.responderChosenInlineResult.bind(this);
-      this.responderCallbackQuery = this.responderCallbackQuery.bind(this);      
+      this.responderChosenInlineResult = this.responderChosenInlineResult.bind(
+        this
+      );
+      this.responderCallbackQuery = this.responderCallbackQuery.bind(this);
+      this.responderOnLocation = this.responderOnLocation.bind(this);
     }
 
     public responderAMensaje(msg: Message) {
@@ -81,27 +84,31 @@ export namespace index {
       }
     }
 
-    public responderAInlineQuery(msg: ApiMessage){
+    public responderAInlineQuery(msg: ApiMessage) {
       for (let i = 0; i < this.receiversList.length; i++) {
         this.receiversList[i].onRecibirInlineQueryBase(msg);
       }
     }
 
-    public responderChosenInlineResult(msg: ApiMessage){
+    public responderChosenInlineResult(msg: ApiMessage) {
       for (let i = 0; i < this.receiversList.length; i++) {
         this.receiversList[i].onChosenInlineResultBase(msg);
       }
     }
 
-    public responderCallbackQuery(msg: ApiMessage){
+    public responderCallbackQuery(msg: ApiMessage) {
       for (let i = 0; i < this.receiversList.length; i++) {
         this.receiversList[i].onCallbackQueryBase(msg);
       }
     }
 
+    public responderOnLocation(msg: Message) {
+      for (let i = 0; i < this.receiversList.length; i++) {
+        this.receiversList[i].onLocationBase(msg);
+      }
+    }
   }
 
-  
   bot.on("message", (msg: Message & ApiMessage) => {
     vincularData(msg, "message");
   });
@@ -112,25 +119,23 @@ export namespace index {
 
   bot.on("callback_query", (msg: ApiMessage & Message) => {
     vincularData(msg, "callback_query");
-  });  
+  });
 
-  bot.on('chosen_inline_result', (msg: ApiMessage & Message) => {
+  bot.on("chosen_inline_result", (msg: ApiMessage & Message) => {
     vincularData(msg, "chosen_inline_result");
   });
 
   bot.on("location", (msg: ApiMessage & Message) => {
-    console.log("location", msg);
+    vincularData(msg, "location");
   });
 
-
   let vincularData = (msg: Message & ApiMessage, cmd: string) => {
-
     Data.Settings.getSettings().then((settings: Settings) => {
       let estadoGlobal = {
-        settings: settings,
+        settings: settings
       } as EstadoGlobal;
 
-      let mainReceiverFn:(msg: Message & ApiMessage)=>void;
+      let mainReceiverFn: (msg: Message & ApiMessage) => void;
       let mainReceiver: MainReceiver = new MainReceiver(estadoGlobal);
 
       switch (cmd) {
@@ -141,15 +146,19 @@ export namespace index {
         case "inline_query":
           estadoGlobal.idUsuarioChat = msg.from.id.toString();
           mainReceiverFn = mainReceiver.responderAInlineQuery;
-        break;
+          break;
+        case "location":
+          estadoGlobal.idUsuarioChat = msg.chat.id.toString();
+          mainReceiverFn = mainReceiver.responderOnLocation;
+          break;
         case "callback_query":
           estadoGlobal.idUsuarioChat = msg.from.id.toString();
           mainReceiverFn = mainReceiver.responderCallbackQuery;
-        break;
+          break;
         case "chosen_inline_result":
           estadoGlobal.idUsuarioChat = msg.from.id.toString();
           mainReceiverFn = mainReceiver.responderChosenInlineResult;
-        break;        
+          break;
       }
 
       Data.Estudiantes.getEstudianteByChatId(msg, estadoGlobal).then(

@@ -18,6 +18,7 @@ export interface Estudiante extends InformacionContexto {
     nombre:string;
     email:string;     
     registroConfirmado:boolean; //Cuando un estudiante ha confirmado su registro en el bot (el código corresponde y tiene asignaturas asociadas)
+    tempData:string;
 }
 
 export interface CelularUsuario {
@@ -60,4 +61,8 @@ export interface Asignatura {
   horarios:ListadoHorarios;
 }
 
+export interface RegistroAsistenciaModel {
+  latitud:number,
+  longitud:number
+}
 //#endregion

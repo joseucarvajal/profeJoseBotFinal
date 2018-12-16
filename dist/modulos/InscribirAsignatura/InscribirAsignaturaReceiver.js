@@ -81,12 +81,6 @@ var InscribirAsignatura;
             this.registrarAsignaturaAEstudiante(msg);
         };
         InscribirAsignaturaReceiver.prototype.registrarAsignaturaAEstudiante = function (msg) {
-            var _this = this;
-            Data.Asignacion.registrarEstudianteAAsignatura(msg, this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante, msg.result_id).then(function () {
-                Data.Asignacion.registrarAsignaturaAEstudiante(msg, _this.estadoGlobal, _this.estadoGlobal.infoUsuarioMensaje.estudiante, msg.result_id).then(function () {
-                    _this.botSender.responderMensajeHTML(msg, "Te has inscrito satisfactoriamente");
-                });
-            });
         };
         return InscribirAsignaturaReceiver;
     }(BotReceiver_1.BotReceiver));

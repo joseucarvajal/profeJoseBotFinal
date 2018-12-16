@@ -54,6 +54,11 @@ export abstract class BotReceiver {
   }
   protected onCallbackQuery(msg: ApiMessage){}
 
+  public onLocationBase(msg: Message){
+    this.onLocation(msg);
+  }
+  protected onLocation(msg: Message){}
+
   private estaEnContextoActual(contexto?: string): boolean {
     if (!this.estadoGlobal.infoUsuarioMensaje.estudiante) {
       return false;

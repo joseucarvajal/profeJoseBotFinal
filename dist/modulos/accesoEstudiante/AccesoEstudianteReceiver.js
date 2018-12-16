@@ -35,8 +35,8 @@ var AccesoEstudiante;
         Comandos.ConfirmarDatosEstudiante = "ConfirmarDatosEstudiante";
         var ConfirmarDatosEstudianteInlineOptsEnum;
         (function (ConfirmarDatosEstudianteInlineOptsEnum) {
-            ConfirmarDatosEstudianteInlineOptsEnum["ConfirmarSI"] = "\u2714\uFE0F";
-            ConfirmarDatosEstudianteInlineOptsEnum["ConfirmarNO"] = "\u26D4\uFE0F";
+            ConfirmarDatosEstudianteInlineOptsEnum["ConfirmarSI"] = "\u2714\uFE0F Si";
+            ConfirmarDatosEstudianteInlineOptsEnum["ConfirmarNO"] = "\u26D4\uFE0F No";
         })(ConfirmarDatosEstudianteInlineOptsEnum = Comandos.ConfirmarDatosEstudianteInlineOptsEnum || (Comandos.ConfirmarDatosEstudianteInlineOptsEnum = {}));
     })(Comandos = AccesoEstudiante.Comandos || (AccesoEstudiante.Comandos = {}));
     AccesoEstudiante.nombreContexto = "AccesoEstudianteReceiver";
@@ -132,6 +132,17 @@ var AccesoEstudiante;
             return new Promise(function (resolve, reject) {
                 _this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo = msg.text;
                 Data.Estudiantes.getEstudianteByCodigoAsignatura(msg, _this.estadoGlobal, _this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo, _this.listaAsignaturasEstudiante[0].codigo).then(function (estudiante) {
+                    if (estudiante == null) {
+                        _this.botSender.responderMensajeErrorHTML(msg, "A\u00FAn no est\u00E1s en el listado de la asignatura <b>" + _this.listaAsignaturasEstudiante[0].nombre + "</b>, grupo: <b>" + _this.listaAsignaturasEstudiante[0].grupo + "</b>, c\u00F3digo: <b>" + _this.listaAsignaturasEstudiante[0].codigo + "</b> p\u00EDdele al profe que te agregue");
+                        var mensajeProfesor = {
+                            chat: {
+                                id: parseInt(_this.estadoGlobal.settings.idUsuarioChatDocente)
+                            }
+                        };
+                        _this.botSender.responderMensajeErrorHTML(mensajeProfesor, "El estudiante <b>" + msg.from.first_name + "</b>, c\u00F3digo: <b>" + msg.text + "</b>, existe en la asignatura, pero no se encuentra en la lista (asignatura_estudiante) de la asignatura <b>" + _this.listaAsignaturasEstudiante[0].nombre + ", c\u00F3digo: " + _this.listaAsignaturasEstudiante[0].codigo + "</b>");
+                        reject();
+                        return;
+                    }
                     _this.estadoGlobal.infoUsuarioMensaje.estudiante = estudiante;
                     Data.Estudiantes.actualizarChat(msg, _this.estadoGlobal, _this.estadoGlobal.infoUsuarioMensaje.estudiante).then(function () {
                         resolve();
@@ -154,8 +165,8 @@ var AccesoEstudiante;
                     horario = asignatura.horarios[codigoHorario];
                     conector = i > 0 ? " y " : "\n";
                     infoAsignatura +=
-                        "<i>" +
-                            conector +
+                        conector +
+                            "<i>" +
                             horario.dia +
                             "</i> " +
                             horario.horaInicio +
@@ -175,7 +186,8 @@ var AccesoEstudiante;
                 email: "",
                 comando: Comandos.SolicitarCodigo,
                 contexto: this.nombreContexto,
-                registroConfirmado: false
+                registroConfirmado: false,
+                tempData: ""
             };
             var estudiante = __assign({}, this.estadoGlobal.infoUsuarioMensaje.estudiante);
             this.estadoGlobal.infoUsuarioMensaje.estudiante = defaultEstudiante;
@@ -185,7 +197,13 @@ var AccesoEstudiante;
             this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto = this.nombreContexto;
         };
         AccesoEstudianteReceiver.prototype.enviarAMenuEstudiante = function (msg) {
-            this.enviarMensajeAReceiver(this.indexMain.menuPrincipalReceiver, this.indexMain.menuPrincipalReceiver.responderMenuPrincipalEstudiante, msg, MenuPrincipalReceiver_1.MenuPrincipal.Comandos.MenuPrincipalEstudiante);
+            var _this = this;
+            this.botSender
+                .responderMensajeHTML(msg, "\u2705 Has confirmado tus datos satisfactoriamente")
+                .then(function () {
+                _this.enviarMensajeAReceiver(_this.indexMain.menuPrincipalReceiver, _this.indexMain.menuPrincipalReceiver
+                    .responderMenuPrincipalEstudiante, msg, MenuPrincipalReceiver_1.MenuPrincipal.Comandos.MenuPrincipalEstudiante);
+            });
         };
         return AccesoEstudianteReceiver;
     }(BotReceiver_1.BotReceiver));

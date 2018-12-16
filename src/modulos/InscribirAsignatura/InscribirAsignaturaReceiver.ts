@@ -105,24 +105,6 @@ export namespace InscribirAsignatura {
     }
 
     private registrarAsignaturaAEstudiante(msg: ApiMessage & Message){
-      Data.Asignacion.registrarEstudianteAAsignatura(
-        msg,
-        this.estadoGlobal,
-        this.estadoGlobal.infoUsuarioMensaje.estudiante,
-        msg.result_id
-      ).then(() => {
-        Data.Asignacion.registrarAsignaturaAEstudiante(
-          msg,
-          this.estadoGlobal,
-          this.estadoGlobal.infoUsuarioMensaje.estudiante,
-          msg.result_id
-        ).then(() => {
-          this.botSender.responderMensajeHTML(
-            msg,
-            `Te has inscrito satisfactoriamente`
-          );
-        });
-      });
     }
   }
 }

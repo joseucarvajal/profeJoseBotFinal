@@ -1,12 +1,6 @@
 import { Message } from "../../bot/Message";
 import { BotReceiver } from "../bot/BotReceiver";
-import { KeyboardButton } from "../../bot/KeyboardButton";
-import {
-  EstadoGlobal,
-  Estudiante,
-  CelularUsuario,
-  Asignatura
-} from "../../core";
+import { EstadoGlobal, Estudiante, Asignatura } from "../../core";
 import { MainReceiverContract } from "../indexContracts";
 
 import * as Data from "../../data";
@@ -21,8 +15,8 @@ export namespace AccesoEstudiante {
 
     export const ConfirmarDatosEstudiante = "ConfirmarDatosEstudiante";
     export enum ConfirmarDatosEstudianteInlineOptsEnum {
-      ConfirmarSI = "✔️",
-      ConfirmarNO = "⛔️"
+      ConfirmarSI = "✔️ Si",
+      ConfirmarNO = "⛔️ No"
     }
   }
 
@@ -117,11 +111,12 @@ export namespace AccesoEstudiante {
         this.estadoGlobal,
         this.estadoGlobal.infoUsuarioMensaje.estudiante
       ).then(() => {
-        if(this.estadoGlobal.infoUsuarioMensaje.estudiante.registroConfirmado){
+        if (
+          this.estadoGlobal.infoUsuarioMensaje.estudiante.registroConfirmado
+        ) {
           this.enviarAMenuEstudiante(msg);
-        }        
+        }
       });
-
     }
 
     private validarYEnviarConfirmacionEstudiante(msg: Message & ApiMessage) {
@@ -163,6 +158,36 @@ export namespace AccesoEstudiante {
           this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo,
           this.listaAsignaturasEstudiante[0].codigo
         ).then((estudiante: Estudiante) => {
+          if (estudiante == null) {
+            this.botSender.responderMensajeErrorHTML(
+              msg,
+              `Aún no estás en el listado de la asignatura <b>${
+                this.listaAsignaturasEstudiante[0].nombre
+              }</b>, grupo: <b>${
+                this.listaAsignaturasEstudiante[0].grupo
+              }</b>, código: <b>${
+                this.listaAsignaturasEstudiante[0].codigo
+              }</b> pídele al profe que te agregue`
+            );
+
+            let mensajeProfesor: Message & ApiMessage = {
+              chat: {
+                id: parseInt(this.estadoGlobal.settings.idUsuarioChatDocente)
+              } as Chat
+            } as Message & ApiMessage;
+
+            this.botSender.responderMensajeErrorHTML(
+              mensajeProfesor,
+              `El estudiante <b>${msg.from.first_name}</b>, código: <b>${
+                msg.text
+              }</b>, existe en la asignatura, pero no se encuentra en la lista (asignatura_estudiante) de la asignatura <b>${
+                this.listaAsignaturasEstudiante[0].nombre
+              }, código: ${this.listaAsignaturasEstudiante[0].codigo}</b>`
+            );
+            reject();
+            return;
+          }
+
           this.estadoGlobal.infoUsuarioMensaje.estudiante = estudiante;
           Data.Estudiantes.actualizarChat(
             msg,
@@ -203,8 +228,8 @@ export namespace AccesoEstudiante {
               horario = asignatura.horarios[codigoHorario];
               conector = i > 0 ? " y " : "\n";
               infoAsignatura +=
-                "<i>" +
                 conector +
+                "<i>" +
                 horario.dia +
                 "</i> " +
                 horario.horaInicio +
@@ -237,7 +262,8 @@ Si corresponde a tu información, presiona <b>"${
         email: "",
         comando: Comandos.SolicitarCodigo,
         contexto: this.nombreContexto,
-        registroConfirmado: false
+        registroConfirmado: false,
+        tempData: ""
       };
 
       let estudiante: Estudiante = {
@@ -253,12 +279,20 @@ Si corresponde a tu información, presiona <b>"${
     }
 
     private enviarAMenuEstudiante(msg: Message & ApiMessage) {
-      this.enviarMensajeAReceiver(
-        this.indexMain.menuPrincipalReceiver,
-        this.indexMain.menuPrincipalReceiver.responderMenuPrincipalEstudiante,
-        msg,
-        MenuPrincipal.Comandos.MenuPrincipalEstudiante
-      );
+      this.botSender
+        .responderMensajeHTML(
+          msg,
+          `✅ Has confirmado tus datos satisfactoriamente`
+        )
+        .then(() => {
+          this.enviarMensajeAReceiver(
+            this.indexMain.menuPrincipalReceiver,
+            this.indexMain.menuPrincipalReceiver
+              .responderMenuPrincipalEstudiante,
+            msg,
+            MenuPrincipal.Comandos.MenuPrincipalEstudiante
+          );
+        });
     }
   }
 }
