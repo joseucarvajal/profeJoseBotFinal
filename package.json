@@ -16,13 +16,12 @@
     "express": "^4.15.2",
     "firebase": "^4.2.0",
     "node-schedule": "^1.2.3",
-    "node-telegram-bot-api": "^0.30.0"
+    "node-telegram-bot-api": "^0.27.1"
   },
   "devDependencies": {
     "@types/firebase": "^2.4.31",
     "@types/node": "^8.0.19",
     "@types/node-telegram-bot-api": "^0.27.0",
-    "request": "^2.88.0",
     "tape": "^4.7.0",
     "typescript": "^2.4.2"
   },
