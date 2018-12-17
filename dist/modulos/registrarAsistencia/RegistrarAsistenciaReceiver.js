@@ -16,10 +16,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var BotReceiver_1 = require("../bot/BotReceiver");
 var Data = require("../../data");
 var core_1 = require("../../core");
+var InscribirAsignaturaReceiver_1 = require("../InscribirAsignatura/InscribirAsignaturaReceiver");
 var RegistrarAsistencia;
 (function (RegistrarAsistencia) {
     var Comandos;
     (function (Comandos) {
+        Comandos.SolicitarCodigo = "Ingresa tu código";
         Comandos.SeleccionarComandoInline = "SeleccionarComandoInline";
         var SeleccionarComandoInlineOptsEnum;
         (function (SeleccionarComandoInlineOptsEnum) {
@@ -44,25 +46,50 @@ var RegistrarAsistencia;
             _this.registrarAsistencia = _this.registrarAsistencia.bind(_this);
             return _this;
         }
+        //#region parent events
         RegistrarAsistenciaReceiver.prototype.registrarAsistencia = function (msg) {
-            this.enviarOpcionesSeleccionAsignatura(msg);
+            if (!this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo) {
+                this.enviarSolicitudCodigo(msg);
+            }
+            else {
+                this.enviarOpcionesInscripcionAsignaturas();
+            }
         };
-        RegistrarAsistenciaReceiver.prototype.onRecibirMensaje = function (msg) { };
+        RegistrarAsistenciaReceiver.prototype.onRecibirMensaje = function (msg) {
+            if (this.estaComandoEnContexto(Comandos.SolicitarCodigo)) {
+                this.recibirCodigo();
+            }
+        };
         RegistrarAsistenciaReceiver.prototype.onRecibirInlineQuery = function (msg) { };
+        //#endregion
+        RegistrarAsistenciaReceiver.prototype.enviarSolicitudCodigo = function (msg) {
+            this.enviarMensajeHTML(msg, Comandos.SolicitarCodigo, Comandos.SolicitarCodigo);
+        };
+        RegistrarAsistenciaReceiver.prototype.recibirCodigo = function () {
+            var _this = this;
+            this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo = this.message.text;
+            Data.Estudiantes.actualizarChat(this.message, this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante).then(function () {
+                _this.enviarOpcionesInscripcionAsignaturas();
+            });
+        };
+        RegistrarAsistenciaReceiver.prototype.enviarOpcionesInscripcionAsignaturas = function () {
+            this.enviarMensajeAReceiver(this.indexMain.inscribirAsignaturaReceiver, this.indexMain.inscribirAsignaturaReceiver
+                .enviarOpcionSeleccionarAsignaturas, this.message, InscribirAsignaturaReceiver_1.InscribirAsignatura.Comandos.InscripcionAsignaturas);
+        };
         RegistrarAsistenciaReceiver.prototype.enviarOpcionesSeleccionAsignatura = function (msg) {
             var _this = this;
             var fechaHoy = new Date();
-            Data.Asignacion.getAsignaturasByEstudianteCodigo(this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo).then(function (listaAsignaturasEstudiante) {
-                if (!listaAsignaturasEstudiante ||
-                    listaAsignaturasEstudiante.length == 0) {
-                    _this.botSender.responderMensajeErrorHTML(msg, "No tienes asignaturas registradas");
+            Data.Asignacion.getAsignaturasByEstudianteCodigo(this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo).then(function (asignaturasDeEstudiante) {
+                if (asignaturasDeEstudiante.result == false) {
+                    _this.botSender.responderMensajeErrorHTML(msg, "Ha ocurrido un error, por favor notif\u00EDcale al profe Jose");
+                    _this.enviarMensajeErrorHTMLAProfesor(asignaturasDeEstudiante.message);
                     return;
                 }
                 var asignatura;
                 var horario;
                 var tieneAlgunHorarioHoy = false;
-                for (var i = 0; i < listaAsignaturasEstudiante.length; i++) {
-                    asignatura = listaAsignaturasEstudiante[i];
+                for (var i = 0; i < asignaturasDeEstudiante.listaAsignaturas.length; i++) {
+                    asignatura = asignaturasDeEstudiante.listaAsignaturas[i];
                     for (var codigoHorario in asignatura.horarios) {
                         horario = asignatura.horarios[codigoHorario];
                         if (core_1.Constants.DiasSemana.get(fechaHoy.getDay()) == horario.dia) {

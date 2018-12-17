@@ -33,6 +33,8 @@ export namespace MenuPrincipal {
 
     startKeyboardOpts: Array<Array<KeyboardButton>> = [
       [{ text: Comandos.MenuPrincipalEstudianteOpts.RegistrarAsistencia }],
+      [{ text: Comandos.MenuPrincipalEstudianteOpts.InscribirAsignatura }],
+      //[{ text: Comandos.MenuPrincipalEstudianteOpts.DesInscribirAsignatura }],
       [{ text: Comandos.MenuPrincipalEstudianteOpts.EditarInfoBasica }]
     ];
 

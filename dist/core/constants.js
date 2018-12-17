@@ -11,4 +11,9 @@ var Constants;
         [5, "viernes"],
         [6, "sabado"],
     ]);
+    var EstadoEstudianteAsignatura;
+    (function (EstadoEstudianteAsignatura) {
+        EstadoEstudianteAsignatura["Activa"] = "activo";
+        EstadoEstudianteAsignatura["Cancelada"] = "cancelada";
+    })(EstadoEstudianteAsignatura = Constants.EstadoEstudianteAsignatura || (Constants.EstadoEstudianteAsignatura = {}));
 })(Constants = exports.Constants || (exports.Constants = {}));

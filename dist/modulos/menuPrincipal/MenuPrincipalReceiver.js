@@ -35,6 +35,8 @@ var MenuPrincipal;
             _this.nombreContexto = nombreContexto;
             _this.startKeyboardOpts = [
                 [{ text: Comandos.MenuPrincipalEstudianteOpts.RegistrarAsistencia }],
+                [{ text: Comandos.MenuPrincipalEstudianteOpts.InscribirAsignatura }],
+                //[{ text: Comandos.MenuPrincipalEstudianteOpts.DesInscribirAsignatura }],
                 [{ text: Comandos.MenuPrincipalEstudianteOpts.EditarInfoBasica }]
             ];
             _this.responderMenuPrincipalEstudiante = _this.responderMenuPrincipalEstudiante.bind(_this);

@@ -78,31 +78,31 @@ export namespace index {
       this.responderOnLocation = this.responderOnLocation.bind(this);
     }
 
-    public responderAMensaje(msg: Message) {
+    public responderAMensaje(msg: Message & ApiMessage) {
       for (let i = 0; i < this.receiversList.length; i++) {
         this.receiversList[i].onRecibirMensajeBase(msg);
       }
     }
 
-    public responderAInlineQuery(msg: ApiMessage) {
+    public responderAInlineQuery(msg: Message & ApiMessage) {
       for (let i = 0; i < this.receiversList.length; i++) {
         this.receiversList[i].onRecibirInlineQueryBase(msg);
       }
     }
 
-    public responderChosenInlineResult(msg: ApiMessage) {
+    public responderChosenInlineResult(msg: Message & ApiMessage) {
       for (let i = 0; i < this.receiversList.length; i++) {
         this.receiversList[i].onChosenInlineResultBase(msg);
       }
     }
 
-    public responderCallbackQuery(msg: ApiMessage) {
+    public responderCallbackQuery(msg: Message & ApiMessage) {
       for (let i = 0; i < this.receiversList.length; i++) {
         this.receiversList[i].onCallbackQueryBase(msg);
       }
     }
 
-    public responderOnLocation(msg: Message) {
+    public responderOnLocation(msg: Message & ApiMessage) {
       for (let i = 0; i < this.receiversList.length; i++) {
         this.receiversList[i].onLocationBase(msg);
       }

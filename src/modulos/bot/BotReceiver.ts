@@ -1,15 +1,13 @@
 import { Message } from "../../bot/Message";
 import { BotSender } from "./BotSender";
-import {
-  EstadoGlobal,
-  InformacionContexto
-} from "../../core";
+import { EstadoGlobal, InformacionContexto } from "../../core";
 
 import * as Data from "../../data";
 import { MainReceiverContract } from "../indexContracts";
 import { KeyboardButton } from "../../bot/KeyboardButton";
 import { ApiMessage } from "../../api/ApiMessage";
 import { InlineKeyboardButton } from "../../bot/InlineKeyboardButton";
+import { Chat } from "../../bot/Chat";
 
 export abstract class BotReceiver {
   informacionContexto: InformacionContexto;
@@ -18,6 +16,9 @@ export abstract class BotReceiver {
   public estadoGlobal: EstadoGlobal;
   protected abstract nombreContexto: string;
   public indexMain: MainReceiverContract;
+
+  protected message: Message; 
+  protected apiMessage: ApiMessage;
 
   constructor(
     estadoGlobal: EstadoGlobal,
@@ -29,35 +30,53 @@ export abstract class BotReceiver {
     this.informacionContexto = {
       contexto: nombreContexto
     } as InformacionContexto;
+
+    this.message = {} as Message;
+    this.apiMessage = {} as ApiMessage;
   }
 
-  public onRecibirMensajeBase(msg: Message) {
+  public onRecibirMensajeBase(msg: Message & ApiMessage) {
+
     if (!msg.text && !msg.contact) {
       return;
     }
 
+    this.initializeMessage(msg);
     this.onRecibirMensaje(msg);
   }
 
-  public onRecibirInlineQueryBase(msg: ApiMessage){
+  public onRecibirInlineQueryBase(msg: Message & ApiMessage) {
+    this.initializeMessage(msg);
     this.onRecibirInlineQuery(msg);
   }
-  protected onRecibirInlineQuery(msg: ApiMessage){}
+  protected onRecibirInlineQuery(msg: Message & ApiMessage) {}
 
-  public onChosenInlineResultBase(msg: ApiMessage){
+  public onChosenInlineResultBase(msg: Message & ApiMessage) {
+    this.initializeMessage(msg);
     this.onChosenInlineResult(msg);
   }
-  protected onChosenInlineResult(msg: ApiMessage){}
+  protected onChosenInlineResult(msg: Message & ApiMessage) {}
 
-  public onCallbackQueryBase(msg: ApiMessage){
+  public onCallbackQueryBase(msg: Message & ApiMessage) {
+    this.initializeMessage(msg);
     this.onCallbackQuery(msg);
   }
-  protected onCallbackQuery(msg: ApiMessage){}
+  protected onCallbackQuery(msg: Message & ApiMessage) {}
 
-  public onLocationBase(msg: Message){
+  public onLocationBase(msg: Message & ApiMessage) {
+    this.initializeMessage(msg);
     this.onLocation(msg);
   }
-  protected onLocation(msg: Message){}
+  protected onLocation(msg: Message) {}
+
+
+  private initializeMessage(msg: Message & ApiMessage){
+    if(msg.chat){
+      this.message = msg;
+      return;
+    }
+    this.apiMessage = msg;
+  }
 
   private estaEnContextoActual(contexto?: string): boolean {
     if (!this.estadoGlobal.infoUsuarioMensaje.estudiante) {
@@ -107,37 +126,36 @@ export abstract class BotReceiver {
     comando: string,
     html: string
   ): Promise<any> {
-    this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto = this.nombreContexto;
-    this.estadoGlobal.infoUsuarioMensaje.estudiante.comando = comando;
-    Data.Estudiantes.actualizarChat(
-      msg,
-      this.estadoGlobal,
-      this.estadoGlobal.infoUsuarioMensaje.estudiante
-    ).then(() => {
-      return this.botSender.responderMensajeHTML(msg, html);
+    return new Promise<any>((resolve, reject) => {
+      this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto = this.nombreContexto;
+      this.estadoGlobal.infoUsuarioMensaje.estudiante.comando = comando;
+      Data.Estudiantes.actualizarChat(
+        msg,
+        this.estadoGlobal,
+        this.estadoGlobal.infoUsuarioMensaje.estudiante
+      ).then(() => {
+        this.botSender.responderMensajeHTML(msg, html).then(()=>{
+          resolve();
+        });
+      });
     });
-
-    return new Promise<any>(() => {});
   }
 
   enviarMensajeInlineKeyBoard(
     msg: Message & ApiMessage,
-    comandoAActualizar:string,
-    label:string,
+    comandoAActualizar: string,
+    label: string,
     opcionesInlineKeyboard: Array<Array<InlineKeyboardButton>>
-  ){
-    this.actualizarContextoComando(
-      msg,
-      comandoAActualizar
-    ).then(() => {
+  ) {
+    this.actualizarContextoComando(msg, comandoAActualizar).then(() => {
       this.botSender.responderInlineKeyboard(
         msg,
         label,
         opcionesInlineKeyboard
       );
-    });  
+    });
   }
-  
+
   protected actualizarContextoComando(
     msg: Message,
     comando: string
@@ -155,7 +173,7 @@ export abstract class BotReceiver {
     instanciaReceiver: BotReceiver,
     fn: (msg: Message) => void,
     msg: Message & ApiMessage,
-    comando: string,
+    comando: string
   ) {
     this.actualizarContextoComando(msg, comando).then(() => {
       this.enviarMensajeAReceiver(instanciaReceiver, fn, msg, comando);
@@ -193,4 +211,33 @@ export abstract class BotReceiver {
   }
 
   protected abstract onRecibirMensaje(msg: Message): void;
+
+  protected enviarMensajeErrorHTMLAProfesor(message:string){
+    let msg:Message & ApiMessage = {
+      chat:{
+        id:this.estadoGlobal.settings.idUsuarioChatDocente
+      } as Chat
+    } as Message & ApiMessage;
+
+    this.botSender.responderMensajeErrorHTML(msg, message);
+  }
+
+  protected enviarMensajeHTMLAProfesor(message:string){
+    let msg:Message & ApiMessage = {
+      chat:{
+        id:this.estadoGlobal.settings.idUsuarioChatDocente
+      } as Chat
+    } as Message & ApiMessage;
+
+    this.botSender.responderMensajeHTML(msg, message);
+  }
+
+  protected getMesssage():Message | ApiMessage{
+
+    if(this.message){
+      return this.message;
+    }
+
+    return this.apiMessage;
+  }
 }

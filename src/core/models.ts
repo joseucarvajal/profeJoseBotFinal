@@ -5,7 +5,7 @@ import { Constants } from "./constants";
 export interface Settings {
   celularDocente: string;
   periodoActual: string;
-  idUsuarioChatDocente:string;
+  idUsuarioChatDocente:number;
 }
 
 export interface InformacionContexto {
@@ -19,6 +19,7 @@ export interface Estudiante extends InformacionContexto {
     email:string;     
     registroConfirmado:boolean; //Cuando un estudiante ha confirmado su registro en el bot (el código corresponde y tiene asignaturas asociadas)
     tempData:string;
+    asignaturas?:ListadoAsignaturas;
 }
 
 export interface CelularUsuario {
@@ -53,16 +54,35 @@ export interface ListadoHorarios {
   [key: string]: Horario;
 }
 
-export interface Asignatura {  
+export interface ListadoEstudiantes {
+  [key: string]: Estudiante;
+}
+
+export interface Asignatura { 
   codigo:string;
   nombre:string;
   grupo:number;
-  estudiantesMatriculados:Array<string>;
   horarios:ListadoHorarios;
+}
+
+export interface AsignaturaEstudiantes {
+  [key: string]: ListadoEstudiantes;
 }
 
 export interface RegistroAsistenciaModel {
   latitud:number,
   longitud:number
+}
+
+export interface AsignaturasDeEstudiante {
+  estudiante: Estudiante;
+  listaAsignaturas: Array<Asignatura>;
+  result:boolean;
+  message:string;
+}
+
+export interface AsignaturaAsignadaAEstudiante {
+  codigo:string;
+  estado:Constants.EstadoEstudianteAsignatura;
 }
 //#endregion

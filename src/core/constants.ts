@@ -10,5 +10,9 @@ export namespace Constants {
         [6, `sabado`],
     ]);
 
+    export enum EstadoEstudianteAsignatura {
+        Activa = "activo",
+        Cancelada = "cancelada"        
+    }
 }
 
