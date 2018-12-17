@@ -225,11 +225,11 @@ export namespace InscribirAsignatura {
         if (this.listaAsignaturasEstudiante.length > 0) {
           opcionesInscripcion = this.enviarOpcionesInscripcionAsignaturasOpts;
           mensaje = `
-          ⚠️ Por favor verifica estos datos:
-          
-          <b>Código:</b> ${estudiante.codigo}
-          <b>Nombre:</b> ${estudiante.nombre}
-          <b>Email:</b> ${estudiante.email}
+  ⚠️ Por favor verifica estos datos:
+
+  <b>Código:</b> ${estudiante.codigo}
+  <b>Nombre:</b> ${estudiante.nombre}
+  <b>Email:</b> ${estudiante.email}
           
 <b>Asignaturas</b>: ${this.listaAsignaturasEstudiante.map(
             (asignatura: Asignatura) => {

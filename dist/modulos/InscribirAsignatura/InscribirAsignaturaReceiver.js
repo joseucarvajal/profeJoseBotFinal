@@ -150,7 +150,7 @@ var InscribirAsignatura;
                 var mensaje;
                 if (_this.listaAsignaturasEstudiante.length > 0) {
                     opcionesInscripcion = _this.enviarOpcionesInscripcionAsignaturasOpts;
-                    mensaje = "\n          \u26A0\uFE0F Por favor verifica estos datos:\n          \n          <b>C\u00F3digo:</b> " + estudiante.codigo + "\n          <b>Nombre:</b> " + estudiante.nombre + "\n          <b>Email:</b> " + estudiante.email + "\n          \n<b>Asignaturas</b>: " + _this.listaAsignaturasEstudiante.map(function (asignatura) {
+                    mensaje = "\n  \u26A0\uFE0F Por favor verifica estos datos:\n\n  <b>C\u00F3digo:</b> " + estudiante.codigo + "\n  <b>Nombre:</b> " + estudiante.nombre + "\n  <b>Email:</b> " + estudiante.email + "\n          \n<b>Asignaturas</b>: " + _this.listaAsignaturasEstudiante.map(function (asignatura) {
                         var infoAsignatura = "\n\n📒<b>" +
                             asignatura.nombre +
                             "</b>, " +
