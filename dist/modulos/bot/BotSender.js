@@ -62,7 +62,7 @@ var BotSender = /** @class */ (function () {
                 caption: "Descarga el documento"
             };
             var config = { format: "A4" };
-            var html = "\n      <style>\n      table {\n        /*\n        border-collapse: collapse;\n        */\n      }\n      </style>\n    <table border=\"1\" cellspacing=\"1\" style=\"width: 100%; border:1px solid;position: relative;\">\n      <tr>\n        <th>hello</th>\n        <th>world</th>\n      </tr>\n      <tr>\n        <td>1</td>\n        <td>1</td>\n      </tr>\n      <tr>\n        <td>2</td>\n        <td>2</td>\n      </tr>\n    </table>\n      ";
+            var html = "\n    <table border=\"1\" cellspacing=\"0\" style=\"width: 100%; border:1px solid;position: relative;\">\n      <tr>\n        <th>hello</th>\n        <th>world</th>\n      </tr>\n      <tr>\n        <td>1</td>\n        <td>1</td>\n      </tr>\n      <tr>\n        <td>2</td>\n        <td>2</td>\n      </tr>\n    </table>\n      ";
             pdf.create(html, config).toFile(path, function (err, res) {
                 if (err) {
                     return console.error("Generating PDF", err);

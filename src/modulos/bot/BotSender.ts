@@ -96,14 +96,7 @@ export class BotSender {
       var config = { format: "A4" };
 
       let html = `
-      <style>
-      table {
-        /*
-        border-collapse: collapse;
-        */
-      }
-      </style>
-    <table border="1" cellspacing="1" style="width: 100%; border:1px solid;position: relative;">
+    <table border="1" cellspacing="0" style="width: 100%; border:1px solid;position: relative;">
       <tr>
         <th>hello</th>
         <th>world</th>
