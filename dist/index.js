@@ -5,7 +5,7 @@ require('./initBot');
 
 require('./modulos/index');
 */
-console.log("llega 1");
+var fs = require("fs");
 // using the http module
 var http = require('http'), 
 // look for PORT environment variable, 
@@ -14,11 +14,19 @@ var http = require('http'),
 port = process.env.PORT || 80;
 // create a simple server
 var server = http.createServer(function (req, res) {
-    res.writeHead(200, {
-        'Content-Type': 'text/plain'
-    });
-    res.write('hello heroku!', 'utf-8');
-    res.end();
+    /*
+        res.writeHead(200, {
+            'Content-Type': 'text/plain'
+        });
+        res.write('hello heroku!', 'utf-8');
+        res.end();
+ */
+    var file = fs.createReadStream('./dist/tmp/test.pdf');
+    var stat = fs.statSync('./dist/tmp/test.pdf');
+    res.setHeader('Content-Length', stat.size);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename=quote.pdf');
+    file.pipe(res);
 });
 // listen on the port
 server.listen(port, function () {
