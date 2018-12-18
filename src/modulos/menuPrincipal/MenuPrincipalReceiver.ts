@@ -24,10 +24,6 @@ export namespace MenuPrincipal {
   export class MenuPrincipalReceiver extends BotReceiver {
     nombreContexto = nombreContexto;
 
-    btnRegistrarAsistencia: KeyboardButton = {
-      text: Comandos.MenuPrincipalEstudianteOpts.RegistrarAsistencia
-    };
-
     constructor(estadoGlobal: EstadoGlobal, indexMain: MainReceiverContract) {
       super(estadoGlobal, indexMain, nombreContexto);
 
@@ -37,22 +33,17 @@ export namespace MenuPrincipal {
     }
 
     startKeyboardOpts: Array<Array<KeyboardButton>> = [
-      [this.btnRegistrarAsistencia],
+      [
+        {
+          text: Comandos.MenuPrincipalEstudianteOpts.RegistrarAsistencia
+        }
+      ],
       [{ text: Comandos.MenuPrincipalEstudianteOpts.InscribirAsignatura }],
       [{ text: Comandos.MenuPrincipalEstudianteOpts.EditarInfoBasica }]
     ];
 
     //#region public
     public responderMenuPrincipalEstudiante(msg: Message & ApiMessage) {
-      if (this.estadoGlobal.infoUsuarioMensaje.estudiante) {
-        if (
-          this.estadoGlobal.infoUsuarioMensaje.estudiante
-            .inscripcionAsignaturasConfirmado
-        ) {
-          this.btnRegistrarAsistencia.request_location = true;
-        }
-      }
-
       this.botSender.responderKeyboardMarkup(
         msg,
         `Selecciona una opción`,
@@ -88,11 +79,7 @@ export namespace MenuPrincipal {
       }
     }
 
-    public onLocation(msg: Message & ApiMessage) {
-      if(this.estaComandoEnContexto(Comandos.MenuPrincipalEstudiante)){
-        this.gotoRegistrarAsistencia(msg);
-      }
-    }
+    public onLocation(msg: Message & ApiMessage) { }
     //#endregion
 
     private goToEditarInformacionBasica(msg: Message & ApiMessage) {
@@ -116,8 +103,7 @@ export namespace MenuPrincipal {
     }
 
     private gotoRegistrarAsistencia(msg: Message & ApiMessage) {
-      console.log("llega gotoRegistrarAsistencia");
-      if (msg.location) {
+      if (this.estadoGlobal.infoUsuarioMensaje.estudiante.inscripcionAsignaturasConfirmado) {
         this.enviarMensajeAReceiver(
           this.indexMain.registrarAsistenciaReceiver,
           this.indexMain.registrarAsistenciaReceiver.solicitarAsistenciaGPS,

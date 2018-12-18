@@ -73,6 +73,10 @@ var BotReceiver = /** @class */ (function () {
         return (this.nombreContexto ==
             this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto);
     };
+    BotReceiver.prototype.estaOpcionSeleccionadaEnContexto = function (opcionSeleccionada, msg) {
+        return (this.estaEnContextoActual() &&
+            msg.text == opcionSeleccionada);
+    };
     BotReceiver.prototype.estaComandoEnContexto = function (comando, contexto) {
         return (this.estaEnContextoActual(contexto) &&
             this.estadoGlobal.infoUsuarioMensaje.estudiante.comando == comando);

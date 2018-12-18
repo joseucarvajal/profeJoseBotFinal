@@ -63,6 +63,7 @@ export interface Asignatura {
   nombre:string;
   grupo:number;
   horarios:ListadoHorarios;
+  estado?:Constants.EstadoEstudianteAsignatura;
 }
 
 export interface AsignaturaEstudiantes {

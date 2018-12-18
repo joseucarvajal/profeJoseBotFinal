@@ -108,7 +108,7 @@ var Asignacion;
             });
         });
     };
-    Asignacion.getAsignaturasInscritasPorEstudiante = function (estadoGlobal) {
+    var getAsignaturasInscritasPorEstudiante = function (estadoGlobal) {
         return initDatabase_1.dataBase
             .ref("periodosAcademicos/" +
             estadoGlobal.settings.periodoActual +
@@ -124,9 +124,25 @@ var Asignacion;
             console.log("Asignaturas/getAsignaturasXPeriodoAndDocente" + error);
         });
     };
+    Asignacion.getAsignaturasInscritasPorEstudianteCachedInfoCompleta = function (estadoGlobal, codigoEstudiante) {
+        return new Promise(function (resolve, reject) {
+            Asignacion.getAsignaturasXPeriodoAndDocente(estadoGlobal).then(function (listadoTodasAsignaturas) {
+                getAsignaturasInscritasPorEstudiante(estadoGlobal).then(function (listadoEstudianteAsignatura) {
+                    var listaAsignaturasDeEstudiante = new Array();
+                    var asignatura;
+                    for (var codigoAsignatura in listadoEstudianteAsignatura) {
+                        asignatura = listadoTodasAsignaturas[codigoAsignatura];
+                        asignatura.estado = listadoEstudianteAsignatura[codigoAsignatura].estado;
+                        listaAsignaturasDeEstudiante.push(asignatura);
+                    }
+                    resolve(listaAsignaturasDeEstudiante);
+                });
+            });
+        });
+    };
     Asignacion.getAsignaturasQueNoTieneEstudiante = function (estadoGlobal, codigoEstudiante) {
         return new Promise(function (resolve, reject) {
-            Asignacion.getAsignaturasInscritasPorEstudiante(estadoGlobal).then(function (listadoAsignaturasEstudiante) {
+            getAsignaturasInscritasPorEstudiante(estadoGlobal).then(function (listadoAsignaturasEstudiante) {
                 Asignacion.getAsignaturasXPeriodoAndDocente(estadoGlobal).then(function (listadoAsignaturas) {
                     var asignaturasQueNoTieneEstudiante = new Array();
                     for (var codigoAsignatura in listadoAsignaturas) {

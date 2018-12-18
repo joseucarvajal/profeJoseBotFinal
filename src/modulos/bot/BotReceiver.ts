@@ -124,6 +124,13 @@ export abstract class BotReceiver {
     );
   }
 
+  protected estaOpcionSeleccionadaEnContexto(opcionSeleccionada: string, msg: Message & ApiMessage): boolean {
+    return (
+      this.estaEnContextoActual() &&
+      msg.text == opcionSeleccionada
+    );
+  }
+
   protected estaComandoEnContexto(comando: string, contexto?: string): boolean {
     return (
       this.estaEnContextoActual(contexto) &&

@@ -15,6 +15,7 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var BotReceiver_1 = require("../bot/BotReceiver");
 var Data = require("../../data");
+var core_1 = require("../../core");
 var InscribirAsignatura;
 (function (InscribirAsignatura) {
     var Comandos;
@@ -83,7 +84,9 @@ var InscribirAsignatura;
             this.indexMain.solicitudesDocenteReceiver
                 .enviarSolicitudInscribirAsignatura(msg, this.estadoGlobal.infoUsuarioMensaje.estudiante, msg.from.id, msg.result_id)
                 .then(function () {
-                _this.botSender.responderMensajeHTML(msg, "\u2709\uFE0F Se ha enviado la <b>solicitud</b> al profe Jose de manera satisfactoria, cuando \u00E9l apruebe o rechace recibir\u00E1s un mensaje con la respuesta").then(function () {
+                _this.botSender
+                    .responderMensajeHTML(msg, "\u2709\uFE0F Se ha enviado la <b>solicitud</b> al profe Jose de manera satisfactoria, cuando \u00E9l apruebe o rechace recibir\u00E1s un mensaje con la respuesta")
+                    .then(function () {
                     _this.irAMenuPrincipal(msg);
                 });
             });
@@ -211,6 +214,7 @@ var InscribirAsignatura;
             this.enviarOpcionesInscribirOtrasAsignaturas(msg, mensaje, opcionesMenuInscripcion);
         };
         InscribirAsignaturaReceiver.prototype.responderOpcionesEstudianteConInscripcionConfirmada = function (msg) {
+            var _this = this;
             var opcionesMenuInscripcion = [
                 [
                     {
@@ -220,8 +224,18 @@ var InscribirAsignatura;
                     }
                 ]
             ];
-            var mensaje = "\uD83D\uDCA1  Ya inscribiste asignaturas. Si deseas puedes enviarle al profe Jose una <b>solicitud</b> para inscribir otra asignatura";
-            this.enviarOpcionesInscribirOtrasAsignaturas(msg, mensaje, opcionesMenuInscripcion);
+            Data.Asignacion.getAsignaturasInscritasPorEstudianteCachedInfoCompleta(this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo).then(function (listaAsignaturas) {
+                var mensajeListadoAsignaturas = "";
+                var asignatura;
+                for (var i = 0; i < listaAsignaturas.length; i++) {
+                    asignatura = listaAsignaturas[i];
+                    if (asignatura.estado == core_1.Constants.EstadoEstudianteAsignatura.Activa) {
+                        mensajeListadoAsignaturas += "\n" + (i + 1) + ". <b>" + asignatura.nombre + "</b>, grupo <b>" + asignatura.grupo + "</b>";
+                    }
+                }
+                var mensaje = "\n\uD83D\uDCA1  Ya has inscrito las siguientes asignaturas:\n" + mensajeListadoAsignaturas + "\n\nSi deseas puedes enviarle al profe Jose una <b>solicitud</b> para inscribir otra asignatura";
+                _this.enviarOpcionesInscribirOtrasAsignaturas(msg, mensaje, opcionesMenuInscripcion);
+            });
         };
         InscribirAsignaturaReceiver.prototype.enviarOpcionesInscribirOtrasAsignaturas = function (msg, message, opcionesMenuInscripcion) {
             this.enviarMensajeInlineKeyBoard(msg, Comandos.EsperandoInscripcionAsignaturasRpta, message, opcionesMenuInscripcion);

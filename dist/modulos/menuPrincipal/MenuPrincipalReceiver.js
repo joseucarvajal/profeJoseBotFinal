@@ -34,11 +34,12 @@ var MenuPrincipal;
         function MenuPrincipalReceiver(estadoGlobal, indexMain) {
             var _this = _super.call(this, estadoGlobal, indexMain, nombreContexto) || this;
             _this.nombreContexto = nombreContexto;
-            _this.btnRegistrarAsistencia = {
-                text: Comandos.MenuPrincipalEstudianteOpts.RegistrarAsistencia
-            };
             _this.startKeyboardOpts = [
-                [_this.btnRegistrarAsistencia],
+                [
+                    {
+                        text: Comandos.MenuPrincipalEstudianteOpts.RegistrarAsistencia
+                    }
+                ],
                 [{ text: Comandos.MenuPrincipalEstudianteOpts.InscribirAsignatura }],
                 [{ text: Comandos.MenuPrincipalEstudianteOpts.EditarInfoBasica }]
             ];
@@ -47,12 +48,6 @@ var MenuPrincipal;
         }
         //#region public
         MenuPrincipalReceiver.prototype.responderMenuPrincipalEstudiante = function (msg) {
-            if (this.estadoGlobal.infoUsuarioMensaje.estudiante) {
-                if (this.estadoGlobal.infoUsuarioMensaje.estudiante
-                    .inscripcionAsignaturasConfirmado) {
-                    this.btnRegistrarAsistencia.request_location = true;
-                }
-            }
             this.botSender.responderKeyboardMarkup(msg, "Selecciona una opci\u00F3n", this.startKeyboardOpts);
         };
         //#endregion
@@ -79,11 +74,7 @@ var MenuPrincipal;
                 }
             }
         };
-        MenuPrincipalReceiver.prototype.onLocation = function (msg) {
-            if (this.estaComandoEnContexto(Comandos.MenuPrincipalEstudiante)) {
-                this.gotoRegistrarAsistencia(msg);
-            }
-        };
+        MenuPrincipalReceiver.prototype.onLocation = function (msg) { };
         //#endregion
         MenuPrincipalReceiver.prototype.goToEditarInformacionBasica = function (msg) {
             this.enviarMensajeAReceiver(this.indexMain.editarInformacionBasicaReceiver, this.indexMain.editarInformacionBasicaReceiver
@@ -94,8 +85,7 @@ var MenuPrincipal;
                 .enviarOpcionSeleccionarAsignaturas, msg, InscribirAsignaturaReceiver_1.InscribirAsignatura.Comandos.InscripcionAsignaturas);
         };
         MenuPrincipalReceiver.prototype.gotoRegistrarAsistencia = function (msg) {
-            console.log("llega gotoRegistrarAsistencia");
-            if (msg.location) {
+            if (this.estadoGlobal.infoUsuarioMensaje.estudiante.inscripcionAsignaturasConfirmado) {
                 this.enviarMensajeAReceiver(this.indexMain.registrarAsistenciaReceiver, this.indexMain.registrarAsistenciaReceiver.solicitarAsistenciaGPS, msg, RegistrarAsistenciaReceiver_1.RegistrarAsistencia.Comandos.SolicitarAsistenciaGPS);
                 return;
             }

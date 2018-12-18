@@ -111,10 +111,7 @@ var EditarInformacionBasica;
             });
         };
         EditarInformacionBasicaReceiver.prototype.enviarMensajeDatosActualizadosConExito = function (msg) {
-            var _this = this;
-            return this.botSender.responderMensajeHTML(msg, "\u2705 Has actualizado tus datos con \u00E9xito").then(function () {
-                _this.irAMenuPrincipal(msg);
-            });
+            return this.botSender.responderMensajeHTML(msg, "\u2705 Has actualizado tus datos con \u00E9xito");
         };
         return EditarInformacionBasicaReceiver;
     }(BotReceiver_1.BotReceiver));

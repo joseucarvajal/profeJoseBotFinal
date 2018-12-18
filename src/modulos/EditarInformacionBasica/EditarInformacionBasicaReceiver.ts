@@ -140,9 +140,7 @@ export namespace EditarInformacionBasica {
       return this.botSender.responderMensajeHTML(
         msg,
         `✅ Has actualizado tus datos con éxito`
-      ).then(()=>{
-        this.irAMenuPrincipal(msg);
-      });
+      );
     }
   }
 }

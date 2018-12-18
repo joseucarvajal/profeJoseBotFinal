@@ -8,7 +8,8 @@ import {
   Asignatura,
   Estudiante,
   AsignaturasDeEstudiante,
-  Horario
+  Horario,
+  Constants
 } from "../../core";
 import { MainReceiverContract } from "../indexContracts";
 import { InlineKeyboardButton } from "../../bot/InlineKeyboardButton";
@@ -63,8 +64,7 @@ export namespace InscribirAsignatura {
 
     //#region public
     public enviarOpcionSeleccionarAsignaturas(msg: Message & ApiMessage) {
-
-      if(!this.validarQueEstudianteHayaIngresadoDatosBasicos(msg)){
+      if (!this.validarQueEstudianteHayaIngresadoDatosBasicos(msg)) {
         return;
       }
 
@@ -118,12 +118,14 @@ export namespace InscribirAsignatura {
           msg.result_id
         )
         .then(() => {
-          this.botSender.responderMensajeHTML(
-            msg,
-            `✉️ Se ha enviado la <b>solicitud</b> al profe Jose de manera satisfactoria, cuando él apruebe o rechace recibirás un mensaje con la respuesta`
-          ).then(()=>{
-            this.irAMenuPrincipal(msg);
-          });
+          this.botSender
+            .responderMensajeHTML(
+              msg,
+              `✉️ Se ha enviado la <b>solicitud</b> al profe Jose de manera satisfactoria, cuando él apruebe o rechace recibirás un mensaje con la respuesta`
+            )
+            .then(() => {
+              this.irAMenuPrincipal(msg);
+            });
         });
     }
 
@@ -203,7 +205,7 @@ export namespace InscribirAsignatura {
               msg,
               "",
               `✅ Se han registrado tus asignaturas con éxito`
-            ).then(()=>{
+            ).then(() => {
               this.irAMenuPrincipal(msg);
             });
           });
@@ -351,13 +353,33 @@ Presiona <b>"${
           }
         ]
       ];
-      let mensaje = `💡  Ya inscribiste asignaturas. Si deseas puedes enviarle al profe Jose una <b>solicitud</b> para inscribir otra asignatura`;
+      
+      Data.Asignacion.getAsignaturasInscritasPorEstudianteCachedInfoCompleta(
+        this.estadoGlobal,
+        this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo
+      ).then((listaAsignaturas: Array<Asignatura>) => {
 
-      this.enviarOpcionesInscribirOtrasAsignaturas(
-        msg,
-        mensaje,
-        opcionesMenuInscripcion
-      );
+        let mensajeListadoAsignaturas = "";
+        let asignatura;
+        for(let i=0; i<listaAsignaturas.length; i++){
+          asignatura = listaAsignaturas[i];
+          if(asignatura.estado == Constants.EstadoEstudianteAsignatura.Activa){
+            mensajeListadoAsignaturas += `\n${(i+1)}. <b>${asignatura.nombre}</b>, grupo <b>${asignatura.grupo}</b>`;
+          }          
+        }        
+
+        let mensaje = `
+💡  Ya has inscrito las siguientes asignaturas:
+${mensajeListadoAsignaturas}
+
+Si deseas puedes enviarle al profe Jose una <b>solicitud</b> para inscribir otra asignatura`;
+
+        this.enviarOpcionesInscribirOtrasAsignaturas(
+          msg,
+          mensaje,
+          opcionesMenuInscripcion
+        );
+      });
     }
 
     private enviarOpcionesInscribirOtrasAsignaturas(

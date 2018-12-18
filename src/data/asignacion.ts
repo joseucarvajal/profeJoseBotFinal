@@ -14,6 +14,7 @@ import {
 import { ApiMessage } from "../api/ApiMessage";
 import { Constants } from "../core";
 import { Estudiantes } from "./estudiantes";
+import { strictEqual } from "assert";
 
 export namespace Asignacion {
   export const getAsignaturasXPeriodoAndDocente = (
@@ -141,7 +142,7 @@ export namespace Asignacion {
         console.log("Asignaturas/getAsignaturasXPeriodoAndDocente" + error);
       });
   };
-
+  
   export const getAsignaturasByEstudianteCodigo = (
     estadoGlobal: EstadoGlobal,
     codigoEstudiante: string
@@ -191,7 +192,7 @@ export namespace Asignacion {
     });
   };
 
-  export const getAsignaturasInscritasPorEstudiante = (
+  const getAsignaturasInscritasPorEstudiante = (
     estadoGlobal: EstadoGlobal
   ): Promise<ListadoAsignaturas> => {
     return dataBase
@@ -210,6 +211,32 @@ export namespace Asignacion {
       .catch((error: any) => {
         console.log("Asignaturas/getAsignaturasXPeriodoAndDocente" + error);
       });
+  };
+
+  export const getAsignaturasInscritasPorEstudianteCachedInfoCompleta = (
+    estadoGlobal: EstadoGlobal,
+    codigoEstudiante: string
+  ): Promise<Array<Asignatura>> => {
+    return new Promise<Array<Asignatura>>((resolve, reject) => {
+      getAsignaturasXPeriodoAndDocente(estadoGlobal).then(
+        (listadoTodasAsignaturas: ListadoAsignaturas) => {
+          getAsignaturasInscritasPorEstudiante(estadoGlobal).then(
+            (listadoEstudianteAsignatura: ListadoAsignaturas) => {
+              let listaAsignaturasDeEstudiante = new Array<Asignatura>();
+
+              let asignatura: Asignatura;
+              for (let codigoAsignatura in listadoEstudianteAsignatura) {
+                asignatura = listadoTodasAsignaturas[codigoAsignatura];
+                asignatura.estado = listadoEstudianteAsignatura[codigoAsignatura].estado;
+                listaAsignaturasDeEstudiante.push(asignatura);
+              }
+
+              resolve(listaAsignaturasDeEstudiante);
+            }
+          );
+        }
+      );
+    });
   };
 
   export const getAsignaturasQueNoTieneEstudiante = (
