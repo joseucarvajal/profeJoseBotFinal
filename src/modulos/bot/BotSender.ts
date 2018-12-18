@@ -7,7 +7,8 @@ import { InlineKeyboardButton } from "../../bot/InlineKeyboardButton";
 import { ApiMessage } from "../../api/ApiMessage";
 import { resolve } from "dns";
 
-const fs = require('fs');
+const fs = require("fs");
+const pdf = require("pdf-thumbnail");
 
 export class BotSender {
   responderMensajeHTML(
@@ -86,20 +87,46 @@ export class BotSender {
     });
   }
 
-  enviarDocumento(msg: Message & ApiMessage, path:string) : Promise<any>{    
-
-    return new Promise<any>((resolve)=>{
-      fs.access(path, fs.F_OK, (err:any) => {
+  enviarDocumento(msg: Message & ApiMessage, path: string): Promise<any> {
+    return new Promise<any>(resolve => {
+      fs.access(path, fs.F_OK, (err: any) => {
         if (err) {
           console.log("file to send doesn't exists", err);
-          return
-        }      
-        
-        bot.sendDocument(msg.from.id, path).then(()=>{
-          resolve();
-        });
-      })      
+          return;
+        }
+
+        const pdfBuffer = fs.readFileSync(path);
+
+        const thumbnailOpts = {
+          compress: {
+            type: "JPEG", //default
+            quality: 70 //default
+          }
+        };
+
+        pdf(pdfBuffer /*Buffer or stream of the pdf*/, thumbnailOpts)
+          .then((data: any) => {
+            /*Stream of the image*/
+            // ...
+            /*
+            bot.sendDocument(msg.from.id, path).then(() => {
+              resolve();
+            });
+            */
+
+            let messageOptions = {
+              chat_id: msg.id,
+              document:path
+            };
+
+            console.log("llega 2");
+
+            bot.sendMessage(msg.id, messageOptions);
+          })
+          .catch((err: any) => {
+            console.log("Error generatin PDF thumbnail", err);
+          });
+      });
     });
-    
   }
 }

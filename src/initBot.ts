@@ -1,6 +1,7 @@
 import {
   token
 } from './initBotToken';
+import { Constants } from './core';
 
 const TelegramBot = require('node-telegram-bot-api');
 
@@ -32,7 +33,7 @@ if (process.env.NODE_ENV.trim() == 'development') {
   
   bot = new TelegramBot(token, prodOptions);
 
-  const url = 'https://evening-headland-56271.herokuapp.com/dist/index.js';
+  const url = `${Constants.UrlServidor}/dist/index.js`;
 
   bot.setWebHook(`${url}/bot${token}`);
 }

@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var initBot_1 = require("../../initBot");
-var fs = require('fs');
+var fs = require("fs");
+var pdf = require("pdf-thumbnail");
 var BotSender = /** @class */ (function () {
     function BotSender() {
     }
@@ -62,8 +63,31 @@ var BotSender = /** @class */ (function () {
                     console.log("file to send doesn't exists", err);
                     return;
                 }
-                initBot_1.bot.sendDocument(msg.from.id, path).then(function () {
-                    resolve();
+                var pdfBuffer = fs.readFileSync(path);
+                var thumbnailOpts = {
+                    compress: {
+                        type: "JPEG",
+                        quality: 70 //default
+                    }
+                };
+                pdf(pdfBuffer /*Buffer or stream of the pdf*/, thumbnailOpts)
+                    .then(function (data) {
+                    /*Stream of the image*/
+                    // ...
+                    /*
+                    bot.sendDocument(msg.from.id, path).then(() => {
+                      resolve();
+                    });
+                    */
+                    var messageOptions = {
+                        chat_id: msg.id,
+                        document: path
+                    };
+                    console.log("llega 2");
+                    initBot_1.bot.sendMessage(msg.id, messageOptions);
+                })
+                    .catch(function (err) {
+                    console.log("Error generatin PDF thumbnail", err);
                 });
             });
         });

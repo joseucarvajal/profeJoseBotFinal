@@ -1,6 +1,6 @@
 import { Message } from "../../bot/Message";
 import { BotReceiver } from "../bot/BotReceiver";
-import { EstadoGlobal, Estudiante, Asignatura } from "../../core";
+import { EstadoGlobal, Estudiante, Asignatura, Constants } from "../../core";
 import { MainReceiverContract } from "../indexContracts";
 
 import * as Data from "../../data";
@@ -41,7 +41,7 @@ export namespace AccesoEstudiante {
 
     protected onRecibirMensaje(msg: Message & ApiMessage) {
       if (msg.text == "/start") {
-        this.botSender.enviarDocumento(msg, "./dist/tmp/test.pdf");
+        this.botSender.enviarDocumento(msg, `${Constants.UrlServidor}/dist/tmp/test.pdf`);
         //this.onRecibirComandoStart(msg);
       }       
     }

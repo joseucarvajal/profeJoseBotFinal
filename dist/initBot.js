@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var initBotToken_1 = require("./initBotToken");
+var core_1 = require("./core");
 var TelegramBot = require('node-telegram-bot-api');
 var bot = null;
 exports.bot = bot;
@@ -21,6 +22,6 @@ else {
         }
     };
     exports.bot = bot = new TelegramBot(initBotToken_1.token, prodOptions);
-    var url = 'https://evening-headland-56271.herokuapp.com/dist/index.js';
+    var url = core_1.Constants.UrlServidor + "/dist/index.js";
     bot.setWebHook(url + "/bot" + initBotToken_1.token);
 }

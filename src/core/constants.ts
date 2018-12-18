@@ -14,5 +14,7 @@ export namespace Constants {
         Activa = "activo",
         Cancelada = "cancelada"        
     }
+
+    export const UrlServidor = 'https://evening-headland-56271.herokuapp.com';
 }
 

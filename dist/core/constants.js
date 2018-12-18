@@ -16,4 +16,5 @@ var Constants;
         EstadoEstudianteAsignatura["Activa"] = "activo";
         EstadoEstudianteAsignatura["Cancelada"] = "cancelada";
     })(EstadoEstudianteAsignatura = Constants.EstadoEstudianteAsignatura || (Constants.EstadoEstudianteAsignatura = {}));
+    Constants.UrlServidor = 'https://evening-headland-56271.herokuapp.com';
 })(Constants = exports.Constants || (exports.Constants = {}));
