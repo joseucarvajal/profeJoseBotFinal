@@ -7,7 +7,7 @@ var http = require('http'),
 // look for PORT environment variable, 
 // else look for CLI argument,
 // else use hard coded value for port 8080
-port = process.env.PORT || process.argv[2] || 8080;
+port = process.env.PORT || process.argv[2] || 47264;
 // create a simple server
 var server = http.createServer(function (req, res) {
     res.writeHead(200, {
