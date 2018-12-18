@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var initBot_1 = require("../../initBot");
 var fs = require("fs");
-var pdf = require("pdf-thumbnail");
+var pdf = require("html-pdf");
 var BotSender = /** @class */ (function () {
     function BotSender() {
     }
@@ -58,36 +58,17 @@ var BotSender = /** @class */ (function () {
     };
     BotSender.prototype.enviarDocumento = function (msg, path) {
         return new Promise(function (resolve) {
-            fs.access(path, fs.F_OK, function (err) {
+            var messageOptions = {
+                caption: "Descarga el documento"
+            };
+            var config = { format: "A4" };
+            var html = "\n      <style>\n      table {\n        /*\n        border-collapse: collapse;\n        */\n      }\n      </style>\n    <table border=\"1\" cellspacing=\"1\" style=\"width: 100%; border:1px solid;position: relative;\">\n      <tr>\n        <th>hello</th>\n        <th>world</th>\n      </tr>\n      <tr>\n        <td>1</td>\n        <td>1</td>\n      </tr>\n      <tr>\n        <td>2</td>\n        <td>2</td>\n      </tr>\n    </table>\n      ";
+            pdf.create(html, config).toFile(path, function (err, res) {
                 if (err) {
-                    console.log("file to send doesn't exists", err);
-                    return;
+                    return console.error("Generating PDF", err);
                 }
-                var pdfBuffer = fs.readFileSync(path);
-                var thumbnailOpts = {
-                    compress: {
-                        type: "JPEG",
-                        quality: 70 //default
-                    }
-                };
-                pdf(pdfBuffer /*Buffer or stream of the pdf*/, thumbnailOpts)
-                    .then(function (data) {
-                    /*Stream of the image*/
-                    // ...
-                    /*
-                    bot.sendDocument(msg.from.id, path).then(() => {
-                      resolve();
-                    });
-                    */
-                    var messageOptions = {
-                        chat_id: msg.id,
-                        document: path
-                    };
-                    console.log("llega 2");
-                    initBot_1.bot.sendMessage(msg.id, messageOptions);
-                })
-                    .catch(function (err) {
-                    console.log("Error generatin PDF thumbnail", err);
+                initBot_1.bot.sendDocument(msg.from.id, path, messageOptions, {}).then(function () {
+                    resolve();
                 });
             });
         });

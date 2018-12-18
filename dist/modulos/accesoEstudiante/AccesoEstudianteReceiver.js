@@ -25,7 +25,6 @@ var __assign = (this && this.__assign) || function () {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var BotReceiver_1 = require("../bot/BotReceiver");
-var core_1 = require("../../core");
 var MenuPrincipalReceiver_1 = require("../menuPrincipal/MenuPrincipalReceiver");
 var AccesoEstudiante;
 (function (AccesoEstudiante) {
@@ -50,7 +49,7 @@ var AccesoEstudiante;
         };
         AccesoEstudianteReceiver.prototype.onRecibirMensaje = function (msg) {
             if (msg.text == "/start") {
-                this.botSender.enviarDocumento(msg, core_1.Constants.UrlServidor + "/dist/tmp/test.pdf");
+                this.botSender.enviarDocumento(msg, "./dist/tmp/test.pdf");
                 //this.onRecibirComandoStart(msg);
             }
         };

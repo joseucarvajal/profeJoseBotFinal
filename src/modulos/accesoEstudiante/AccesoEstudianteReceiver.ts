@@ -40,8 +40,8 @@ export namespace AccesoEstudiante {
     }
 
     protected onRecibirMensaje(msg: Message & ApiMessage) {
-      if (msg.text == "/start") {
-        this.botSender.enviarDocumento(msg, `${Constants.UrlServidor}/dist/tmp/test.pdf`);
+      if (msg.text == "/start") {        
+        this.botSender.enviarDocumento(msg, `./dist/tmp/test.pdf`);
         //this.onRecibirComandoStart(msg);
       }       
     }
