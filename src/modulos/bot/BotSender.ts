@@ -5,6 +5,9 @@ import { ReplyKeyboardMarkup } from "../../bot/ReplyKeyboardMarkup";
 import { KeyboardButton } from "../../bot/KeyboardButton";
 import { InlineKeyboardButton } from "../../bot/InlineKeyboardButton";
 import { ApiMessage } from "../../api/ApiMessage";
+import { resolve } from "dns";
+
+const fs = require('fs');
 
 export class BotSender {
   responderMensajeHTML(
@@ -83,7 +86,20 @@ export class BotSender {
     });
   }
 
-  enviarDocumento(msg: Message & ApiMessage, path:string) : Promise<any>{
-    return bot.sendDocument(msg.from.id, path);
+  enviarDocumento(msg: Message & ApiMessage, path:string) : Promise<any>{    
+
+    return new Promise<any>((resolve)=>{
+      fs.access(path, fs.F_OK, (err:any) => {
+        if (err) {
+          console.log("file to send doesn't exists", err);
+          return
+        }      
+        
+        bot.sendDocument(msg.from.id, path).then(()=>{
+          resolve();
+        });
+      })      
+    });
+    
   }
 }

@@ -49,7 +49,7 @@ var AccesoEstudiante;
         };
         AccesoEstudianteReceiver.prototype.onRecibirMensaje = function (msg) {
             if (msg.text == "/start") {
-                this.botSender.enviarDocumento(msg, "/tmp/test.pdf");
+                this.botSender.enviarDocumento(msg, "./dist/tmp/test.pdf");
                 //this.onRecibirComandoStart(msg);
             }
         };

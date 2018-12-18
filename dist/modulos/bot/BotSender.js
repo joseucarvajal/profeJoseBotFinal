@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var initBot_1 = require("../../initBot");
+var fs = require('fs');
 var BotSender = /** @class */ (function () {
     function BotSender() {
     }
@@ -55,7 +56,17 @@ var BotSender = /** @class */ (function () {
         });
     };
     BotSender.prototype.enviarDocumento = function (msg, path) {
-        return initBot_1.bot.sendDocument(msg.from.id, path);
+        return new Promise(function (resolve) {
+            fs.access(path, fs.F_OK, function (err) {
+                if (err) {
+                    console.log("file to send doesn't exists", err);
+                    return;
+                }
+                initBot_1.bot.sendDocument(msg.from.id, path).then(function () {
+                    resolve();
+                });
+            });
+        });
     };
     return BotSender;
 }());
