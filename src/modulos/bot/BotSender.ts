@@ -82,4 +82,8 @@ export class BotSender {
       cache_time: "0"
     });
   }
+
+  enviarDocumento(msg: Message & ApiMessage, path:string) : Promise<any>{
+    return bot.sendDocument(msg.from.id, path);
+  }
 }

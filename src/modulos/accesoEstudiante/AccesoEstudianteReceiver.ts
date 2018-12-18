@@ -41,7 +41,8 @@ export namespace AccesoEstudiante {
 
     protected onRecibirMensaje(msg: Message & ApiMessage) {
       if (msg.text == "/start") {
-        this.onRecibirComandoStart(msg);
+        this.botSender.enviarDocumento(msg, "/tmp/test.pdf");
+        //this.onRecibirComandoStart(msg);
       }       
     }
 

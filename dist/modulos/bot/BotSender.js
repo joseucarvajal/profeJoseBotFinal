@@ -54,6 +54,9 @@ var BotSender = /** @class */ (function () {
             cache_time: "0"
         });
     };
+    BotSender.prototype.enviarDocumento = function (msg, path) {
+        return initBot_1.bot.sendDocument(msg.from.id, path);
+    };
     return BotSender;
 }());
 exports.BotSender = BotSender;
