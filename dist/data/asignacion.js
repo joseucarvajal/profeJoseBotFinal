@@ -19,11 +19,30 @@ var Asignacion;
             console.log("Asignaturas/getAsignaturasXPeriodoAndDocente" + error);
         });
     };
-    Asignacion.registrarEstudianteAAsignatura = function (msg, estadoGlobal, estudiante, codigoAsignatura) {
+    Asignacion.asociarEstudianteAAsignatura = function (estadoGlobal, estudiante, codigoAsignatura) {
+        return new Promise(function (resolve, reject) {
+            Asignacion.registrarAsignaturaEstudiante(estadoGlobal, estudiante, codigoAsignatura).then(function () {
+                Asignacion.registrarEstudianteAsignatura(estadoGlobal, estudiante, codigoAsignatura).then(function () {
+                    resolve();
+                });
+            });
+        });
+    };
+    Asignacion.registrarAsignaturaEstudiante = function (estadoGlobal, estudiante, codigoAsignatura) {
         return initDatabase_1.dataBase
-            .ref("periodosAcademicos/" + estadoGlobal.settings.periodoActual + "/asignacion/" + estadoGlobal.settings.celularDocente + "/asignaturas/" + codigoAsignatura + "/estudiantes/" + estadoGlobal.idUsuarioChat)
+            .ref("periodosAcademicos/" + estadoGlobal.settings.periodoActual + "/asignacion/" + estadoGlobal.settings.celularDocente + "/asignatura_estudiante/" + codigoAsignatura + "/" + estudiante.codigo)
             .set({
-            idUsuarioChat: estadoGlobal.idUsuarioChat
+            codigo: estudiante.codigo,
+            nombre: estudiante.nombre,
+            email: estudiante.email
+        });
+    };
+    Asignacion.registrarEstudianteAsignatura = function (estadoGlobal, estudiante, codigoAsignatura) {
+        return initDatabase_1.dataBase
+            .ref("periodosAcademicos/" + estadoGlobal.settings.periodoActual + "/asignacion/" + estadoGlobal.settings.celularDocente + "/estudiante_asignatura/" + estudiante.codigo + "/" + codigoAsignatura)
+            .set({
+            codigo: codigoAsignatura,
+            estado: core_1.Constants.EstadoEstudianteAsignatura.Activa
         });
     };
     Asignacion.registrarAsignaturasAEstudiante = function (msg, estadoGlobal, listaAsignaturas) {
@@ -111,7 +130,8 @@ var Asignacion;
                 Asignacion.getAsignaturasXPeriodoAndDocente(estadoGlobal).then(function (listadoAsignaturas) {
                     var asignaturasQueNoTieneEstudiante = new Array();
                     for (var codigoAsignatura in listadoAsignaturas) {
-                        if (!listadoAsignaturasEstudiante[codigoAsignatura]) {
+                        if (!listadoAsignaturasEstudiante ||
+                            !listadoAsignaturasEstudiante[codigoAsignatura]) {
                             asignaturasQueNoTieneEstudiante.push(listadoAsignaturas[codigoAsignatura]);
                         }
                     }
@@ -128,5 +148,21 @@ var Asignacion;
         return initDatabase_1.dataBase
             .ref("periodosAcademicos/" + estadoGlobal.settings.periodoActual + "/asignacion/" + estadoGlobal.settings.celularDocente + "/asistencias_asignatura/" + codigoAsignatura + "/" + msg.date + "/" + estadoGlobal.infoUsuarioMensaje.estudiante.codigo + "/")
             .set(registroAsistencia);
+    };
+    Asignacion.getAsignaturaByCodigo = function (estadoGlobal, codigoAsignatura) {
+        return initDatabase_1.dataBase
+            .ref("periodosAcademicos/" +
+            estadoGlobal.settings.periodoActual +
+            "/asignacion/" +
+            estadoGlobal.settings.celularDocente +
+            "/asignaturas/" +
+            codigoAsignatura)
+            .once("value")
+            .then(function (snapshot) {
+            return snapshot.val();
+        })
+            .catch(function (error) {
+            console.log("Asignaturas/getAsignaturasXPeriodoAndDocente" + error);
+        });
     };
 })(Asignacion = exports.Asignacion || (exports.Asignacion = {}));

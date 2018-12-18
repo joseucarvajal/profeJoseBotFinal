@@ -23,6 +23,27 @@ export namespace Estudiantes {
       .set(estudiante);
   };
 
+  export const getEstudianteXChatId = (
+    msg: Message & ApiMessage,
+    estadoGlobal: EstadoGlobal,
+    chatId:string,
+  ): Promise<Estudiante> => {
+    return dataBase
+      .ref(
+        "periodosAcademicos/" +
+          estadoGlobal.settings.periodoActual +
+          "/chats/" +
+          chatId
+      )
+      .once("value")
+      .then((snapshot: any) => {
+        return snapshot.val();
+      })
+      .catch((error: any) => {
+        console.log("Estudiantes/getEstudianteByChatId" + error);
+      });
+  };
+
   export const getEstudianteByChatId = (
     msg: Message & ApiMessage,
     estadoGlobal: EstadoGlobal

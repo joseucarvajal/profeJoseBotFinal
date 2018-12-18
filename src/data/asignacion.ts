@@ -13,6 +13,7 @@ import {
 } from "../core/models";
 import { ApiMessage } from "../api/ApiMessage";
 import { Constants } from "../core";
+import { Estudiantes } from "./estudiantes";
 
 export namespace Asignacion {
   export const getAsignaturasXPeriodoAndDocente = (
@@ -35,8 +36,29 @@ export namespace Asignacion {
       });
   };
 
-  export const registrarEstudianteAAsignatura = (
-    msg: ApiMessage,
+  export const asociarEstudianteAAsignatura = (
+    estadoGlobal: EstadoGlobal,
+    estudiante: Estudiante,
+    codigoAsignatura: string
+  ): Promise<any> => {
+    return new Promise<any>((resolve, reject) => {
+      registrarAsignaturaEstudiante(
+        estadoGlobal,
+        estudiante,
+        codigoAsignatura
+      ).then(() => {
+        registrarEstudianteAsignatura(
+          estadoGlobal,
+          estudiante,
+          codigoAsignatura
+        ).then(() => {
+          resolve();
+        });
+      });
+    });
+  };
+
+  export const registrarAsignaturaEstudiante = (
     estadoGlobal: EstadoGlobal,
     estudiante: Estudiante,
     codigoAsignatura: string
@@ -45,13 +67,30 @@ export namespace Asignacion {
       .ref(
         `periodosAcademicos/${estadoGlobal.settings.periodoActual}/asignacion/${
           estadoGlobal.settings.celularDocente
-        }/asignaturas/${codigoAsignatura}/estudiantes/${
-          estadoGlobal.idUsuarioChat
-        }`
+        }/asignatura_estudiante/${codigoAsignatura}/${estudiante.codigo}`
       )
       .set({
-        idUsuarioChat: estadoGlobal.idUsuarioChat
-      });
+        codigo: estudiante.codigo,
+        nombre: estudiante.nombre,
+        email: estudiante.email
+      } as Estudiante);
+  };
+
+  export const registrarEstudianteAsignatura = (
+    estadoGlobal: EstadoGlobal,
+    estudiante: Estudiante,
+    codigoAsignatura: string
+  ): Promise<any> => {
+    return dataBase
+      .ref(
+        `periodosAcademicos/${estadoGlobal.settings.periodoActual}/asignacion/${
+          estadoGlobal.settings.celularDocente
+        }/estudiante_asignatura/${estudiante.codigo}/${codigoAsignatura}`
+      )
+      .set({
+        codigo: codigoAsignatura,
+        estado: Constants.EstadoEstudianteAsignatura.Activa
+      } as AsignaturaAsignadaAEstudiante);
   };
 
   export const registrarAsignaturasAEstudiante = (
@@ -185,7 +224,10 @@ export namespace Asignacion {
               let asignaturasQueNoTieneEstudiante = new Array<Asignatura>();
 
               for (let codigoAsignatura in listadoAsignaturas) {
-                if (!listadoAsignaturasEstudiante[codigoAsignatura]) {
+                if (
+                  !listadoAsignaturasEstudiante ||
+                  !listadoAsignaturasEstudiante[codigoAsignatura]
+                ) {
                   asignaturasQueNoTieneEstudiante.push(
                     listadoAsignaturas[codigoAsignatura]
                   );
@@ -218,5 +260,27 @@ export namespace Asignacion {
         }/`
       )
       .set(registroAsistencia);
+  };
+
+  export const getAsignaturaByCodigo = (
+    estadoGlobal: EstadoGlobal,
+    codigoAsignatura: string
+  ): Promise<Asignatura> => {
+    return dataBase
+      .ref(
+        "periodosAcademicos/" +
+          estadoGlobal.settings.periodoActual +
+          "/asignacion/" +
+          estadoGlobal.settings.celularDocente +
+          "/asignaturas/" +
+          codigoAsignatura
+      )
+      .once("value")
+      .then((snapshot: any) => {
+        return snapshot.val();
+      })
+      .catch((error: any) => {
+        console.log("Asignaturas/getAsignaturasXPeriodoAndDocente" + error);
+      });
   };
 }

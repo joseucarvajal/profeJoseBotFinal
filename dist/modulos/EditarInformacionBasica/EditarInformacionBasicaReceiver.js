@@ -15,7 +15,6 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var BotReceiver_1 = require("../bot/BotReceiver");
 var Data = require("../../data");
-var MenuPrincipalReceiver_1 = require("../menuPrincipal/MenuPrincipalReceiver");
 var EditarInformacionBasica;
 (function (EditarInformacionBasica) {
     var Comandos;
@@ -35,7 +34,11 @@ var EditarInformacionBasica;
             return _this;
         }
         EditarInformacionBasicaReceiver.prototype.responderEditarInformacionBasica = function (msg) {
-            this.solicitarCodigo(msg);
+            if (!this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo) {
+                this.solicitarCodigo(msg);
+                return;
+            }
+            this.solicitarNombreCompleto(msg);
         };
         EditarInformacionBasicaReceiver.prototype.solicitarCodigo = function (msg) {
             this.enviarMensajeHTML(msg, Comandos.IngresaTuCodigo, "Ingresa tu código");
@@ -108,10 +111,10 @@ var EditarInformacionBasica;
             });
         };
         EditarInformacionBasicaReceiver.prototype.enviarMensajeDatosActualizadosConExito = function (msg) {
-            return this.botSender.responderMensajeHTML(msg, "\u2705 Has actualizado tus datos con \u00E9xito");
-        };
-        EditarInformacionBasicaReceiver.prototype.irAMenuPrincipal = function (msg) {
-            this.enviarMensajeAReceiver(this.indexMain.menuPrincipalReceiver, this.indexMain.menuPrincipalReceiver.responderMenuPrincipalEstudiante, msg, MenuPrincipalReceiver_1.MenuPrincipal.Comandos.MenuPrincipalEstudiante);
+            var _this = this;
+            return this.botSender.responderMensajeHTML(msg, "\u2705 Has actualizado tus datos con \u00E9xito").then(function () {
+                _this.irAMenuPrincipal(msg);
+            });
         };
         return EditarInformacionBasicaReceiver;
     }(BotReceiver_1.BotReceiver));

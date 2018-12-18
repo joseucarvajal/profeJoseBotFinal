@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var BotSender_1 = require("./BotSender");
 var Data = require("../../data");
+var MenuPrincipalReceiver_1 = require("../menuPrincipal/MenuPrincipalReceiver");
 var BotReceiver = /** @class */ (function () {
     function BotReceiver(estadoGlobal, indexMain, nombreContexto) {
         this.botSender = new BotSender_1.BotSender();
@@ -40,6 +41,21 @@ var BotReceiver = /** @class */ (function () {
         this.onLocation(msg);
     };
     BotReceiver.prototype.onLocation = function (msg) { };
+    BotReceiver.prototype.validarQueEstudianteHayaIngresadoDatosBasicos = function (msg) {
+        var _this = this;
+        if (!this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo ||
+            !this.estadoGlobal.infoUsuarioMensaje.estudiante.nombre ||
+            !this.estadoGlobal.infoUsuarioMensaje.estudiante.email) {
+            this.botSender.responderMensajeErrorHTML(msg, "No se puede responder la solicitud, primero actualiza tus datos b\u00E1sicos").then(function () {
+                _this.irAMenuPrincipal(msg);
+            });
+            return false;
+        }
+        return true;
+    };
+    BotReceiver.prototype.irAMenuPrincipal = function (msg) {
+        this.enviarMensajeAReceiver(this.indexMain.menuPrincipalReceiver, this.indexMain.menuPrincipalReceiver.responderMenuPrincipalEstudiante, msg, MenuPrincipalReceiver_1.MenuPrincipal.Comandos.MenuPrincipalEstudiante);
+    };
     BotReceiver.prototype.initializeMessage = function (msg) {
         if (msg.chat) {
             this.message = msg;

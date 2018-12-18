@@ -7,6 +7,7 @@ var AccesoEstudianteReceiver_1 = require("./accesoEstudiante/AccesoEstudianteRec
 var EditarInformacionBasicaReceiver_1 = require("./EditarInformacionBasica/EditarInformacionBasicaReceiver");
 var InscribirAsignaturaReceiver_1 = require("./InscribirAsignatura/InscribirAsignaturaReceiver");
 var RegistrarAsistenciaReceiver_1 = require("./registrarAsistencia/RegistrarAsistenciaReceiver");
+var SolicitudesDocenteReceiver_1 = require("./solicitudesDocente/SolicitudesDocenteReceiver");
 var index;
 (function (index) {
     var MainReceiver = /** @class */ (function () {
@@ -17,12 +18,14 @@ var index;
             this.editarInformacionBasicaReceiver = new EditarInformacionBasicaReceiver_1.EditarInformacionBasica.EditarInformacionBasicaReceiver(this.estadoGlobal, this);
             this.inscribirAsignaturaReceiver = new InscribirAsignaturaReceiver_1.InscribirAsignatura.InscribirAsignaturaReceiver(this.estadoGlobal, this);
             this.registrarAsistenciaReceiver = new RegistrarAsistenciaReceiver_1.RegistrarAsistencia.RegistrarAsistenciaReceiver(this.estadoGlobal, this);
+            this.solicitudesDocenteReceiver = new SolicitudesDocenteReceiver_1.SolicitudesDocente.SolicitudesDocenteReceiver(this.estadoGlobal, this);
             this.receiversList = [
                 this.accesoEstudianteReceiver,
                 this.menuPrincipalReceiver,
                 this.editarInformacionBasicaReceiver,
                 this.inscribirAsignaturaReceiver,
-                this.registrarAsistenciaReceiver
+                this.registrarAsistenciaReceiver,
+                this.solicitudesDocenteReceiver
             ];
             this.responderAMensaje = this.responderAMensaje.bind(this);
             this.responderAInlineQuery = this.responderAInlineQuery.bind(this);

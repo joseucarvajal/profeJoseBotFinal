@@ -11,6 +11,20 @@ var Estudiantes;
             estadoGlobal.idUsuarioChat)
             .set(estudiante);
     };
+    Estudiantes.getEstudianteXChatId = function (msg, estadoGlobal, chatId) {
+        return initDatabase_1.dataBase
+            .ref("periodosAcademicos/" +
+            estadoGlobal.settings.periodoActual +
+            "/chats/" +
+            chatId)
+            .once("value")
+            .then(function (snapshot) {
+            return snapshot.val();
+        })
+            .catch(function (error) {
+            console.log("Estudiantes/getEstudianteByChatId" + error);
+        });
+    };
     Estudiantes.getEstudianteByChatId = function (msg, estadoGlobal) {
         return initDatabase_1.dataBase
             .ref("periodosAcademicos/" +

@@ -8,10 +8,12 @@ import { ApiMessage } from "../../api/ApiMessage";
 import { InlineKeyboardButton } from "../../bot/InlineKeyboardButton";
 import { KeyboardButton } from "../../bot/KeyboardButton";
 import { InscribirAsignatura } from "../InscribirAsignatura/InscribirAsignaturaReceiver";
+import { MenuPrincipal } from "../menuPrincipal/MenuPrincipalReceiver";
 
 export namespace RegistrarAsistencia {
   export namespace Comandos {
-    export const SolicitarCodigo = "Ingresa tu código";
+
+    export const SolicitarAsistenciaGPS = `SolicitarAsistenciaGPS`;
 
     export const SeleccionarComandoInline = `SeleccionarComandoInline`;
     export enum SeleccionarComandoInlineOptsEnum {
@@ -40,42 +42,48 @@ export namespace RegistrarAsistencia {
       this.registrarAsistencia = this.registrarAsistencia.bind(this);
     }
 
-    //#region parent events
+    //#region public
     public registrarAsistencia(msg: Message & ApiMessage) {
-      if (!this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo) {
-        this.enviarSolicitudCodigo(msg);
-      } else {
-        this.enviarOpcionesInscripcionAsignaturas();
+      if(!this.validarQueEstudianteHayaIngresadoDatosBasicos(msg)){
+        return;
+      }
+      this.enviarOpcionesInscripcionAsignaturas();      
+    }
+
+    public solicitarAsistenciaGPS(msg: Message & ApiMessage){
+      this.enviarOpcionesSeleccionAsignaturaParaRegistrarAsistencia(msg);
+    }
+    //#endregion
+
+    //#region parent events
+
+    protected onCallbackQuery(msg: Message & ApiMessage) {}
+
+    protected onLocation(msg: Message & ApiMessage) {
+      if (
+        this.estaComandoEnContexto(
+          Comandos.SolicitarAsistenciaGPS
+        )
+      ) {
+        Data.Asignacion.registrarAsistencia(
+          msg,
+          this.estadoGlobal,
+          this.estadoGlobal.infoUsuarioMensaje.estudiante.tempData
+        ).then(() => {
+          this.botSender.responderMensajeHTML(
+            msg,
+            `✅ Has registrado asistencia con éxito`
+          ).then(()=>{
+            this.irAMenuPrincipal(msg);
+          });
+        });
       }
     }
 
-    protected onRecibirMensaje(msg: Message) {
-      if (this.estaComandoEnContexto(Comandos.SolicitarCodigo)) {
-        this.recibirCodigo();
-      }
-    }
+    protected onRecibirMensaje(msg: Message) {}
 
     protected onRecibirInlineQuery(msg: Message & ApiMessage) {}
     //#endregion
-
-    private enviarSolicitudCodigo(msg: Message & ApiMessage) {
-      this.enviarMensajeHTML(
-        msg,
-        Comandos.SolicitarCodigo,
-        Comandos.SolicitarCodigo
-      );
-    }
-
-    private recibirCodigo() {
-      this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo = this.message.text;
-      Data.Estudiantes.actualizarChat(
-        this.message,
-        this.estadoGlobal,
-        this.estadoGlobal.infoUsuarioMensaje.estudiante
-      ).then(()=>{
-        this.enviarOpcionesInscripcionAsignaturas();
-      });
-    }
 
     private enviarOpcionesInscripcionAsignaturas() {
       this.enviarMensajeAReceiver(
@@ -87,8 +95,10 @@ export namespace RegistrarAsistencia {
       );
     }
 
-    private enviarOpcionesSeleccionAsignatura(msg: Message & ApiMessage) {
+    private enviarOpcionesSeleccionAsignaturaParaRegistrarAsistencia(msg: Message & ApiMessage) {
       let fechaHoy = new Date();
+
+      console.log("a enviar");
 
       Data.Asignacion.getAsignaturasByEstudianteCodigo(
         this.estadoGlobal,
@@ -138,28 +148,6 @@ export namespace RegistrarAsistencia {
           );
         }
       });
-    }
-
-    protected onCallbackQuery(msg: Message & ApiMessage) {}
-
-    protected onLocation(msg: Message & ApiMessage) {
-      if (
-        this.estaComandoEnContexto(
-          Comandos.SeleccionarComandoInlineOptsEnum
-            .SeleccionarAsignaturaByDefault
-        )
-      ) {
-        Data.Asignacion.registrarAsistencia(
-          msg,
-          this.estadoGlobal,
-          this.estadoGlobal.infoUsuarioMensaje.estudiante.tempData
-        ).then(() => {
-          this.botSender.responderMensajeHTML(
-            msg,
-            `✅ Has registrado asistencia con éxito`
-          );
-        });
-      }
     }
   }
 }

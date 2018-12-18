@@ -21,7 +21,7 @@ var RegistrarAsistencia;
 (function (RegistrarAsistencia) {
     var Comandos;
     (function (Comandos) {
-        Comandos.SolicitarCodigo = "Ingresa tu código";
+        Comandos.SolicitarAsistenciaGPS = "SolicitarAsistenciaGPS";
         Comandos.SeleccionarComandoInline = "SeleccionarComandoInline";
         var SeleccionarComandoInlineOptsEnum;
         (function (SeleccionarComandoInlineOptsEnum) {
@@ -46,39 +46,40 @@ var RegistrarAsistencia;
             _this.registrarAsistencia = _this.registrarAsistencia.bind(_this);
             return _this;
         }
-        //#region parent events
+        //#region public
         RegistrarAsistenciaReceiver.prototype.registrarAsistencia = function (msg) {
-            if (!this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo) {
-                this.enviarSolicitudCodigo(msg);
+            if (!this.validarQueEstudianteHayaIngresadoDatosBasicos(msg)) {
+                return;
             }
-            else {
-                this.enviarOpcionesInscripcionAsignaturas();
+            this.enviarOpcionesInscripcionAsignaturas();
+        };
+        RegistrarAsistenciaReceiver.prototype.solicitarAsistenciaGPS = function (msg) {
+            this.enviarOpcionesSeleccionAsignaturaParaRegistrarAsistencia(msg);
+        };
+        //#endregion
+        //#region parent events
+        RegistrarAsistenciaReceiver.prototype.onCallbackQuery = function (msg) { };
+        RegistrarAsistenciaReceiver.prototype.onLocation = function (msg) {
+            var _this = this;
+            if (this.estaComandoEnContexto(Comandos.SolicitarAsistenciaGPS)) {
+                Data.Asignacion.registrarAsistencia(msg, this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante.tempData).then(function () {
+                    _this.botSender.responderMensajeHTML(msg, "\u2705 Has registrado asistencia con \u00E9xito").then(function () {
+                        _this.irAMenuPrincipal(msg);
+                    });
+                });
             }
         };
-        RegistrarAsistenciaReceiver.prototype.onRecibirMensaje = function (msg) {
-            if (this.estaComandoEnContexto(Comandos.SolicitarCodigo)) {
-                this.recibirCodigo();
-            }
-        };
+        RegistrarAsistenciaReceiver.prototype.onRecibirMensaje = function (msg) { };
         RegistrarAsistenciaReceiver.prototype.onRecibirInlineQuery = function (msg) { };
         //#endregion
-        RegistrarAsistenciaReceiver.prototype.enviarSolicitudCodigo = function (msg) {
-            this.enviarMensajeHTML(msg, Comandos.SolicitarCodigo, Comandos.SolicitarCodigo);
-        };
-        RegistrarAsistenciaReceiver.prototype.recibirCodigo = function () {
-            var _this = this;
-            this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo = this.message.text;
-            Data.Estudiantes.actualizarChat(this.message, this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante).then(function () {
-                _this.enviarOpcionesInscripcionAsignaturas();
-            });
-        };
         RegistrarAsistenciaReceiver.prototype.enviarOpcionesInscripcionAsignaturas = function () {
             this.enviarMensajeAReceiver(this.indexMain.inscribirAsignaturaReceiver, this.indexMain.inscribirAsignaturaReceiver
                 .enviarOpcionSeleccionarAsignaturas, this.message, InscribirAsignaturaReceiver_1.InscribirAsignatura.Comandos.InscripcionAsignaturas);
         };
-        RegistrarAsistenciaReceiver.prototype.enviarOpcionesSeleccionAsignatura = function (msg) {
+        RegistrarAsistenciaReceiver.prototype.enviarOpcionesSeleccionAsignaturaParaRegistrarAsistencia = function (msg) {
             var _this = this;
             var fechaHoy = new Date();
+            console.log("a enviar");
             Data.Asignacion.getAsignaturasByEstudianteCodigo(this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo).then(function (asignaturasDeEstudiante) {
                 if (asignaturasDeEstudiante.result == false) {
                     _this.botSender.responderMensajeErrorHTML(msg, "Ha ocurrido un error, por favor notif\u00EDcale al profe Jose");
@@ -105,16 +106,6 @@ var RegistrarAsistencia;
                     _this.botSender.responderMensajeErrorHTML(msg, "No tienes asignaturas para registrar asistencia el d\u00EDa de hoy");
                 }
             });
-        };
-        RegistrarAsistenciaReceiver.prototype.onCallbackQuery = function (msg) { };
-        RegistrarAsistenciaReceiver.prototype.onLocation = function (msg) {
-            var _this = this;
-            if (this.estaComandoEnContexto(Comandos.SeleccionarComandoInlineOptsEnum
-                .SeleccionarAsignaturaByDefault)) {
-                Data.Asignacion.registrarAsistencia(msg, this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante.tempData).then(function () {
-                    _this.botSender.responderMensajeHTML(msg, "\u2705 Has registrado asistencia con \u00E9xito");
-                });
-            }
         };
         return RegistrarAsistenciaReceiver;
     }(BotReceiver_1.BotReceiver));

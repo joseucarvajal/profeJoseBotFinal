@@ -53,7 +53,7 @@ export namespace AccesoEstudiante {
         email: "",
         comando: Comandos.SolicitarCodigo,
         contexto: this.nombreContexto,
-        registroConfirmado: false,
+        inscripcionAsignaturasConfirmado: false,
         tempData: ""        
       };
 

@@ -8,6 +8,7 @@ import { KeyboardButton } from "../../bot/KeyboardButton";
 import { ApiMessage } from "../../api/ApiMessage";
 import { InlineKeyboardButton } from "../../bot/InlineKeyboardButton";
 import { Chat } from "../../bot/Chat";
+import { MenuPrincipal } from "../menuPrincipal/MenuPrincipalReceiver";
 
 export abstract class BotReceiver {
   informacionContexto: InformacionContexto;
@@ -17,7 +18,7 @@ export abstract class BotReceiver {
   protected abstract nombreContexto: string;
   public indexMain: MainReceiverContract;
 
-  protected message: Message; 
+  protected message: Message;
   protected apiMessage: ApiMessage;
 
   constructor(
@@ -36,7 +37,6 @@ export abstract class BotReceiver {
   }
 
   public onRecibirMensajeBase(msg: Message & ApiMessage) {
-
     if (!msg.text && !msg.contact) {
       return;
     }
@@ -69,9 +69,38 @@ export abstract class BotReceiver {
   }
   protected onLocation(msg: Message) {}
 
+  protected validarQueEstudianteHayaIngresadoDatosBasicos(
+    msg: Message & ApiMessage
+  ): boolean {
+    if (
+      !this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo ||
+      !this.estadoGlobal.infoUsuarioMensaje.estudiante.nombre ||
+      !this.estadoGlobal.infoUsuarioMensaje.estudiante.email
+    ) {
+      this.botSender.responderMensajeErrorHTML(
+        msg,
+        `No se puede responder la solicitud, primero actualiza tus datos básicos`
+      ).then(()=>{
+        this.irAMenuPrincipal(msg);
+      });
 
-  private initializeMessage(msg: Message & ApiMessage){
-    if(msg.chat){
+      return false;
+    }
+
+    return true;
+  }
+
+  protected irAMenuPrincipal(msg: Message & ApiMessage) {
+    this.enviarMensajeAReceiver(
+      this.indexMain.menuPrincipalReceiver,
+      this.indexMain.menuPrincipalReceiver.responderMenuPrincipalEstudiante,
+      msg,
+      MenuPrincipal.Comandos.MenuPrincipalEstudiante
+    );
+  }
+
+  private initializeMessage(msg: Message & ApiMessage) {
+    if (msg.chat) {
       this.message = msg;
       return;
     }
@@ -134,7 +163,7 @@ export abstract class BotReceiver {
         this.estadoGlobal,
         this.estadoGlobal.infoUsuarioMensaje.estudiante
       ).then(() => {
-        this.botSender.responderMensajeHTML(msg, html).then(()=>{
+        this.botSender.responderMensajeHTML(msg, html).then(() => {
           resolve();
         });
       });
@@ -212,29 +241,28 @@ export abstract class BotReceiver {
 
   protected abstract onRecibirMensaje(msg: Message): void;
 
-  protected enviarMensajeErrorHTMLAProfesor(message:string){
-    let msg:Message & ApiMessage = {
-      chat:{
-        id:this.estadoGlobal.settings.idUsuarioChatDocente
+  protected enviarMensajeErrorHTMLAProfesor(message: string) {
+    let msg: Message & ApiMessage = {
+      chat: {
+        id: this.estadoGlobal.settings.idUsuarioChatDocente
       } as Chat
     } as Message & ApiMessage;
 
     this.botSender.responderMensajeErrorHTML(msg, message);
   }
 
-  protected enviarMensajeHTMLAProfesor(message:string){
-    let msg:Message & ApiMessage = {
-      chat:{
-        id:this.estadoGlobal.settings.idUsuarioChatDocente
+  protected enviarMensajeHTMLAProfesor(message: string) {
+    let msg: Message & ApiMessage = {
+      chat: {
+        id: this.estadoGlobal.settings.idUsuarioChatDocente
       } as Chat
     } as Message & ApiMessage;
 
     this.botSender.responderMensajeHTML(msg, message);
   }
 
-  protected getMesssage():Message | ApiMessage{
-
-    if(this.message){
+  protected getMesssage(): Message | ApiMessage {
+    if (this.message) {
       return this.message;
     }
 

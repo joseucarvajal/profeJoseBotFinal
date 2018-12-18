@@ -28,7 +28,13 @@ export namespace EditarInformacionBasica {
     }
 
     public responderEditarInformacionBasica(msg: Message & ApiMessage) {
-      this.solicitarCodigo(msg);
+      if(!this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo){
+        this.solicitarCodigo(msg);
+        return;
+      }
+      
+      this.solicitarNombreCompleto(msg);
+
     }
 
     private solicitarCodigo(msg: Message & ApiMessage) {
@@ -134,16 +140,9 @@ export namespace EditarInformacionBasica {
       return this.botSender.responderMensajeHTML(
         msg,
         `✅ Has actualizado tus datos con éxito`
-      );
-    }
-
-    private irAMenuPrincipal(msg: Message & ApiMessage) {
-      this.enviarMensajeAReceiver(
-        this.indexMain.menuPrincipalReceiver,
-        this.indexMain.menuPrincipalReceiver.responderMenuPrincipalEstudiante,
-        msg,
-        MenuPrincipal.Comandos.MenuPrincipalEstudiante
-      );
+      ).then(()=>{
+        this.irAMenuPrincipal(msg);
+      });
     }
   }
 }

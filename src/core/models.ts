@@ -17,7 +17,7 @@ export interface Estudiante extends InformacionContexto {
     codigo:string;
     nombre:string;
     email:string;     
-    registroConfirmado:boolean; //Cuando un estudiante ha confirmado su registro en el bot (el código corresponde y tiene asignaturas asociadas)
+    inscripcionAsignaturasConfirmado:boolean; //Cuando un estudiante ha confirmado su registro en el bot (el código corresponde y tiene asignaturas asociadas)
     tempData:string;
     asignaturas?:ListadoAsignaturas;
 }

@@ -6,6 +6,8 @@ import { KeyboardButton } from "../../bot/KeyboardButton";
 import { EstadoGlobal } from "../../core";
 import { MainReceiverContract } from "../indexContracts";
 import { ApiMessage } from "../../api/ApiMessage";
+import { InscribirAsignatura } from "../InscribirAsignatura/InscribirAsignaturaReceiver";
+import { RegistrarAsistencia } from "../registrarAsistencia/RegistrarAsistenciaReceiver";
 
 export namespace MenuPrincipal {
   export namespace Comandos {
@@ -14,14 +16,17 @@ export namespace MenuPrincipal {
     export enum MenuPrincipalEstudianteOpts {
       RegistrarAsistencia = "⏱ Registrar asistencia",
       InscribirAsignatura = "📚 Inscribir asignatura",
-      DesInscribirAsignatura = "❌ Des-inscribir asignatura",
-      EditarInfoBasica = "✏️ Editar información básica"
+      EditarInfoBasica = "✏️ Actualizar mis datos básicos"
     }
   }
 
   let nombreContexto = "MenuPrincipalEstudianteReceiver";
   export class MenuPrincipalReceiver extends BotReceiver {
     nombreContexto = nombreContexto;
+
+    btnRegistrarAsistencia: KeyboardButton = {
+      text: Comandos.MenuPrincipalEstudianteOpts.RegistrarAsistencia
+    };
 
     constructor(estadoGlobal: EstadoGlobal, indexMain: MainReceiverContract) {
       super(estadoGlobal, indexMain, nombreContexto);
@@ -32,25 +37,35 @@ export namespace MenuPrincipal {
     }
 
     startKeyboardOpts: Array<Array<KeyboardButton>> = [
-      [{ text: Comandos.MenuPrincipalEstudianteOpts.RegistrarAsistencia }],
+      [this.btnRegistrarAsistencia],
       [{ text: Comandos.MenuPrincipalEstudianteOpts.InscribirAsignatura }],
-      //[{ text: Comandos.MenuPrincipalEstudianteOpts.DesInscribirAsignatura }],
       [{ text: Comandos.MenuPrincipalEstudianteOpts.EditarInfoBasica }]
     ];
 
+    //#region public
     public responderMenuPrincipalEstudiante(msg: Message & ApiMessage) {
+      if (this.estadoGlobal.infoUsuarioMensaje.estudiante) {
+        if (
+          this.estadoGlobal.infoUsuarioMensaje.estudiante
+            .inscripcionAsignaturasConfirmado
+        ) {
+          this.btnRegistrarAsistencia.request_location = true;
+        }
+      }
+
       this.botSender.responderKeyboardMarkup(
         msg,
         `Selecciona una opción`,
         this.startKeyboardOpts
       );
     }
+    //#endregion
 
+    //#region parent events
     protected onRecibirMensaje(msg: Message & ApiMessage) {
-
       let esOpcionMenuPpalEstudiante = false;
-      for(let i=0; i<this.startKeyboardOpts.length; i++){
-        if(this.startKeyboardOpts[i][0].text == msg.text){
+      for (let i = 0; i < this.startKeyboardOpts.length; i++) {
+        if (this.startKeyboardOpts[i][0].text == msg.text) {
           esOpcionMenuPpalEstudiante = true;
           break;
         }
@@ -58,29 +73,60 @@ export namespace MenuPrincipal {
 
       if (esOpcionMenuPpalEstudiante) {
         switch (msg.text) {
+          case Comandos.MenuPrincipalEstudianteOpts.RegistrarAsistencia:
+            this.gotoRegistrarAsistencia(msg);
+            break;
+
+          case Comandos.MenuPrincipalEstudianteOpts.InscribirAsignatura:
+            this.goToInscribirAsignatura(msg);
+            break;
 
           case Comandos.MenuPrincipalEstudianteOpts.EditarInfoBasica:
             this.goToEditarInformacionBasica(msg);
             break;
-
-          case Comandos.MenuPrincipalEstudianteOpts.RegistrarAsistencia:
-            this.gotoRegistrarAsistencia(msg);
-            break;          
         }
       }
     }
-    
+
+    public onLocation(msg: Message & ApiMessage) {
+      if(this.estaComandoEnContexto(Comandos.MenuPrincipalEstudiante)){
+        this.gotoRegistrarAsistencia(msg);
+      }
+    }
+    //#endregion
+
     private goToEditarInformacionBasica(msg: Message & ApiMessage) {
       this.enviarMensajeAReceiver(
-        this.indexMain.registrarAsistenciaReceiver,
-        this.indexMain.registrarAsistenciaReceiver
-          .registrarAsistencia,
+        this.indexMain.editarInformacionBasicaReceiver,
+        this.indexMain.editarInformacionBasicaReceiver
+          .responderEditarInformacionBasica,
         msg,
-        MenuPrincipal.Comandos.MenuPrincipalEstudianteOpts.RegistrarAsistencia
+        MenuPrincipal.Comandos.MenuPrincipalEstudianteOpts.EditarInfoBasica
+      );
+    }
+
+    private goToInscribirAsignatura(msg: Message & ApiMessage) {
+      this.enviarMensajeAReceiver(
+        this.indexMain.inscribirAsignaturaReceiver,
+        this.indexMain.inscribirAsignaturaReceiver
+          .enviarOpcionSeleccionarAsignaturas,
+        msg,
+        InscribirAsignatura.Comandos.InscripcionAsignaturas
       );
     }
 
     private gotoRegistrarAsistencia(msg: Message & ApiMessage) {
+      console.log("llega gotoRegistrarAsistencia");
+      if (msg.location) {
+        this.enviarMensajeAReceiver(
+          this.indexMain.registrarAsistenciaReceiver,
+          this.indexMain.registrarAsistenciaReceiver.solicitarAsistenciaGPS,
+          msg,
+          RegistrarAsistencia.Comandos.SolicitarAsistenciaGPS
+        );
+        return;
+      }
+
       this.enviarMensajeAReceiver(
         this.indexMain.registrarAsistenciaReceiver,
         this.indexMain.registrarAsistenciaReceiver.registrarAsistencia,
@@ -90,4 +136,3 @@ export namespace MenuPrincipal {
     }
   }
 }
-
