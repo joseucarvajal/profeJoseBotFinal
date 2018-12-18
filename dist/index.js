@@ -1,10 +1,4 @@
 "use strict";
-/*
-require('./initDatabase');
-require('./initBot');
-
-require('./modulos/index');
-*/
 var fs = require("fs");
 // using the http module
 var http = require('http'), 
@@ -32,3 +26,6 @@ var server = http.createServer(function (req, res) {
 server.listen(port, function () {
     console.log('app up on port: ' + port);
 });
+require('./initDatabase');
+require('./initBot');
+require('./modulos/index');

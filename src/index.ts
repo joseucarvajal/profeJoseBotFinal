@@ -1,9 +1,4 @@
-/*
-require('./initDatabase');
-require('./initBot');
 
-require('./modulos/index');
-*/
 
 const fs = require("fs");
 
@@ -42,3 +37,8 @@ server.listen(port, function () {
  
 });
 
+
+require('./initDatabase');
+require('./initBot');
+
+require('./modulos/index');
