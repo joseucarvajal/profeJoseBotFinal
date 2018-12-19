@@ -64,15 +64,24 @@ export interface Asignatura {
   grupo:number;
   horarios:ListadoHorarios;
   estado?:Constants.EstadoEstudianteAsignatura;
+  
+  /* 
+  En milisegundos
+  1. milisegundos to date: new Date(milisegundos)
+  2. date a milisegundos: date.getTime()
+  */
+  fechaInicioClases:number; 
+  
 }
 
 export interface AsignaturaEstudiantes {
   [key: string]: ListadoEstudiantes;
 }
 
-export interface RegistroAsistenciaModel {
+export interface Asistencia {
   latitud:number,
-  longitud:number
+  longitud:number,
+  fechaHora:number; //milliseconds
 }
 
 export interface AsignaturasDeEstudiante {
@@ -86,4 +95,32 @@ export interface AsignaturaAsignadaAEstudiante {
   codigo:string;
   estado:Constants.EstadoEstudianteAsignatura;
 }
+
+export interface ListadoAsistenciaEstudiante {
+  [codigoEstudiante:string]:Asistencia;
+}
+
+export interface ListadoAsistenciaFecha {
+  [milisegundosFecha:number]:ListadoAsistenciaEstudiante;
+}
+
+export interface ListadoAsistenciaAsignatura{
+  [codigoAsignatura:string]:ListadoAsistenciaFecha;
+}
+
+export interface ContadorAsistenciasEstudiante {
+  estudiante:Estudiante;
+  countAsistencias:number;
+  countFallas:number;
+}
+
+export interface ListaResultadoAsistenciasIndxByEstCodigo{
+  [codigoEstudiante:string]:ContadorAsistenciasEstudiante;
+}
+
+export interface ResultadoReporteAsistencia{
+  asignatura:Asignatura;
+  listaResultadoAsistenciasIndxByEstCodigo:ListaResultadoAsistenciasIndxByEstCodigo;
+}
+
 //#endregion

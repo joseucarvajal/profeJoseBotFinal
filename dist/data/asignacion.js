@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var initDatabase_1 = require("../initDatabase");
 var core_1 = require("../core");
+var Utils_1 = require("../utils/Utils");
 var Asignacion;
 (function (Asignacion) {
     Asignacion.getAsignaturasXPeriodoAndDocente = function (estadoGlobal) {
@@ -69,6 +70,22 @@ var Asignacion;
             "/asignacion/" +
             estadoGlobal.settings.celularDocente +
             "/asignatura_estudiante/")
+            .once("value")
+            .then(function (snapshot) {
+            return snapshot.val();
+        })
+            .catch(function (error) {
+            console.log("Asignaturas/getAsignaturasXPeriodoAndDocente" + error);
+        });
+    };
+    Asignacion.getEstudiantesInscritosEnAsignatura = function (estadoGlobal, codigoAsignatura) {
+        return initDatabase_1.dataBase
+            .ref("periodosAcademicos/" +
+            estadoGlobal.settings.periodoActual +
+            "/asignacion/" +
+            estadoGlobal.settings.celularDocente +
+            "/asignatura_estudiante/"
+            + codigoAsignatura)
             .once("value")
             .then(function (snapshot) {
             return snapshot.val();
@@ -159,10 +176,13 @@ var Asignacion;
     Asignacion.registrarAsistencia = function (msg, estadoGlobal, codigoAsignatura) {
         var registroAsistencia = {
             latitud: msg.location.latitude,
-            longitud: msg.location.longitude
+            longitud: msg.location.longitude,
+            fechaHora: msg.date
         };
+        var fechaAsistencia = new Date(Utils_1.Utils.getRealDate(msg.date));
+        fechaAsistencia.setHours(0, 0, 0, 0);
         return initDatabase_1.dataBase
-            .ref("periodosAcademicos/" + estadoGlobal.settings.periodoActual + "/asignacion/" + estadoGlobal.settings.celularDocente + "/asistencias_asignatura/" + codigoAsignatura + "/" + msg.date + "/" + estadoGlobal.infoUsuarioMensaje.estudiante.codigo + "/")
+            .ref("periodosAcademicos/" + estadoGlobal.settings.periodoActual + "/asignacion/" + estadoGlobal.settings.celularDocente + "/asistencias_asignatura/" + codigoAsignatura + "/" + fechaAsistencia.getTime() + "/" + estadoGlobal.infoUsuarioMensaje.estudiante.codigo + "/")
             .set(registroAsistencia);
     };
     Asignacion.getAsignaturaByCodigo = function (estadoGlobal, codigoAsignatura) {
@@ -179,6 +199,22 @@ var Asignacion;
         })
             .catch(function (error) {
             console.log("Asignaturas/getAsignaturasXPeriodoAndDocente" + error);
+        });
+    };
+    Asignacion.getListadoAsistenciaByAsignatura = function (estadoGlobal, asignatura) {
+        return initDatabase_1.dataBase
+            .ref("periodosAcademicos/" +
+            estadoGlobal.settings.periodoActual +
+            "/asignacion/" +
+            estadoGlobal.settings.celularDocente +
+            "/asistencias_asignatura/" +
+            asignatura.codigo)
+            .once("value")
+            .then(function (snapshot) {
+            return snapshot.val();
+        })
+            .catch(function (error) {
+            console.log("asignacion/getListadoAsistenciaByAsignatura" + error);
         });
     };
 })(Asignacion = exports.Asignacion || (exports.Asignacion = {}));

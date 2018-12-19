@@ -21,6 +21,7 @@ import { InscribirAsignatura } from "./InscribirAsignatura/InscribirAsignaturaRe
 import { ApiMessage } from "../api/ApiMessage";
 import { RegistrarAsistencia } from "./registrarAsistencia/RegistrarAsistenciaReceiver";
 import { SolicitudesDocente } from "./solicitudesDocente/SolicitudesDocenteReceiver";
+import { Docente } from "./docente/DocenteReceiver";
 
 export namespace index {
   class MainReceiver implements MainReceiverContract {
@@ -32,6 +33,7 @@ export namespace index {
     inscribirAsignaturaReceiver: InscribirAsignatura.InscribirAsignaturaReceiver;
     registrarAsistenciaReceiver: RegistrarAsistencia.RegistrarAsistenciaReceiver;
     solicitudesDocenteReceiver: SolicitudesDocente.SolicitudesDocenteReceiver;
+    docenteReceiver: Docente.DocenteReceiver;
 
     receiversList: Array<BotReceiver>;
 
@@ -68,13 +70,19 @@ export namespace index {
         this
       );
 
+      this.docenteReceiver = new Docente.DocenteReceiver(
+        this.estadoGlobal,
+        this
+      );
+
       this.receiversList = [
         this.accesoEstudianteReceiver,
         this.menuPrincipalReceiver,
         this.editarInformacionBasicaReceiver,
         this.inscribirAsignaturaReceiver,
         this.registrarAsistenciaReceiver,
-        this.solicitudesDocenteReceiver
+        this.solicitudesDocenteReceiver,
+        this.docenteReceiver
       ];
 
       this.responderAMensaje = this.responderAMensaje.bind(this);

@@ -6,15 +6,17 @@ import {
   Asignatura,
   ListadoAsignaturas,
   Estudiante,
-  RegistroAsistenciaModel,
+  Asistencia,
   AsignaturasDeEstudiante,
   AsignaturaEstudiantes,
-  AsignaturaAsignadaAEstudiante
+  AsignaturaAsignadaAEstudiante,
+  ListadoEstudiantes,
+  ListadoAsistenciaAsignatura,
+  ListadoAsistenciaFecha
 } from "../core/models";
 import { ApiMessage } from "../api/ApiMessage";
 import { Constants } from "../core";
-import { Estudiantes } from "./estudiantes";
-import { strictEqual } from "assert";
+import { Utils } from "../utils/Utils";
 
 export namespace Asignacion {
   export const getAsignaturasXPeriodoAndDocente = (
@@ -142,6 +144,29 @@ export namespace Asignacion {
         console.log("Asignaturas/getAsignaturasXPeriodoAndDocente" + error);
       });
   };
+
+  export const getEstudiantesInscritosEnAsignatura = (
+    estadoGlobal: EstadoGlobal,
+    codigoAsignatura:string
+  ): Promise<ListadoEstudiantes> => {
+    return dataBase
+      .ref(
+        "periodosAcademicos/" +
+          estadoGlobal.settings.periodoActual +
+          "/asignacion/" +
+          estadoGlobal.settings.celularDocente +
+          "/asignatura_estudiante/"
+          + codigoAsignatura
+      )
+      .once("value")
+      .then((snapshot: any) => {
+        return snapshot.val();
+      })
+      .catch((error: any) => {
+        console.log("Asignaturas/getAsignaturasXPeriodoAndDocente" + error);
+      });
+  };
+
   
   export const getAsignaturasByEstudianteCodigo = (
     estadoGlobal: EstadoGlobal,
@@ -275,14 +300,18 @@ export namespace Asignacion {
   ): Promise<any> => {
     let registroAsistencia = {
       latitud: msg.location.latitude,
-      longitud: msg.location.longitude
-    } as RegistroAsistenciaModel;
+      longitud: msg.location.longitude,
+      fechaHora: msg.date
+    } as Asistencia;
+
+    let fechaAsistencia = new Date(Utils.getRealDate(msg.date));
+    fechaAsistencia.setHours(0, 0, 0, 0);    
 
     return dataBase
       .ref(
         `periodosAcademicos/${estadoGlobal.settings.periodoActual}/asignacion/${
           estadoGlobal.settings.celularDocente
-        }/asistencias_asignatura/${codigoAsignatura}/${msg.date}/${
+        }/asistencias_asignatura/${codigoAsignatura}/${fechaAsistencia.getTime()}/${
           estadoGlobal.infoUsuarioMensaje.estudiante.codigo
         }/`
       )
@@ -310,4 +339,27 @@ export namespace Asignacion {
         console.log("Asignaturas/getAsignaturasXPeriodoAndDocente" + error);
       });
   };
+
+  export const getListadoAsistenciaByAsignatura = (
+    estadoGlobal: EstadoGlobal,
+    asignatura:Asignatura
+  ): Promise<ListadoAsistenciaFecha> => {
+    return dataBase
+      .ref(
+        "periodosAcademicos/" +
+          estadoGlobal.settings.periodoActual +
+          "/asignacion/" +
+          estadoGlobal.settings.celularDocente +
+          "/asistencias_asignatura/" +
+          asignatura.codigo
+      )
+      .once("value")
+      .then((snapshot: any) => {
+        return snapshot.val();
+      })
+      .catch((error: any) => {
+        console.log("asignacion/getListadoAsistenciaByAsignatura" + error);
+      });
+  };
+
 }

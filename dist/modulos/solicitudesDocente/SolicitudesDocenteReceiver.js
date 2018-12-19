@@ -100,7 +100,25 @@ var SolicitudesDocente;
                             _this.botSender.responderMensajeHTML(mensajeAEstudiante, "\uD83D\uDCE9 El profe <i>Jose</i> ha <b>aprobado</b> la solicitud de inscripci\u00F3n a la asignatura <b>" + asignatura.nombre + "</b>, ya puedes registrar asistencia para esta asignatura.").then(function () {
                                 _this.irAMenuPrincipal(msg);
                             });
-                            _this.botSender.responderMensajeHTML(msg, "\u2705 Se ha <b>aprobado</b> la solicitud de inscripci\u00F3n del estudiante " + estudiante.nombre + " a la asignatura <b>" + asignatura.nombre + "</b> satisfactoriamente");
+                            var msgActualizarChat = {
+                                chat: {
+                                    id: chatIdEstudiante
+                                },
+                                from: {
+                                    id: chatIdEstudiante
+                                }
+                            };
+                            var mensajeInscripcionAprobada = "\u2705 Se ha <b>aprobado</b> la solicitud de inscripci\u00F3n del estudiante " + estudiante.nombre + " a la asignatura <b>" + asignatura.nombre + "</b> satisfactoriamente";
+                            if (!estudiante.inscripcionAsignaturasConfirmado) {
+                                Data.Estudiantes.actualizarChat(msg, _this.estadoGlobal, estudiante).then(function () {
+                                    estudiante.inscripcionAsignaturasConfirmado = true;
+                                }).then(function () {
+                                    _this.botSender.responderMensajeHTML(msg, mensajeInscripcionAprobada);
+                                });
+                            }
+                            else {
+                                _this.botSender.responderMensajeHTML(msg, mensajeInscripcionAprobada);
+                            }
                         });
                     }
                 });

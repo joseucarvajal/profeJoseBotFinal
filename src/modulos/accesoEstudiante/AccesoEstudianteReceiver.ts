@@ -40,12 +40,10 @@ export namespace AccesoEstudiante {
     }
 
     protected onRecibirMensaje(msg: Message & ApiMessage) {
-      if (msg.text == "/start") {        
-        this.botSender.enviarDocumento(msg, `./dist/tmp/test.pdf`);
-        //this.onRecibirComandoStart(msg);
+      if (msg.text == "/start" || msg.text == "/estudiante") {        
+        this.onRecibirComandoStart(msg);
       }       
     }
-
 
     private inicializarDatosEstudianteContexto() {
       let defaultEstudiante: Estudiante = {

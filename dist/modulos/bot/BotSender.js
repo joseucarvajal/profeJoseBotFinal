@@ -56,18 +56,19 @@ var BotSender = /** @class */ (function () {
             cache_time: "0"
         });
     };
-    BotSender.prototype.enviarDocumento = function (msg, path) {
+    BotSender.prototype.enviarHTMLComoDocumentoPDF = function (msg, nombreDocumento, html, description) {
         return new Promise(function (resolve) {
+            var patDocumento = "./dist/tmp/" + nombreDocumento;
             var messageOptions = {
-                caption: "Descarga el documento"
+                caption: description,
+                parse_mode: "HTML",
             };
             var config = { format: "A4" };
-            var html = "\n    <table border=\"1\" cellspacing=\"0\" style=\"width: 100%; border:1px solid;position: relative;\">\n      <tr>\n        <th>hello</th>\n        <th>world</th>\n      </tr>\n      <tr>\n        <td>1</td>\n        <td>1</td>\n      </tr>\n      <tr>\n        <td>2</td>\n        <td>2</td>\n      </tr>\n    </table>\n      ";
-            pdf.create(html, config).toFile(path, function (err, res) {
+            pdf.create(html, config).toFile(patDocumento, function (err, res) {
                 if (err) {
                     return console.error("Generating PDF", err);
                 }
-                initBot_1.bot.sendDocument(msg.from.id, path, messageOptions, {}).then(function () {
+                initBot_1.bot.sendDocument(msg.from.id, patDocumento, messageOptions, {}).then(function () {
                     resolve();
                 });
             });

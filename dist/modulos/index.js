@@ -8,6 +8,7 @@ var EditarInformacionBasicaReceiver_1 = require("./EditarInformacionBasica/Edita
 var InscribirAsignaturaReceiver_1 = require("./InscribirAsignatura/InscribirAsignaturaReceiver");
 var RegistrarAsistenciaReceiver_1 = require("./registrarAsistencia/RegistrarAsistenciaReceiver");
 var SolicitudesDocenteReceiver_1 = require("./solicitudesDocente/SolicitudesDocenteReceiver");
+var DocenteReceiver_1 = require("./docente/DocenteReceiver");
 var index;
 (function (index) {
     var MainReceiver = /** @class */ (function () {
@@ -19,13 +20,15 @@ var index;
             this.inscribirAsignaturaReceiver = new InscribirAsignaturaReceiver_1.InscribirAsignatura.InscribirAsignaturaReceiver(this.estadoGlobal, this);
             this.registrarAsistenciaReceiver = new RegistrarAsistenciaReceiver_1.RegistrarAsistencia.RegistrarAsistenciaReceiver(this.estadoGlobal, this);
             this.solicitudesDocenteReceiver = new SolicitudesDocenteReceiver_1.SolicitudesDocente.SolicitudesDocenteReceiver(this.estadoGlobal, this);
+            this.docenteReceiver = new DocenteReceiver_1.Docente.DocenteReceiver(this.estadoGlobal, this);
             this.receiversList = [
                 this.accesoEstudianteReceiver,
                 this.menuPrincipalReceiver,
                 this.editarInformacionBasicaReceiver,
                 this.inscribirAsignaturaReceiver,
                 this.registrarAsistenciaReceiver,
-                this.solicitudesDocenteReceiver
+                this.solicitudesDocenteReceiver,
+                this.docenteReceiver
             ];
             this.responderAMensaje = this.responderAMensaje.bind(this);
             this.responderAInlineQuery = this.responderAInlineQuery.bind(this);

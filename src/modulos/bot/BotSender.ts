@@ -86,36 +86,23 @@ export class BotSender {
     });
   }
 
-  enviarDocumento(msg: Message & ApiMessage, path: string): Promise<any> {
+  enviarHTMLComoDocumentoPDF(msg: Message & ApiMessage, nombreDocumento: string, html:string, description:string): Promise<any> {
     return new Promise<any>(resolve => {
 
+      let patDocumento = `./dist/tmp/${nombreDocumento}`;
+
       let messageOptions = {
-        caption: `Descarga el documento`
+        caption: description,
+        parse_mode: "HTML",
       };
 
       var config = { format: "A4" };
 
-      let html = `
-    <table border="1" cellspacing="0" style="width: 100%; border:1px solid;position: relative;">
-      <tr>
-        <th>hello</th>
-        <th>world</th>
-      </tr>
-      <tr>
-        <td>1</td>
-        <td>1</td>
-      </tr>
-      <tr>
-        <td>2</td>
-        <td>2</td>
-      </tr>
-    </table>
-      `;
-      pdf.create(html, config).toFile(path, (err: any, res: any) => {
+      pdf.create(html, config).toFile(patDocumento, (err: any, res: any) => {
         if (err) {
           return console.error(`Generating PDF`, err);
         }
-        bot.sendDocument(msg.from.id, path, messageOptions, {}).then(() => {
+        bot.sendDocument(msg.from.id, patDocumento, messageOptions, {}).then(() => {
           resolve();
         });
       });

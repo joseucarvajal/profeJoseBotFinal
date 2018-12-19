@@ -9,6 +9,7 @@ import { ApiMessage } from "../../api/ApiMessage";
 import { InlineKeyboardButton } from "../../bot/InlineKeyboardButton";
 import { Chat } from "../../bot/Chat";
 import { Estudiantes } from "../../data";
+import { strictEqual } from "assert";
 
 export namespace SolicitudesDocente {
   export namespace Comandos {
@@ -161,14 +162,38 @@ export namespace SolicitudesDocente {
                 this.irAMenuPrincipal(msg);
               });
 
-              this.botSender.responderMensajeHTML(
-                msg,
-                `✅ Se ha <b>aprobado</b> la solicitud de inscripción del estudiante ${
-                  estudiante.nombre
-                } a la asignatura <b>${
-                  asignatura.nombre
-                }</b> satisfactoriamente`
-              );
+              let msgActualizarChat = {
+                chat:{
+                  id:chatIdEstudiante
+                } as Chat,
+                from:{
+                  id:chatIdEstudiante
+                }
+              } as Message;
+            
+              let mensajeInscripcionAprobada = 
+              `✅ Se ha <b>aprobado</b> la solicitud de inscripción del estudiante ${
+                estudiante.nombre
+              } a la asignatura <b>${
+                asignatura.nombre
+              }</b> satisfactoriamente`;
+
+              if(!estudiante.inscripcionAsignaturasConfirmado){
+                Data.Estudiantes.actualizarChat(msg, this.estadoGlobal, estudiante).then(()=>{
+                  estudiante.inscripcionAsignaturasConfirmado = true;
+                }).then(()=>{
+                  this.botSender.responderMensajeHTML(
+                    msg,
+                    mensajeInscripcionAprobada
+                  );                  
+                });  
+              }
+              else{
+                this.botSender.responderMensajeHTML(
+                  msg,
+                  mensajeInscripcionAprobada
+                );  
+              }
             });
           }
         });
