@@ -1,6 +1,6 @@
 import { Message } from "../../bot/Message";
 import { BotSender } from "./BotSender";
-import { EstadoGlobal, InformacionContexto } from "../../core";
+import { EstadoGlobal, InformacionContexto, Asignatura } from "../../core";
 
 import * as Data from "../../data";
 import { MainReceiverContract } from "../indexContracts";
@@ -290,5 +290,38 @@ export abstract class BotReceiver {
     }
 
     return this.apiMessage;
+  }
+
+  protected getAsignaturasFormatoInlineQuery(listadoAsignaturas: Array<Asignatura>):Array<any>{
+    let opcionesListaAsignaturas = new Array<any>();
+    let asignatura: Asignatura;
+    for (let i = 0; i < listadoAsignaturas.length; i++) {
+      asignatura = listadoAsignaturas[i];
+
+      let mensajeHorarios = "";
+      let horario;
+      let horarioCounter = 0;
+      for (let codigoHorario in asignatura.horarios) {
+        horario = asignatura.horarios[codigoHorario];
+        if (horarioCounter > 0) {
+          mensajeHorarios += " y ";
+        }
+        mensajeHorarios +=
+          horario.dia + ", " + horario.horaInicio + " a " + horario.horaFin;
+        horarioCounter++;
+      }
+
+      opcionesListaAsignaturas.push({
+        id: asignatura.codigo,
+        type: "article",
+        title: `${asignatura.nombre}, grupo ${asignatura.grupo}`,
+        description: `${mensajeHorarios}`,
+        input_message_content: {
+          message_text: `${asignatura.nombre}, grupo ${asignatura.grupo}`
+        }
+      });      
+    }    
+
+    return opcionesListaAsignaturas;
   }
 }

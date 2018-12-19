@@ -67,8 +67,7 @@ var InscribirAsignatura;
             }
         };
         InscribirAsignaturaReceiver.prototype.onRecibirInlineQuery = function (msg) {
-            if (!this.estaComandoEnContexto(Comandos.OpcionesInscripcionAsignaturasOptsEnum
-                .InscribirOtraAsignatura)) {
+            if (this.estaComandoEnContexto(Comandos.EsperandoInscripcionAsignaturasRpta)) {
                 this.enviarAsignaturasQueNoTieneInscritasElEstudiante(msg);
             }
         };
@@ -99,32 +98,7 @@ var InscribirAsignatura;
         InscribirAsignaturaReceiver.prototype.enviarAsignaturasQueNoTieneInscritasElEstudiante = function (msg) {
             var _this = this;
             Data.Asignacion.getAsignaturasQueNoTieneEstudiante(this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo).then(function (listadoAsignaturas) {
-                var opcionesListaAsignaturas = new Array();
-                var asignatura;
-                for (var i = 0; i < listadoAsignaturas.length; i++) {
-                    asignatura = listadoAsignaturas[i];
-                    var mensajeHorarios = "";
-                    var horario = void 0;
-                    var horarioCounter = 0;
-                    for (var codigoHorario in asignatura.horarios) {
-                        horario = asignatura.horarios[codigoHorario];
-                        if (horarioCounter > 0) {
-                            mensajeHorarios += " y ";
-                        }
-                        mensajeHorarios +=
-                            horario.dia + ", " + horario.horaInicio + " a " + horario.horaFin;
-                        horarioCounter++;
-                    }
-                    opcionesListaAsignaturas.push({
-                        id: asignatura.codigo,
-                        type: "article",
-                        title: asignatura.nombre + ", grupo " + asignatura.grupo,
-                        description: "" + mensajeHorarios,
-                        input_message_content: {
-                            message_text: asignatura.nombre + ", grupo " + asignatura.grupo
-                        }
-                    });
-                }
+                var opcionesListaAsignaturas = _this.getAsignaturasFormatoInlineQuery(listadoAsignaturas);
                 _this.botSender.responderInLineQuery(msg, opcionesListaAsignaturas);
             });
         };

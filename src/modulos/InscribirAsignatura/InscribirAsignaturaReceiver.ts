@@ -83,15 +83,12 @@ export namespace InscribirAsignatura {
       }
     }
 
-    public onRecibirInlineQuery(msg: Message & ApiMessage) {
+    public onRecibirInlineQuery(msg: Message & ApiMessage) {      
       if (
-        !this.estaComandoEnContexto(
-          Comandos.OpcionesInscripcionAsignaturasOptsEnum
-            .InscribirOtraAsignatura
-        )
+        this.estaComandoEnContexto(Comandos.EsperandoInscripcionAsignaturasRpta)
       ) {
         this.enviarAsignaturasQueNoTieneInscritasElEstudiante(msg);
-      }
+      }      
     }
 
     onChosenInlineResult(msg: ApiMessage & Message) {      
@@ -144,35 +141,7 @@ export namespace InscribirAsignatura {
         this.estadoGlobal,
         this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo
       ).then((listadoAsignaturas: Array<Asignatura>) => {
-        let opcionesListaAsignaturas = new Array<any>();
-        let asignatura: Asignatura;
-        for (let i = 0; i < listadoAsignaturas.length; i++) {
-          asignatura = listadoAsignaturas[i];
-
-          let mensajeHorarios = "";
-          let horario;
-          let horarioCounter = 0;
-          for (let codigoHorario in asignatura.horarios) {
-            horario = asignatura.horarios[codigoHorario];
-            if (horarioCounter > 0) {
-              mensajeHorarios += " y ";
-            }
-            mensajeHorarios +=
-              horario.dia + ", " + horario.horaInicio + " a " + horario.horaFin;
-            horarioCounter++;
-          }
-
-          opcionesListaAsignaturas.push({
-            id: asignatura.codigo,
-            type: "article",
-            title: `${asignatura.nombre}, grupo ${asignatura.grupo}`,
-            description: `${mensajeHorarios}`,
-            input_message_content: {
-              message_text: `${asignatura.nombre}, grupo ${asignatura.grupo}`
-            }
-          });
-        }
-
+        let opcionesListaAsignaturas = this.getAsignaturasFormatoInlineQuery(listadoAsignaturas);
         this.botSender.responderInLineQuery(msg, opcionesListaAsignaturas);
       });
     }

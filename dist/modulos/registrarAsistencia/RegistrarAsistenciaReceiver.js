@@ -28,6 +28,10 @@ var RegistrarAsistencia;
             SeleccionarComandoInlineOptsEnum["SeleccionarAsignaturaByDefault"] = "\u2714\uFE0F Registrar asistencia";
             SeleccionarComandoInlineOptsEnum["Volver"] = "\uD83D\uDD19 Volver";
         })(SeleccionarComandoInlineOptsEnum = Comandos.SeleccionarComandoInlineOptsEnum || (Comandos.SeleccionarComandoInlineOptsEnum = {}));
+        var SeleccionarAsignaturaAsistenciaOPts;
+        (function (SeleccionarAsignaturaAsistenciaOPts) {
+            SeleccionarAsignaturaAsistenciaOPts["SeleccionarAsignatura"] = "\u2197\uFE0F Seleccionar una asignatura";
+        })(SeleccionarAsignaturaAsistenciaOPts = Comandos.SeleccionarAsignaturaAsistenciaOPts || (Comandos.SeleccionarAsignaturaAsistenciaOPts = {}));
     })(Comandos = RegistrarAsistencia.Comandos || (RegistrarAsistencia.Comandos = {}));
     var nombreContexto = "RegistrarAsistenciaReceiver";
     var RegistrarAsistenciaReceiver = /** @class */ (function (_super) {
@@ -40,12 +44,19 @@ var RegistrarAsistencia;
                     {
                         text: Comandos.SeleccionarComandoInlineOptsEnum
                             .SeleccionarAsignaturaByDefault,
-                        request_location: true
                     }
                 ],
                 [
                     {
                         text: Comandos.SeleccionarComandoInlineOptsEnum.Volver
+                    }
+                ]
+            ];
+            _this.seleccionarAsignaturaAsistenciaOPts = [
+                [
+                    {
+                        text: Comandos.SeleccionarAsignaturaAsistenciaOPts.SeleccionarAsignatura,
+                        switch_inline_query_current_chat: ""
                     }
                 ]
             ];
@@ -80,7 +91,11 @@ var RegistrarAsistencia;
                 this.irAMenuPrincipal(msg);
             }
         };
-        RegistrarAsistenciaReceiver.prototype.onRecibirInlineQuery = function (msg) { };
+        RegistrarAsistenciaReceiver.prototype.onRecibirInlineQuery = function (msg) {
+            if (this.estaComandoEnContexto(Comandos.SeleccionarAsignaturaAsistenciaOPts.SeleccionarAsignatura)) {
+                this.enviarListaAsignaturasParaReportarAsistencia(msg);
+            }
+        };
         //#endregion
         RegistrarAsistenciaReceiver.prototype.guardarAsistencia = function (msg) {
             var _this = this;
@@ -99,31 +114,61 @@ var RegistrarAsistencia;
         RegistrarAsistenciaReceiver.prototype.enviarOpcionesSeleccionAsignaturaParaRegistrarAsistencia = function (msg) {
             var _this = this;
             var fechaHoy = new Date();
-            Data.Asignacion.getAsignaturasInscritasPorEstudianteCachedInfoCompleta(this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo).then(function (listadoAsignaturasDeEstudiante) {
-                var asignatura;
-                var horario;
-                var tieneAlgunHorarioHoy = false;
-                for (var i = 0; i < listadoAsignaturasDeEstudiante.length; i++) {
-                    asignatura = listadoAsignaturasDeEstudiante[i];
-                    for (var codigoHorario in asignatura.horarios) {
-                        horario = asignatura.horarios[codigoHorario];
-                        if (core_1.Constants.DiasSemana.get(fechaHoy.getDay()) == horario.dia &&
-                            asignatura.estado == core_1.Constants.EstadoEstudianteAsignatura.Activa) {
-                            tieneAlgunHorarioHoy = true;
-                            _this.estadoGlobal.infoUsuarioMensaje.estudiante.tempData =
-                                asignatura.codigo;
-                            _this.enviarMensajeKeyboardMarkup(msg, "Hoy es <b>" + core_1.Constants.DiasSemana.get(fechaHoy.getDay()) + "</b>. Deseas reportar asistencia en la asignatura <b>" + asignatura.nombre + "\u2753 </b>", _this.seleccionarAsignaturaInlineOpts, Comandos.SeleccionarComandoInlineOptsEnum
-                                .SeleccionarAsignaturaByDefault);
+            this.getAsignaturasAsistenciaHoy(msg).then(function (listadoAsignaturasDeEstudianteHoy) {
+                if (listadoAsignaturasDeEstudianteHoy.length == 0) {
+                    _this.enviarOpcionesRegistrarAsistenciaNoAsignaturas(msg);
+                }
+                else if (listadoAsignaturasDeEstudianteHoy.length == 1) {
+                    _this.enviarOpcionesRegistrarAsistenciaUnaAsignatura(msg, listadoAsignaturasDeEstudianteHoy[0], fechaHoy);
+                }
+                else {
+                    _this.enviarOpcionRegistrarAsistenciaMultiplesAsignaturas(msg, listadoAsignaturasDeEstudianteHoy, fechaHoy);
+                }
+            });
+        };
+        RegistrarAsistenciaReceiver.prototype.getAsignaturasAsistenciaHoy = function (msg) {
+            var _this = this;
+            return new Promise(function (resolve, reject) {
+                var fechaHoy = new Date();
+                Data.Asignacion.getAsignaturasInscritasPorEstudianteCachedInfoCompleta(_this.estadoGlobal, _this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo).then(function (listadoAsignaturasDeEstudiante) {
+                    var asignatura;
+                    var horario;
+                    var listadoAsignaturasDeEstudianteHoy = new Array();
+                    for (var i = 0; i < listadoAsignaturasDeEstudiante.length; i++) {
+                        asignatura = listadoAsignaturasDeEstudiante[i];
+                        for (var codigoHorario in asignatura.horarios) {
+                            horario = asignatura.horarios[codigoHorario];
+                            if (core_1.Constants.DiasSemana.get(fechaHoy.getDay()) == horario.dia &&
+                                asignatura.estado == core_1.Constants.EstadoEstudianteAsignatura.Activa) {
+                                listadoAsignaturasDeEstudianteHoy.push(asignatura);
+                            }
                         }
                     }
-                }
-                if (!tieneAlgunHorarioHoy) {
-                    _this.botSender
-                        .responderMensajeErrorHTML(msg, "No tienes asignaturas para registrar asistencia el d\u00EDa de <b>hoy</b>")
-                        .then(function () {
-                        _this.irAMenuPrincipal(msg);
-                    });
-                }
+                    resolve(listadoAsignaturasDeEstudianteHoy);
+                });
+            });
+        };
+        RegistrarAsistenciaReceiver.prototype.enviarOpcionesRegistrarAsistenciaNoAsignaturas = function (msg) {
+            var _this = this;
+            this.botSender
+                .responderMensajeErrorHTML(msg, "No tienes asignaturas para registrar asistencia el d\u00EDa de <b>hoy</b>")
+                .then(function () {
+                _this.irAMenuPrincipal(msg);
+            });
+        };
+        RegistrarAsistenciaReceiver.prototype.enviarOpcionesRegistrarAsistenciaUnaAsignatura = function (msg, asignatura, fechaHoy) {
+            this.estadoGlobal.infoUsuarioMensaje.estudiante.tempData =
+                asignatura.codigo;
+            this.enviarMensajeKeyboardMarkup(msg, "Hoy es <b>" + core_1.Constants.DiasSemana.get(fechaHoy.getDay()) + "</b>. Deseas reportar asistencia en la asignatura <b>" + asignatura.nombre + "\u2753 </b>", this.seleccionarAsignaturaInlineOpts, Comandos.SeleccionarComandoInlineOptsEnum.SeleccionarAsignaturaByDefault);
+        };
+        RegistrarAsistenciaReceiver.prototype.enviarOpcionRegistrarAsistenciaMultiplesAsignaturas = function (msg, listadoAsignaturasDeEstudianteHoy, fechaHoy) {
+            this.enviarMensajeInlineKeyBoard(msg, Comandos.SeleccionarAsignaturaAsistenciaOPts.SeleccionarAsignatura, "Hoy es <b>" + core_1.Constants.DiasSemana.get(fechaHoy.getDay()) + "</b> y tienes " + listadoAsignaturasDeEstudianteHoy.length + " asignaturas para reportar asistencia.", this.seleccionarAsignaturaAsistenciaOPts);
+        };
+        RegistrarAsistenciaReceiver.prototype.enviarListaAsignaturasParaReportarAsistencia = function (msg) {
+            var _this = this;
+            this.getAsignaturasAsistenciaHoy(msg).then(function (listadoAsignaturasDeEstudianteHoy) {
+                var opcionesListaAsignaturas = _this.getAsignaturasFormatoInlineQuery(listadoAsignaturasDeEstudianteHoy);
+                _this.botSender.responderInLineQuery(msg, opcionesListaAsignaturas);
             });
         };
         return RegistrarAsistenciaReceiver;
