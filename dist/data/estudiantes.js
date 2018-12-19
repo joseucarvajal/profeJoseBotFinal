@@ -8,8 +8,19 @@ var Estudiantes;
             .ref("periodosAcademicos/" +
             estadoGlobal.settings.periodoActual +
             "/chats/" +
-            estadoGlobal.idUsuarioChat)
+            msg.from.id)
             .set(estudiante);
+    };
+    Estudiantes.actualizarContextoChat = function (msg, estadoGlobal, contexto, comando) {
+        return initDatabase_1.dataBase
+            .ref("periodosAcademicos/" +
+            estadoGlobal.settings.periodoActual +
+            "/chats/")
+            .child(msg.from.id)
+            .update({
+            comando: comando,
+            contexto: contexto
+        });
     };
     Estudiantes.getEstudianteXChatId = function (msg, estadoGlobal, chatId) {
         return initDatabase_1.dataBase

@@ -85,7 +85,8 @@ var MenuPrincipal;
                 .enviarOpcionSeleccionarAsignaturas, msg, InscribirAsignaturaReceiver_1.InscribirAsignatura.Comandos.InscripcionAsignaturas);
         };
         MenuPrincipalReceiver.prototype.gotoRegistrarAsistencia = function (msg) {
-            if (this.estadoGlobal.infoUsuarioMensaje.estudiante.inscripcionAsignaturasConfirmado) {
+            if (this.estadoGlobal.infoUsuarioMensaje.estudiante
+                .inscripcionAsignaturasConfirmado) {
                 this.enviarMensajeAReceiver(this.indexMain.registrarAsistenciaReceiver, this.indexMain.registrarAsistenciaReceiver.solicitarAsistenciaGPS, msg, RegistrarAsistenciaReceiver_1.RegistrarAsistencia.Comandos.SolicitarAsistenciaGPS);
                 return;
             }

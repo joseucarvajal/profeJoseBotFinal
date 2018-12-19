@@ -15,30 +15,45 @@ var BotReceiver = /** @class */ (function () {
         this.apiMessage = {};
     }
     BotReceiver.prototype.onRecibirMensajeBase = function (msg) {
-        if (!msg.text && !msg.contact) {
-            return;
-        }
-        this.initializeMessage(msg);
-        this.onRecibirMensaje(msg);
+        var _this = this;
+        this.botSender.enviarActionTyping(msg).then(function () {
+            if (!msg.text && !msg.contact) {
+                return;
+            }
+            _this.initializeMessage(msg);
+            _this.onRecibirMensaje(msg);
+        });
     };
     BotReceiver.prototype.onRecibirInlineQueryBase = function (msg) {
-        this.initializeMessage(msg);
-        this.onRecibirInlineQuery(msg);
+        var _this = this;
+        this.botSender.enviarActionTyping(msg).then(function () {
+            _this.initializeMessage(msg);
+            _this.onRecibirInlineQuery(msg);
+        });
     };
     BotReceiver.prototype.onRecibirInlineQuery = function (msg) { };
     BotReceiver.prototype.onChosenInlineResultBase = function (msg) {
-        this.initializeMessage(msg);
-        this.onChosenInlineResult(msg);
+        var _this = this;
+        this.botSender.enviarActionTyping(msg).then(function () {
+            _this.initializeMessage(msg);
+            _this.onChosenInlineResult(msg);
+        });
     };
     BotReceiver.prototype.onChosenInlineResult = function (msg) { };
     BotReceiver.prototype.onCallbackQueryBase = function (msg) {
-        this.initializeMessage(msg);
-        this.onCallbackQuery(msg);
+        var _this = this;
+        this.botSender.enviarActionTyping(msg).then(function () {
+            _this.initializeMessage(msg);
+            _this.onCallbackQuery(msg);
+        });
     };
     BotReceiver.prototype.onCallbackQuery = function (msg) { };
     BotReceiver.prototype.onLocationBase = function (msg) {
-        this.initializeMessage(msg);
-        this.onLocation(msg);
+        var _this = this;
+        this.botSender.enviarActionTyping(msg).then(function () {
+            _this.initializeMessage(msg);
+            _this.onLocation(msg);
+        });
     };
     BotReceiver.prototype.onLocation = function (msg) { };
     BotReceiver.prototype.validarQueEstudianteHayaIngresadoDatosBasicos = function (msg) {
@@ -46,7 +61,9 @@ var BotReceiver = /** @class */ (function () {
         if (!this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo ||
             !this.estadoGlobal.infoUsuarioMensaje.estudiante.nombre ||
             !this.estadoGlobal.infoUsuarioMensaje.estudiante.email) {
-            this.botSender.responderMensajeErrorHTML(msg, "No se puede responder la solicitud, primero actualiza tus datos b\u00E1sicos").then(function () {
+            this.botSender
+                .responderMensajeErrorHTML(msg, "No se puede responder la solicitud, primero actualiza tus datos b\u00E1sicos")
+                .then(function () {
                 _this.irAMenuPrincipal(msg);
             });
             return false;
@@ -74,8 +91,7 @@ var BotReceiver = /** @class */ (function () {
             this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto);
     };
     BotReceiver.prototype.estaOpcionSeleccionadaEnContexto = function (opcionSeleccionada, msg) {
-        return (this.estaEnContextoActual() &&
-            msg.text == opcionSeleccionada);
+        return this.estaEnContextoActual() && msg.text == opcionSeleccionada;
     };
     BotReceiver.prototype.estaComandoEnContexto = function (comando, contexto) {
         return (this.estaEnContextoActual(contexto) &&
@@ -85,7 +101,7 @@ var BotReceiver = /** @class */ (function () {
         this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto =
             instanciaReceiver.nombreContexto;
         this.estadoGlobal.infoUsuarioMensaje.estudiante.comando = comandoARegistrarEstudiante;
-        Data.Estudiantes.actualizarChat(msg, this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante).then(function () {
+        Data.Estudiantes.actualizarContextoChat(msg, this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto, this.estadoGlobal.infoUsuarioMensaje.estudiante.comando).then(function () {
             fn(msg);
         });
     };
@@ -94,7 +110,7 @@ var BotReceiver = /** @class */ (function () {
         return new Promise(function (resolve, reject) {
             _this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto = _this.nombreContexto;
             _this.estadoGlobal.infoUsuarioMensaje.estudiante.comando = comando;
-            Data.Estudiantes.actualizarChat(msg, _this.estadoGlobal, _this.estadoGlobal.infoUsuarioMensaje.estudiante).then(function () {
+            Data.Estudiantes.actualizarContextoChat(msg, _this.estadoGlobal, _this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto, _this.estadoGlobal.infoUsuarioMensaje.estudiante.comando).then(function () {
                 _this.botSender.responderMensajeHTML(msg, html).then(function () {
                     resolve();
                 });
@@ -110,7 +126,7 @@ var BotReceiver = /** @class */ (function () {
     BotReceiver.prototype.actualizarContextoComando = function (msg, comando) {
         this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto = this.nombreContexto;
         this.estadoGlobal.infoUsuarioMensaje.estudiante.comando = comando;
-        return Data.Estudiantes.actualizarChat(msg, this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante);
+        return Data.Estudiantes.actualizarContextoChat(msg, this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto, this.estadoGlobal.infoUsuarioMensaje.estudiante.comando);
     };
     BotReceiver.prototype.goToAndGuardarContextoComando = function (instanciaReceiver, fn, msg, comando) {
         var _this = this;
@@ -122,7 +138,7 @@ var BotReceiver = /** @class */ (function () {
         var _this = this;
         this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto = this.nombreContexto;
         this.estadoGlobal.infoUsuarioMensaje.estudiante.comando = comando;
-        Data.Estudiantes.actualizarChat(msg, this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante).then(function () {
+        Data.Estudiantes.actualizarContextoChat(msg, this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto, this.estadoGlobal.infoUsuarioMensaje.estudiante.comando).then(function () {
             return _this.botSender.responderKeyboardMarkup(msg, label, opcionesKeyboard);
         });
         return new Promise(function () { });

@@ -141,7 +141,10 @@ export namespace RegistrarAsistencia {
           asignatura = listadoAsignaturasDeEstudiante[i];
           for (let codigoHorario in asignatura.horarios) {
             horario = asignatura.horarios[codigoHorario];
-            if (Constants.DiasSemana.get(fechaHoy.getDay()) == horario.dia && asignatura.estado == Constants.EstadoEstudianteAsignatura.Activa) {
+            if (
+              Constants.DiasSemana.get(fechaHoy.getDay()) == horario.dia &&
+              asignatura.estado == Constants.EstadoEstudianteAsignatura.Activa
+            ) {
               tieneAlgunHorarioHoy = true;
               this.estadoGlobal.infoUsuarioMensaje.estudiante.tempData =
                 asignatura.codigo;
@@ -161,12 +164,14 @@ export namespace RegistrarAsistencia {
         }
 
         if (!tieneAlgunHorarioHoy) {
-          this.botSender.responderMensajeErrorHTML(
-            msg,
-            `No tienes asignaturas para registrar asistencia el día de <b>hoy</b>`
-          ).then(()=>{
-            this.irAMenuPrincipal(msg);
-          });
+          this.botSender
+            .responderMensajeErrorHTML(
+              msg,
+              `No tienes asignaturas para registrar asistencia el día de <b>hoy</b>`
+            )
+            .then(() => {
+              this.irAMenuPrincipal(msg);
+            });
         }
       });
     }

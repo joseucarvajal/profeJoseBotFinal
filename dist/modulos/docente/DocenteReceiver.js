@@ -62,31 +62,27 @@ var Docente;
         //#endregion
         DocenteReceiver.prototype.enviarReporteAsistenciaAsignatura = function (msg) {
             var _this = this;
-            this.botSender
-                .responderMensajeHTML(msg, "\uD83D\uDD57 Estoy generando tu reporte. Por favor espera un momento...")
-                .then(function () {
-                _this.calculoReporteAsistenciaAsignaturas
-                    .calcularReporteAsistenciaAsignaturas(msg, "dummy")
-                    .then(function (resultadoReporteAsistencia) {
-                    var htmlReporte = "\n          <table border=\"1\" cellspacing=\"0\" style=\"width: 100%; border:1px solid;position: relative;\">\n          <tr><th>C\u00F3digo</th><th>Nombre</th><th>Email</th><th>Asistencias</th><th>Fallas</th></tr>\n        ";
-                    var htmlRegistroEstudiante = "";
-                    var resultadoByEst;
-                    for (var codigoEstudiante in resultadoReporteAsistencia.listaResultadoAsistenciasIndxByEstCodigo) {
-                        resultadoByEst =
-                            resultadoReporteAsistencia
-                                .listaResultadoAsistenciasIndxByEstCodigo[codigoEstudiante];
-                        htmlRegistroEstudiante = "<tr><td>" + resultadoByEst.estudiante.codigo + "</td><td>" + resultadoByEst.estudiante.nombre + "</td><td>" + resultadoByEst.estudiante.email + "</td><td>" + resultadoByEst.countAsistencias + "</td><td>" + resultadoByEst.countFallas + "</td></tr>";
-                        htmlReporte += htmlRegistroEstudiante;
-                    }
-                    htmlReporte += "</table>";
-                    var opcionesFormatoFecha = {
-                        weekday: "long",
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric"
-                    };
-                    _this.botSender.enviarHTMLComoDocumentoPDF(msg, "asistencia_" + resultadoReporteAsistencia.asignatura.nombre + ".pdf", htmlReporte, "Reporte asistencia \nasignatura: \"<b>" + resultadoReporteAsistencia.asignatura.nombre + "</b>\" \nFecha: <b>" + new Date().toLocaleDateString('es-ES') + "</b>");
-                });
+            this.calculoReporteAsistenciaAsignaturas
+                .calcularReporteAsistenciaAsignaturas(msg, "dummy")
+                .then(function (resultadoReporteAsistencia) {
+                var htmlReporte = "\n          <table border=\"1\" cellspacing=\"0\" style=\"width: 100%; border:1px solid;position: relative;\">\n          <tr><th>C\u00F3digo</th><th>Nombre</th><th>Email</th><th>Asistencias</th><th>Fallas</th></tr>\n        ";
+                var htmlRegistroEstudiante = "";
+                var resultadoByEst;
+                for (var codigoEstudiante in resultadoReporteAsistencia.listaResultadoAsistenciasIndxByEstCodigo) {
+                    resultadoByEst =
+                        resultadoReporteAsistencia
+                            .listaResultadoAsistenciasIndxByEstCodigo[codigoEstudiante];
+                    htmlRegistroEstudiante = "<tr><td>" + resultadoByEst.estudiante.codigo + "</td><td>" + resultadoByEst.estudiante.nombre + "</td><td>" + resultadoByEst.estudiante.email + "</td><td>" + resultadoByEst.countAsistencias + "</td><td>" + resultadoByEst.countFallas + "</td></tr>";
+                    htmlReporte += htmlRegistroEstudiante;
+                }
+                htmlReporte += "</table>";
+                var opcionesFormatoFecha = {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric"
+                };
+                _this.botSender.enviarHTMLComoDocumentoPDF(msg, "asistencia_" + resultadoReporteAsistencia.asignatura.nombre + ".pdf", htmlReporte, "Reporte asistencia \nasignatura: \"<b>" + resultadoReporteAsistencia.asignatura.nombre + "</b>\" \nFecha: <b>" + new Date().toLocaleDateString("es-ES") + "</b>");
             });
         };
         DocenteReceiver.prototype.irAMenuPrincipalAndSaveState = function (msg) {

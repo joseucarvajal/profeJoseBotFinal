@@ -107,7 +107,8 @@ var RegistrarAsistencia;
                     asignatura = listadoAsignaturasDeEstudiante[i];
                     for (var codigoHorario in asignatura.horarios) {
                         horario = asignatura.horarios[codigoHorario];
-                        if (core_1.Constants.DiasSemana.get(fechaHoy.getDay()) == horario.dia && asignatura.estado == core_1.Constants.EstadoEstudianteAsignatura.Activa) {
+                        if (core_1.Constants.DiasSemana.get(fechaHoy.getDay()) == horario.dia &&
+                            asignatura.estado == core_1.Constants.EstadoEstudianteAsignatura.Activa) {
                             tieneAlgunHorarioHoy = true;
                             _this.estadoGlobal.infoUsuarioMensaje.estudiante.tempData =
                                 asignatura.codigo;
@@ -117,7 +118,9 @@ var RegistrarAsistencia;
                     }
                 }
                 if (!tieneAlgunHorarioHoy) {
-                    _this.botSender.responderMensajeErrorHTML(msg, "No tienes asignaturas para registrar asistencia el d\u00EDa de <b>hoy</b>").then(function () {
+                    _this.botSender
+                        .responderMensajeErrorHTML(msg, "No tienes asignaturas para registrar asistencia el d\u00EDa de <b>hoy</b>")
+                        .then(function () {
                         _this.irAMenuPrincipal(msg);
                     });
                 }

@@ -85,7 +85,7 @@ var InscribirAsignatura;
                 .enviarSolicitudInscribirAsignatura(msg, this.estadoGlobal.infoUsuarioMensaje.estudiante, msg.from.id, msg.result_id)
                 .then(function () {
                 _this.botSender
-                    .responderMensajeHTML(msg, "\u2709\uFE0F Se ha enviado la <b>solicitud</b> al profe Jose de manera satisfactoria, cuando \u00E9l apruebe o rechace recibir\u00E1s un mensaje con la respuesta")
+                    .responderMensajeHTML(msg, "\u2709\uFE0F Se ha enviado la <b>solicitud</b> al profe Jose de manera satisfactoria. Recibir\u00E1s un mensaje cuando el profe haya aprobado o rechazdo la solicitud")
                     .then(function () {
                     _this.irAMenuPrincipal(msg);
                 });
@@ -210,7 +210,7 @@ var InscribirAsignatura;
                     }
                 ]
             ];
-            var mensaje = "\uD83D\uDE26 No apareces en el listado de matr\u00EDcula de ninguna asignatura del profe Jose. Si deseas puedes enviarle al profe una <b>solicitud</b> para inscribir otra asignatura";
+            var mensaje = "\uD83D\uDE26 No apareces en el listado de matr\u00EDcula de las asignaturas del profe Jose. Si deseas puedes enviarle al profe una <b>solicitud</b> para inscribir una asignatura";
             this.enviarOpcionesInscribirOtrasAsignaturas(msg, mensaje, opcionesMenuInscripcion);
         };
         InscribirAsignaturaReceiver.prototype.responderOpcionesEstudianteConInscripcionConfirmada = function (msg) {

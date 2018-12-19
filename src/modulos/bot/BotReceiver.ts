@@ -37,35 +37,45 @@ export abstract class BotReceiver {
   }
 
   public onRecibirMensajeBase(msg: Message & ApiMessage) {
-    if (!msg.text && !msg.contact) {
-      return;
-    }
+    this.botSender.enviarActionTyping(msg).then(() => {
+      if (!msg.text && !msg.contact) {
+        return;
+      }
 
-    this.initializeMessage(msg);
-    this.onRecibirMensaje(msg);
+      this.initializeMessage(msg);
+      this.onRecibirMensaje(msg);
+    });
   }
 
   public onRecibirInlineQueryBase(msg: Message & ApiMessage) {
-    this.initializeMessage(msg);
-    this.onRecibirInlineQuery(msg);
+    this.botSender.enviarActionTyping(msg).then(() => {
+      this.initializeMessage(msg);
+      this.onRecibirInlineQuery(msg);
+    });
   }
   protected onRecibirInlineQuery(msg: Message & ApiMessage) {}
 
   public onChosenInlineResultBase(msg: Message & ApiMessage) {
-    this.initializeMessage(msg);
-    this.onChosenInlineResult(msg);
+    this.botSender.enviarActionTyping(msg).then(() => {
+      this.initializeMessage(msg);
+      this.onChosenInlineResult(msg);
+    });
   }
   protected onChosenInlineResult(msg: Message & ApiMessage) {}
 
   public onCallbackQueryBase(msg: Message & ApiMessage) {
-    this.initializeMessage(msg);
-    this.onCallbackQuery(msg);
+    this.botSender.enviarActionTyping(msg).then(() => {
+      this.initializeMessage(msg);
+      this.onCallbackQuery(msg);
+    });
   }
   protected onCallbackQuery(msg: Message & ApiMessage) {}
 
   public onLocationBase(msg: Message & ApiMessage) {
-    this.initializeMessage(msg);
-    this.onLocation(msg);
+    this.botSender.enviarActionTyping(msg).then(() => {
+      this.initializeMessage(msg);
+      this.onLocation(msg);
+    });
   }
   protected onLocation(msg: Message) {}
 
@@ -77,12 +87,14 @@ export abstract class BotReceiver {
       !this.estadoGlobal.infoUsuarioMensaje.estudiante.nombre ||
       !this.estadoGlobal.infoUsuarioMensaje.estudiante.email
     ) {
-      this.botSender.responderMensajeErrorHTML(
-        msg,
-        `No se puede responder la solicitud, primero actualiza tus datos básicos`
-      ).then(()=>{
-        this.irAMenuPrincipal(msg);
-      });
+      this.botSender
+        .responderMensajeErrorHTML(
+          msg,
+          `No se puede responder la solicitud, primero actualiza tus datos básicos`
+        )
+        .then(() => {
+          this.irAMenuPrincipal(msg);
+        });
 
       return false;
     }
@@ -124,11 +136,11 @@ export abstract class BotReceiver {
     );
   }
 
-  protected estaOpcionSeleccionadaEnContexto(opcionSeleccionada: string, msg: Message & ApiMessage): boolean {
-    return (
-      this.estaEnContextoActual() &&
-      msg.text == opcionSeleccionada
-    );
+  protected estaOpcionSeleccionadaEnContexto(
+    opcionSeleccionada: string,
+    msg: Message & ApiMessage
+  ): boolean {
+    return this.estaEnContextoActual() && msg.text == opcionSeleccionada;
   }
 
   protected estaComandoEnContexto(comando: string, contexto?: string): boolean {
@@ -148,10 +160,11 @@ export abstract class BotReceiver {
       instanciaReceiver.nombreContexto;
     this.estadoGlobal.infoUsuarioMensaje.estudiante.comando = comandoARegistrarEstudiante;
 
-    Data.Estudiantes.actualizarChat(
+    Data.Estudiantes.actualizarContextoChat(
       msg,
       this.estadoGlobal,
-      this.estadoGlobal.infoUsuarioMensaje.estudiante
+      this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto,
+      this.estadoGlobal.infoUsuarioMensaje.estudiante.comando
     ).then(() => {
       fn(msg);
     });
@@ -165,10 +178,11 @@ export abstract class BotReceiver {
     return new Promise<any>((resolve, reject) => {
       this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto = this.nombreContexto;
       this.estadoGlobal.infoUsuarioMensaje.estudiante.comando = comando;
-      Data.Estudiantes.actualizarChat(
+      Data.Estudiantes.actualizarContextoChat(
         msg,
         this.estadoGlobal,
-        this.estadoGlobal.infoUsuarioMensaje.estudiante
+        this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto,
+        this.estadoGlobal.infoUsuarioMensaje.estudiante.comando  
       ).then(() => {
         this.botSender.responderMensajeHTML(msg, html).then(() => {
           resolve();
@@ -198,10 +212,11 @@ export abstract class BotReceiver {
   ): Promise<any> {
     this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto = this.nombreContexto;
     this.estadoGlobal.infoUsuarioMensaje.estudiante.comando = comando;
-    return Data.Estudiantes.actualizarChat(
+    return Data.Estudiantes.actualizarContextoChat(
       msg,
       this.estadoGlobal,
-      this.estadoGlobal.infoUsuarioMensaje.estudiante
+      this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto,
+      this.estadoGlobal.infoUsuarioMensaje.estudiante.comando
     );
   }
 
@@ -224,10 +239,11 @@ export abstract class BotReceiver {
   ): Promise<any> {
     this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto = this.nombreContexto;
     this.estadoGlobal.infoUsuarioMensaje.estudiante.comando = comando;
-    Data.Estudiantes.actualizarChat(
+    Data.Estudiantes.actualizarContextoChat(
       msg,
       this.estadoGlobal,
-      this.estadoGlobal.infoUsuarioMensaje.estudiante
+      this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto,
+      this.estadoGlobal.infoUsuarioMensaje.estudiante.comando
     ).then(() => {
       return this.botSender.responderKeyboardMarkup(
         msg,

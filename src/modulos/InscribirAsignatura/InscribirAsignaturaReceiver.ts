@@ -94,7 +94,7 @@ export namespace InscribirAsignatura {
       }
     }
 
-    onChosenInlineResult(msg: ApiMessage & Message) {
+    onChosenInlineResult(msg: ApiMessage & Message) {      
       if (
         !this.estaComandoEnContexto(
           Comandos.OpcionesInscripcionAsignaturasOptsEnum
@@ -121,7 +121,7 @@ export namespace InscribirAsignatura {
           this.botSender
             .responderMensajeHTML(
               msg,
-              `✉️ Se ha enviado la <b>solicitud</b> al profe Jose de manera satisfactoria, cuando él apruebe o rechace recibirás un mensaje con la respuesta`
+              `✉️ Se ha enviado la <b>solicitud</b> al profe Jose de manera satisfactoria. Recibirás un mensaje cuando el profe haya aprobado o rechazdo la solicitud`
             )
             .then(() => {
               this.irAMenuPrincipal(msg);
@@ -331,7 +331,7 @@ Presiona <b>"${
           }
         ]
       ];
-      let mensaje = `😦 No apareces en el listado de matrícula de ninguna asignatura del profe Jose. Si deseas puedes enviarle al profe una <b>solicitud</b> para inscribir otra asignatura`;
+      let mensaje = `😦 No apareces en el listado de matrícula de las asignaturas del profe Jose. Si deseas puedes enviarle al profe una <b>solicitud</b> para inscribir una asignatura`;
 
       this.enviarOpcionesInscribirOtrasAsignaturas(
         msg,
@@ -353,20 +353,23 @@ Presiona <b>"${
           }
         ]
       ];
-      
+
       Data.Asignacion.getAsignaturasInscritasPorEstudianteCachedInfoCompleta(
         this.estadoGlobal,
         this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo
       ).then((listaAsignaturas: Array<Asignatura>) => {
-
         let mensajeListadoAsignaturas = "";
         let asignatura;
-        for(let i=0; i<listaAsignaturas.length; i++){
+        for (let i = 0; i < listaAsignaturas.length; i++) {
           asignatura = listaAsignaturas[i];
-          if(asignatura.estado == Constants.EstadoEstudianteAsignatura.Activa){
-            mensajeListadoAsignaturas += `\n${(i+1)}. <b>${asignatura.nombre}</b>, grupo <b>${asignatura.grupo}</b>`;
-          }          
-        }        
+          if (
+            asignatura.estado == Constants.EstadoEstudianteAsignatura.Activa
+          ) {
+            mensajeListadoAsignaturas += `\n${i + 1}. <b>${
+              asignatura.nombre
+            }</b>, grupo <b>${asignatura.grupo}</b>`;
+          }
+        }
 
         let mensaje = `
 💡  Ya has inscrito las siguientes asignaturas:

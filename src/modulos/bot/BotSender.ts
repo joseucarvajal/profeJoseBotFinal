@@ -108,4 +108,14 @@ export class BotSender {
       });
     });
   }
+
+  //https://github.com/yagop/node-telegram-bot-api/blob/release/doc/api.md#TelegramBot+sendChatAction
+  public enviarAction(msg: Message & ApiMessage, action:string, options?:any):Promise<any>{
+    return bot.sendChatAction(msg.from.id, action, options);
+  }
+
+  public enviarActionTyping(msg: Message & ApiMessage, options?:any):Promise<any>{
+    return bot.sendChatAction(msg.from.id, 'typing', options);
+  }
+
 }

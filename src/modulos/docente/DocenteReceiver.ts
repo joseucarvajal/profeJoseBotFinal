@@ -76,56 +76,45 @@ export namespace Docente {
     //#endregion
 
     private enviarReporteAsistenciaAsignatura(msg: Message & ApiMessage) {
-      this.botSender
-        .responderMensajeHTML(
-          msg,
-          `🕗 Estoy generando tu reporte. Por favor espera un momento...`
-        )
-        .then(() => {
-          this.calculoReporteAsistenciaAsignaturas
-            .calcularReporteAsistenciaAsignaturas(msg, "dummy")
-            .then((resultadoReporteAsistencia: ResultadoReporteAsistencia) => {
-              let htmlReporte = `
+      this.calculoReporteAsistenciaAsignaturas
+        .calcularReporteAsistenciaAsignaturas(msg, "dummy")
+        .then((resultadoReporteAsistencia: ResultadoReporteAsistencia) => {
+          let htmlReporte = `
           <table border="1" cellspacing="0" style="width: 100%; border:1px solid;position: relative;">
           <tr><th>Código</th><th>Nombre</th><th>Email</th><th>Asistencias</th><th>Fallas</th></tr>
         `;
-              let htmlRegistroEstudiante = ``;
-              let resultadoByEst: ContadorAsistenciasEstudiante;
-              for (let codigoEstudiante in resultadoReporteAsistencia.listaResultadoAsistenciasIndxByEstCodigo) {
-                resultadoByEst =
-                  resultadoReporteAsistencia
-                    .listaResultadoAsistenciasIndxByEstCodigo[codigoEstudiante];
-                htmlRegistroEstudiante = `<tr><td>${
-                  resultadoByEst.estudiante.codigo
-                }</td><td>${resultadoByEst.estudiante.nombre}</td><td>${
-                  resultadoByEst.estudiante.email
-                }</td><td>${resultadoByEst.countAsistencias}</td><td>${
-                  resultadoByEst.countFallas
-                }</td></tr>`;
-                htmlReporte += htmlRegistroEstudiante;
-              }
-              htmlReporte += `</table>`;
+          let htmlRegistroEstudiante = ``;
+          let resultadoByEst: ContadorAsistenciasEstudiante;
+          for (let codigoEstudiante in resultadoReporteAsistencia.listaResultadoAsistenciasIndxByEstCodigo) {
+            resultadoByEst =
+              resultadoReporteAsistencia
+                .listaResultadoAsistenciasIndxByEstCodigo[codigoEstudiante];
+            htmlRegistroEstudiante = `<tr><td>${
+              resultadoByEst.estudiante.codigo
+            }</td><td>${resultadoByEst.estudiante.nombre}</td><td>${
+              resultadoByEst.estudiante.email
+            }</td><td>${resultadoByEst.countAsistencias}</td><td>${
+              resultadoByEst.countFallas
+            }</td></tr>`;
+            htmlReporte += htmlRegistroEstudiante;
+          }
+          htmlReporte += `</table>`;
 
-              let opcionesFormatoFecha = {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric"
-              };
+          let opcionesFormatoFecha = {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric"
+          };
 
-              this.botSender.enviarHTMLComoDocumentoPDF(
-                msg,
-`asistencia_${
-resultadoReporteAsistencia.asignatura.nombre
-}.pdf`,
-htmlReporte,
-`Reporte asistencia 
-asignatura: "<b>${
-resultadoReporteAsistencia.asignatura.nombre
-}</b>" 
-Fecha: <b>${new Date().toLocaleDateString('es-ES')}</b>`
-              );
-            });
+          this.botSender.enviarHTMLComoDocumentoPDF(
+            msg,
+            `asistencia_${resultadoReporteAsistencia.asignatura.nombre}.pdf`,
+            htmlReporte,
+            `Reporte asistencia 
+asignatura: "<b>${resultadoReporteAsistencia.asignatura.nombre}</b>" 
+Fecha: <b>${new Date().toLocaleDateString("es-ES")}</b>`
+          );
         });
     }
 

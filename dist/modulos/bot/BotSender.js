@@ -74,6 +74,13 @@ var BotSender = /** @class */ (function () {
             });
         });
     };
+    //https://github.com/yagop/node-telegram-bot-api/blob/release/doc/api.md#TelegramBot+sendChatAction
+    BotSender.prototype.enviarAction = function (msg, action, options) {
+        return initBot_1.bot.sendChatAction(msg.from.id, action, options);
+    };
+    BotSender.prototype.enviarActionTyping = function (msg, options) {
+        return initBot_1.bot.sendChatAction(msg.from.id, 'typing', options);
+    };
     return BotSender;
 }());
 exports.BotSender = BotSender;

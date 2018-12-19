@@ -18,9 +18,28 @@ export namespace Estudiantes {
         "periodosAcademicos/" +
           estadoGlobal.settings.periodoActual +
           "/chats/" +
-          estadoGlobal.idUsuarioChat
+          msg.from.id
       )
       .set(estudiante);
+  };
+
+  export const actualizarContextoChat = (
+    msg: Message,
+    estadoGlobal: EstadoGlobal,
+    contexto:string,
+    comando:string,
+  ): Promise<any> => {
+    return dataBase
+      .ref(
+        "periodosAcademicos/" +
+          estadoGlobal.settings.periodoActual +
+          "/chats/"           
+      )
+      .child(msg.from.id)
+      .update({
+        comando:comando,
+        contexto: contexto
+      });
   };
 
   export const getEstudianteXChatId = (

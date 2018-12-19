@@ -132,7 +132,7 @@ export namespace SolicitudesDocente {
           ) {
             this.botSender.responderMensajeErrorHTML(
               mensajeAEstudiante,
-              `El profe Jose ha <b>rechazado</b> la solicitud de inscripción a la asignatura <b>${
+              `❌ El profe Jose ha <b>rechazado</b> la solicitud de inscripción a la asignatura <b>${
                 asignatura.nombre
               }</b>, comunícate con el profe o inténtalo de nuevo`
             ).then(()=>{
@@ -155,21 +155,13 @@ export namespace SolicitudesDocente {
             ).then(() => {
               this.botSender.responderMensajeHTML(
                 mensajeAEstudiante,
-                `📩 El profe <i>Jose</i> ha <b>aprobado</b> la solicitud de inscripción a la asignatura <b>${
+                `✅ El profe <i>Jose</i> ha <b>aprobado</b> la solicitud de inscripción a la asignatura <b>${
                   asignatura.nombre
                 }</b>, ya puedes registrar asistencia para esta asignatura.`
               ).then(()=>{
                 this.irAMenuPrincipal(msg);
               });
-
-              let msgActualizarChat = {
-                chat:{
-                  id:chatIdEstudiante
-                } as Chat,
-                from:{
-                  id:chatIdEstudiante
-                }
-              } as Message;
+              
             
               let mensajeInscripcionAprobada = 
               `✅ Se ha <b>aprobado</b> la solicitud de inscripción del estudiante ${
@@ -179,14 +171,21 @@ export namespace SolicitudesDocente {
               }</b> satisfactoriamente`;
 
               if(!estudiante.inscripcionAsignaturasConfirmado){
-                Data.Estudiantes.actualizarChat(msg, this.estadoGlobal, estudiante).then(()=>{
-                  estudiante.inscripcionAsignaturasConfirmado = true;
-                }).then(()=>{
+                let msgActualizarChat = {
+                  chat:{
+                    id:chatIdEstudiante
+                  } as Chat,
+                  from:{
+                    id:chatIdEstudiante
+                  }
+                } as Message;                
+                estudiante.inscripcionAsignaturasConfirmado = true;
+                Data.Estudiantes.actualizarChat(msgActualizarChat, this.estadoGlobal, estudiante).then(()=>{
                   this.botSender.responderMensajeHTML(
                     msg,
                     mensajeInscripcionAprobada
-                  );                  
-                });  
+                  );
+                })
               }
               else{
                 this.botSender.responderMensajeHTML(

@@ -79,7 +79,7 @@ export namespace MenuPrincipal {
       }
     }
 
-    public onLocation(msg: Message & ApiMessage) { }
+    public onLocation(msg: Message & ApiMessage) {}
     //#endregion
 
     private goToEditarInformacionBasica(msg: Message & ApiMessage) {
@@ -103,7 +103,10 @@ export namespace MenuPrincipal {
     }
 
     private gotoRegistrarAsistencia(msg: Message & ApiMessage) {
-      if (this.estadoGlobal.infoUsuarioMensaje.estudiante.inscripcionAsignaturasConfirmado) {
+      if (
+        this.estadoGlobal.infoUsuarioMensaje.estudiante
+          .inscripcionAsignaturasConfirmado
+      ) {
         this.enviarMensajeAReceiver(
           this.indexMain.registrarAsistenciaReceiver,
           this.indexMain.registrarAsistenciaReceiver.solicitarAsistenciaGPS,
