@@ -8,7 +8,7 @@ Asignatura: XXXXXXX
 estudiante codigo | estudiante nombre | Nro. Asistencias | Nro. Fallas |
 
 */
-var CalculoReporteAsistenciaAsignaturas = /** @class */ (function () {
+var CalculoReporteAsistenciaAsignaturas = (function () {
     function CalculoReporteAsistenciaAsignaturas(estadoGlobal) {
         this.estadoGlobal = estadoGlobal;
         this.msg = {};

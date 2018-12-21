@@ -5,10 +5,8 @@ let dateFormat = require('dateformat');
 import * as Data from "../../data";
 import {
   EstadoGlobal,
-  ListaResultadoAsistenciasIndxByEstCodigo,
   ContadorAsistenciasEstudiante,
-  ResultadoReporteAsistencia,
-  ListadoAsignaturas,
+  ResultadoReporteAsistencia,  
   Asignatura,
   HorarioAsignatura,
   Horario
@@ -293,11 +291,12 @@ export namespace Docente {
           }
 
           let htmlReporte = `
+          <div style="font-size:12px">
           <br/>
           <center><h3>Reporte asistencia ${
             resultadoReporteAsistencia.asignatura.nombre
-          } - ${dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")}</h3></center>
-          <table>
+          } - ${dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss tt")}</h3></center>
+          <table style="font-size:12px">
             <tr><td><strong>Asignatura:</strong></td><td>${
               resultadoReporteAsistencia.asignatura.nombre
             } - (${resultadoReporteAsistencia.asignatura.codigo}) </td>
@@ -324,7 +323,7 @@ export namespace Docente {
             </td>
             </tr>
           </table><br/>
-          <table border="1" cellspacing="0" style="width: 100%; border:1px solid;position: relative;">
+          <table border="1" cellspacing="0" style="width: 100%; border:1px solid;position: relative; font-size:12px">
           <tr><th>Código</th><th>Nombre</th><th>Email</th><th>Asistencias</th><th>Fallas</th></tr>
         `;
           let htmlRegistroEstudiante = ``;
@@ -342,14 +341,7 @@ export namespace Docente {
             }</td></tr>`;
             htmlReporte += htmlRegistroEstudiante;
           }
-          htmlReporte += `</table>`;
-
-          let opcionesFormatoFecha = {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric"
-          };
+          htmlReporte += `</table></div>`;
 
           this.botSender.enviarHTMLComoDocumentoPDF(
             msg,

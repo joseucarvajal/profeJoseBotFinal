@@ -77,7 +77,6 @@ var Asignacion;
         });
     };
     Asignacion.registrarAsignaturasAEstudiante = function (msg, estadoGlobal, listaAsignaturas) {
-        var _a;
         var asignaturasEstudiante = {};
         asignaturasEstudiante.asignaturas = {};
         var estudianteAsignaturas = (_a = {},
@@ -92,6 +91,7 @@ var Asignacion;
         return initDatabase_1.dataBase
             .ref("periodosAcademicos/" + estadoGlobal.settings.periodoActual + "/asignacion/" + estadoGlobal.settings.celularDocente + "/estudiante_asignatura/")
             .set(estudianteAsignaturas);
+        var _a;
     };
     Asignacion.getTodasAsignaturasYSusEstudiantes = function (estadoGlobal) {
         return initDatabase_1.dataBase

@@ -1,11 +1,8 @@
 "use strict";
 var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -35,7 +32,7 @@ var RegistrarAsistencia;
         })(SeleccionarAsignaturaAsistenciaOPts = Comandos.SeleccionarAsignaturaAsistenciaOPts || (Comandos.SeleccionarAsignaturaAsistenciaOPts = {}));
     })(Comandos = RegistrarAsistencia.Comandos || (RegistrarAsistencia.Comandos = {}));
     var nombreContexto = "RegistrarAsistenciaReceiver";
-    var RegistrarAsistenciaReceiver = /** @class */ (function (_super) {
+    var RegistrarAsistenciaReceiver = (function (_super) {
         __extends(RegistrarAsistenciaReceiver, _super);
         function RegistrarAsistenciaReceiver(estadoGlobal, indexMain) {
             var _this = _super.call(this, estadoGlobal, indexMain, nombreContexto) || this;
@@ -62,7 +59,6 @@ var RegistrarAsistencia;
                     }
                 ]
             ];
-            _this.distanciaEstudianteCentroAula = 0;
             _this.registrarAsistencia = _this.registrarAsistencia.bind(_this);
             _this.solicitarAsistenciaGPS = _this.solicitarAsistenciaGPS.bind(_this);
             return _this;
@@ -126,7 +122,7 @@ var RegistrarAsistencia;
                 }
                 Data.Asignacion.registrarAsistencia(msg, _this.estadoGlobal, _this.estadoGlobal.infoUsuarioMensaje.estudiante.tempData).then(function () {
                     _this.botSender
-                        .responderMensajeHTML(msg, "\u2705 Has registrado asistencia con \u00E9xito. Est\u00E1s ubicado a <b>" + _this.distanciaEstudianteCentroAula.toFixed(1) + " metros</b> aproximadamente del centro del sal\u00F3n de clase")
+                        .responderMensajeHTML(msg, "\u2705 Has registrado asistencia con \u00E9xito.")
                         .then(function () {
                         _this.irAMenuPrincipal(msg);
                     });
@@ -180,15 +176,13 @@ var RegistrarAsistencia;
             var latitudHorario = parseFloat(latitudLongitudHorario[0]);
             var longitudHorario = parseFloat(latitudLongitudHorario[1]);
             //Distancia en km
-            var distancia = this.distanciaEntreDosGeolocalizaciones(latitudHorario, longitudHorario, msg.location.latitude, msg.location.longitude, "K");
-            distancia = distancia * 1000; //Convertir a metros
-            this.distanciaEstudianteCentroAula = distancia;
-            if (distancia <=
-                this.estadoGlobal.settings.radioMaxDistanciaAsistenciaMetros) {
+            var distanciaKm = this.distanciaEntreDosGeolocalizaciones(latitudHorario, longitudHorario, msg.location.latitude, msg.location.longitude, "K");
+            if (distanciaKm <=
+                this.estadoGlobal.settings.radioMaxDistanciaAsistenciaKm) {
                 return true;
             }
             this.botSender
-                .responderMensajeHTML(msg, "Est\u00E1s muy lejos <b>(" + distancia.toFixed(1) + " metros)</b> aproximadamente del sal\u00F3n de clases")
+                .responderMensajeHTML(msg, "No te encuentras cerca del sal\u00F3n de clases. La asistencia no ha sido registrada")
                 .then(function () {
                 _this.botSender.responderMensajeHTML(msg, "\uD83D\uDE1E");
             });
@@ -281,12 +275,16 @@ var RegistrarAsistencia;
             });
         };
         RegistrarAsistenciaReceiver.prototype.enviarOpcionRegistrarAsistenciaUnaAsignatura = function (msg, asignatura, fechaHoy) {
+            var _this = this;
             if (!this.validarHorarioRegistroAsistencia(msg, asignatura)) {
                 return;
             }
             this.estadoGlobal.infoUsuarioMensaje.estudiante.tempData =
                 asignatura.codigo;
-            this.enviarMensajeKeyboardMarkup(msg, "Hoy es <b>" + core_1.Constants.DiasSemana.get(fechaHoy.getDay()) + "</b>. Deseas reportar asistencia en la asignatura <b>" + asignatura.nombre + "\u2753 </b>", this.seleccionarAsignaturaInlineOpts, Comandos.SeleccionarComandoInlineOptsEnum.SeleccionarAsignaturaByDefault);
+            Data.Estudiantes.actualizarChat(msg, this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante).then(function () {
+                _this.enviarMensajeKeyboardMarkup(msg, "Hoy es <b>" + core_1.Constants.DiasSemana.get(fechaHoy.getDay()) + "</b>. Deseas reportar asistencia en la asignatura <b>" + asignatura.nombre + "\u2753 </b>", _this.seleccionarAsignaturaInlineOpts, Comandos.SeleccionarComandoInlineOptsEnum
+                    .SeleccionarAsignaturaByDefault);
+            });
         };
         RegistrarAsistenciaReceiver.prototype.enviarOpcionRegistrarAsistenciaMultiplesAsignaturas = function (msg, listadoAsignaturasDeEstudianteHoy, fechaHoy) {
             this.enviarMensajeInlineKeyBoard(msg, Comandos.SeleccionarAsignaturaAsistenciaOPts.SeleccionarAsignatura, "Hoy es <b>" + core_1.Constants.DiasSemana.get(fechaHoy.getDay()) + "</b> y tienes " + listadoAsignaturasDeEstudianteHoy.length + " asignaturas para reportar asistencia.", this.seleccionarAsignaturaAsistenciaOPts);

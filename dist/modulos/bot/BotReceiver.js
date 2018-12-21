@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var BotSender_1 = require("./BotSender");
 var Data = require("../../data");
 var MenuPrincipalReceiver_1 = require("../menuPrincipal/MenuPrincipalReceiver");
-var BotReceiver = /** @class */ (function () {
+var BotReceiver = (function () {
     function BotReceiver(estadoGlobal, indexMain, nombreContexto) {
         this.botSender = new BotSender_1.BotSender();
         this.estadoGlobal = estadoGlobal;
@@ -191,7 +191,7 @@ var BotReceiver = /** @class */ (function () {
                 title: asignatura.nombre + ", grupo " + asignatura.grupo,
                 description: "" + mensajeHorarios,
                 input_message_content: {
-                    message_text: asignatura.nombre + ", grupo " + asignatura.grupo
+                    message_text: asignatura.nombre + " (" + asignatura.codigo + "), grupo " + asignatura.grupo
                 }
             });
         }

@@ -8,7 +8,7 @@
   "scripts": {
     "test": "node test.js",
     "build": "set NODE_ENV=production && node dist/index.js",
-    "dev": "set NODE_ENV=development && node dist/index.js"
+    "dev": "concurrently --kill-others \"tsc -w\" \"set NODE_ENV=development && nodemon dist/index.js\""
   },
   "dependencies": {
     "@types/node-schedule": "^1.2.0",
@@ -24,6 +24,8 @@
     "@types/firebase": "^2.4.31",
     "@types/node": "^8.0.19",
     "@types/node-telegram-bot-api": "^0.27.0",
+    "concurrently": "^4.1.0",
+    "nodemon": "^1.18.9",
     "tape": "^4.7.0",
     "typescript": "^2.4.2"
   },

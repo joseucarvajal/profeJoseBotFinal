@@ -317,7 +317,7 @@ export abstract class BotReceiver {
         title: `${asignatura.nombre}, grupo ${asignatura.grupo}`,
         description: `${mensajeHorarios}`,
         input_message_content: {
-          message_text: `${asignatura.nombre}, grupo ${asignatura.grupo}`
+          message_text: `${asignatura.nombre} (${asignatura.codigo}), grupo ${asignatura.grupo}`
         }
       });      
     }    

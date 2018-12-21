@@ -1,11 +1,8 @@
 "use strict";
 var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -40,7 +37,7 @@ var Docente;
         })(ConfirmarGereferenciarAsignaturasOpts = Comandos.ConfirmarGereferenciarAsignaturasOpts || (Comandos.ConfirmarGereferenciarAsignaturasOpts = {}));
     })(Comandos = Docente.Comandos || (Docente.Comandos = {}));
     var nombreContexto = "DocenteReceiver";
-    var DocenteReceiver = /** @class */ (function (_super) {
+    var DocenteReceiver = (function (_super) {
         __extends(DocenteReceiver, _super);
         function DocenteReceiver(estadoGlobal, indexMain) {
             var _this = _super.call(this, estadoGlobal, indexMain, nombreContexto) || this;
@@ -189,7 +186,7 @@ var Docente;
                     .horarios) {
                     listaHorarios.push(resultadoReporteAsistencia.asignatura.horarios[codigoHorario]);
                 }
-                var htmlReporte = "\n          <br/>\n          <center><h3>Reporte asistencia " + resultadoReporteAsistencia.asignatura.nombre + " - " + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "</h3></center>\n          <table>\n            <tr><td><strong>Asignatura:</strong></td><td>" + resultadoReporteAsistencia.asignatura.nombre + " - (" + resultadoReporteAsistencia.asignatura.codigo + ") </td>\n            </tr>\n            <tr><td><strong>Grupo</strong></td><td>" + resultadoReporteAsistencia.asignatura.grupo + "</td></tr>\n            <tr><td><strong>Horarios</strong></td>\n            <td>\n              \n              " + listaHorarios.map(function (horario, i) {
+                var htmlReporte = "\n          <div style=\"font-size:12px\">\n          <br/>\n          <center><h3>Reporte asistencia " + resultadoReporteAsistencia.asignatura.nombre + " - " + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss tt") + "</h3></center>\n          <table style=\"font-size:12px\">\n            <tr><td><strong>Asignatura:</strong></td><td>" + resultadoReporteAsistencia.asignatura.nombre + " - (" + resultadoReporteAsistencia.asignatura.codigo + ") </td>\n            </tr>\n            <tr><td><strong>Grupo</strong></td><td>" + resultadoReporteAsistencia.asignatura.grupo + "</td></tr>\n            <tr><td><strong>Horarios</strong></td>\n            <td>\n              \n              " + listaHorarios.map(function (horario, i) {
                     var y = i > 0 ? " y " : "";
                     return (y +
                         horario.dia +
@@ -199,7 +196,7 @@ var Docente;
                         horario.horaFin +
                         ", aula: " +
                         horario.aula);
-                }) + "\n            </td>\n            </tr>\n          </table><br/>\n          <table border=\"1\" cellspacing=\"0\" style=\"width: 100%; border:1px solid;position: relative;\">\n          <tr><th>C\u00F3digo</th><th>Nombre</th><th>Email</th><th>Asistencias</th><th>Fallas</th></tr>\n        ";
+                }) + "\n            </td>\n            </tr>\n          </table><br/>\n          <table border=\"1\" cellspacing=\"0\" style=\"width: 100%; border:1px solid;position: relative; font-size:12px\">\n          <tr><th>C\u00F3digo</th><th>Nombre</th><th>Email</th><th>Asistencias</th><th>Fallas</th></tr>\n        ";
                 var htmlRegistroEstudiante = "";
                 var resultadoByEst;
                 for (var codigoEstudiante in resultadoReporteAsistencia.listaResultadoAsistenciasIndxByEstCodigo) {
@@ -209,13 +206,7 @@ var Docente;
                     htmlRegistroEstudiante = "<tr><td>" + resultadoByEst.estudiante.codigo + "</td><td>" + resultadoByEst.estudiante.nombre + "</td><td>" + resultadoByEst.estudiante.email + "</td><td>" + resultadoByEst.countAsistencias + "</td><td>" + resultadoByEst.countFallas + "</td></tr>";
                     htmlReporte += htmlRegistroEstudiante;
                 }
-                htmlReporte += "</table>";
-                var opcionesFormatoFecha = {
-                    weekday: "long",
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric"
-                };
+                htmlReporte += "</table></div>";
                 _this.botSender.enviarHTMLComoDocumentoPDF(msg, "asistencia_" + resultadoReporteAsistencia.asignatura.nombre + ".pdf", htmlReporte, "Reporte asistencia");
             });
         };

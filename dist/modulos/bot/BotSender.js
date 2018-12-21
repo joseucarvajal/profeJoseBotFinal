@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var initBot_1 = require("../../initBot");
 var fs = require("fs");
 var pdf = require("html-pdf");
-var BotSender = /** @class */ (function () {
+var BotSender = (function () {
     function BotSender() {
     }
     BotSender.prototype.responderMensajeHTML = function (msgEntrante, htmlText) {

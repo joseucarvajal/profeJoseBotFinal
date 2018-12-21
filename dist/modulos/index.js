@@ -11,7 +11,7 @@ var SolicitudesDocenteReceiver_1 = require("./solicitudesDocente/SolicitudesDoce
 var DocenteReceiver_1 = require("./docente/DocenteReceiver");
 var index;
 (function (index) {
-    var MainReceiver = /** @class */ (function () {
+    var MainReceiver = (function () {
         function MainReceiver(estadoGlobal) {
             this.estadoGlobal = estadoGlobal;
             this.accesoEstudianteReceiver = new AccesoEstudianteReceiver_1.AccesoEstudiante.AccesoEstudianteReceiver(this.estadoGlobal, this);

@@ -15,6 +15,5 @@ export namespace Constants {
         Cancelada = "cancelada"        
     }
 
-    export const UrlServidor = 'https://evening-headland-56271.herokuapp.com';
+    export const UrlServidor = 'https://evening-headland-56271.herokuapp.com';    
 }
-

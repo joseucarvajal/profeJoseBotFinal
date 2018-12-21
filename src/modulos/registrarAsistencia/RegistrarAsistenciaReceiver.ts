@@ -56,8 +56,6 @@ export namespace RegistrarAsistencia {
       ]
     ];
 
-    distanciaEstudianteCentroAula: number = 0;
-
     constructor(estadoGlobal: EstadoGlobal, indexMain: MainReceiverContract) {
       super(estadoGlobal, indexMain, nombreContexto);
 
@@ -173,17 +171,15 @@ export namespace RegistrarAsistencia {
           this.botSender
             .responderMensajeHTML(
               msg,
-              `✅ Has registrado asistencia con éxito. Estás ubicado a <b>${
-                this.distanciaEstudianteCentroAula.toFixed(1)
-              } metros</b> aproximadamente del centro del salón de clase`
+              `✅ Has registrado asistencia con éxito.`
             )
             .then(() => {
               this.irAMenuPrincipal(msg);
             });
         });
       });
-    }    
-    
+    }
+
     //true: es válido
     //false: no es válido
     private validarHorarioRegistroAsistencia(
@@ -261,19 +257,17 @@ export namespace RegistrarAsistencia {
       let longitudHorario = parseFloat(latitudLongitudHorario[1]);
 
       //Distancia en km
-      let distancia = this.distanciaEntreDosGeolocalizaciones(
+      let distanciaKm = this.distanciaEntreDosGeolocalizaciones(
         latitudHorario,
         longitudHorario,
         msg.location.latitude,
         msg.location.longitude,
         `K`
-      );
-      distancia = distancia * 1000; //Convertir a metros
-      this.distanciaEstudianteCentroAula = distancia;
+      );      
 
       if (
-        distancia <=
-        this.estadoGlobal.settings.radioMaxDistanciaAsistenciaMetros
+        distanciaKm <=
+        this.estadoGlobal.settings.radioMaxDistanciaAsistenciaKm
       ) {
         return true;
       }
@@ -281,9 +275,7 @@ export namespace RegistrarAsistencia {
       this.botSender
         .responderMensajeHTML(
           msg,
-          `Estás muy lejos <b>(${distancia.toFixed(
-            1
-          )} metros)</b> aproximadamente del salón de clases`
+          `No te encuentras cerca del salón de clases. La asistencia no ha sido registrada`
         )
         .then(() => {
           this.botSender.responderMensajeHTML(msg, `😞`);
@@ -428,16 +420,24 @@ export namespace RegistrarAsistencia {
 
       this.estadoGlobal.infoUsuarioMensaje.estudiante.tempData =
         asignatura.codigo;
-      this.enviarMensajeKeyboardMarkup(
+
+      Data.Estudiantes.actualizarChat(
         msg,
-        `Hoy es <b>${Constants.DiasSemana.get(
-          fechaHoy.getDay()
-        )}</b>. Deseas reportar asistencia en la asignatura <b>${
-          asignatura.nombre
-        }❓ </b>`,
-        this.seleccionarAsignaturaInlineOpts,
-        Comandos.SeleccionarComandoInlineOptsEnum.SeleccionarAsignaturaByDefault
-      );
+        this.estadoGlobal,
+        this.estadoGlobal.infoUsuarioMensaje.estudiante
+      ).then(() => {
+        this.enviarMensajeKeyboardMarkup(
+          msg,
+          `Hoy es <b>${Constants.DiasSemana.get(
+            fechaHoy.getDay()
+          )}</b>. Deseas reportar asistencia en la asignatura <b>${
+            asignatura.nombre
+          }❓ </b>`,
+          this.seleccionarAsignaturaInlineOpts,
+          Comandos.SeleccionarComandoInlineOptsEnum
+            .SeleccionarAsignaturaByDefault
+        );
+      });
     }
 
     private enviarOpcionRegistrarAsistenciaMultiplesAsignaturas(
