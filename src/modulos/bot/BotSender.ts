@@ -35,7 +35,7 @@ export class BotSender {
     let chatUserId = msgEntrante.chat
       ? msgEntrante.chat.id
       : msgEntrante.from.id;
-    return bot.sendMessage(chatUserId, `😔 ` + htmlText, messageOptions);
+    return bot.sendMessage(chatUserId, htmlText + ` 😔`, messageOptions);
   }
 
   responderKeyboardMarkup(

@@ -17,6 +17,7 @@ var BotReceiver_1 = require("../bot/BotReceiver");
 var Data = require("../../data");
 var core_1 = require("../../core");
 var InscribirAsignaturaReceiver_1 = require("../InscribirAsignatura/InscribirAsignaturaReceiver");
+var dateFormat = require("dateformat");
 var RegistrarAsistencia;
 (function (RegistrarAsistencia) {
     var Comandos;
@@ -114,13 +115,119 @@ var RegistrarAsistencia;
         };
         RegistrarAsistenciaReceiver.prototype.guardarAsistencia = function (msg) {
             var _this = this;
-            Data.Asignacion.registrarAsistencia(msg, this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante.tempData).then(function () {
-                _this.botSender
-                    .responderMensajeHTML(msg, "\u2705 Has registrado asistencia con \u00E9xito")
-                    .then(function () {
+            Data.Asignacion.getAsignaturaByCodigo(this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante.tempData).then(function (asignatura) {
+                if (!_this.validarHorarioRegistroAsistencia(msg, asignatura)) {
                     _this.irAMenuPrincipal(msg);
+                    return;
+                }
+                if (!_this.validarDistanciaRegistroAsistencia(msg, asignatura)) {
+                    return;
+                }
+                Data.Asignacion.registrarAsistencia(msg, _this.estadoGlobal, _this.estadoGlobal.infoUsuarioMensaje.estudiante.tempData).then(function () {
+                    _this.botSender
+                        .responderMensajeHTML(msg, "\u2705 Has registrado asistencia con \u00E9xito")
+                        .then(function () {
+                        _this.irAMenuPrincipal(msg);
+                    });
                 });
             });
+        };
+        //true: es válido
+        //false: no es válido
+        RegistrarAsistenciaReceiver.prototype.validarHorarioRegistroAsistencia = function (msg, asignatura) {
+            var _this = this;
+            var fechaHoy = new Date();
+            var horario = this.getHorarioRegistroAsistencia(asignatura);
+            if (!horario) {
+                this.botSender.responderMensajeErrorHTML(msg, "Hoy no tienes ning\u00FAn horario para registrar asistencia en " + asignatura.nombre);
+                return false;
+            }
+            var horaHoy = dateFormat(fechaHoy, "HH:MM");
+            var horaMinutosInicioClase = horario.horaInicio.split(":");
+            var fechaHoraInicioClase = new Date();
+            fechaHoraInicioClase.setHours(parseInt(horaMinutosInicioClase[0], 10));
+            fechaHoraInicioClase.setMinutes(parseInt(horaMinutosInicioClase[1], 10));
+            var horaMinutosFinClase = horario.horaFin.split(":");
+            var fechaHoraFinClase = new Date();
+            fechaHoraFinClase.setHours(parseInt(horaMinutosFinClase[0], 10));
+            fechaHoraFinClase.setMinutes(parseInt(horaMinutosFinClase[1], 10));
+            var horasDiferencia;
+            if (horaHoy < horario.horaInicio) {
+                horasDiferencia = Math.abs(fechaHoraInicioClase - fechaHoy) / 36e5;
+                this.botSender
+                    .responderMensajeHTML(msg, "Son las <b>" + horaHoy + "</b> y la clase <b>" + asignatura.nombre + "</b> inicia en <b>" + horasDiferencia.toFixed(2) + " horas</b> aproximadamente. A\u00FAn es muy temprano para registrar asistencia.")
+                    .then(function () {
+                    _this.botSender.responderMensajeHTML(msg, "\uD83D\uDE05");
+                });
+                return false;
+            }
+            else if (horaHoy > horario.horaFin) {
+                horasDiferencia = Math.abs(fechaHoraFinClase - fechaHoy) / 36e5;
+                this.botSender
+                    .responderMensajeHTML(msg, "Son las <b>" + horaHoy + "</b> y la clase <b>" + asignatura.nombre + "</b> termin\u00F3 hace <b>" + horasDiferencia.toFixed(2) + " horas</b> aproximadamente. Ya es tarde para registrar asistencia.")
+                    .then(function () {
+                    _this.botSender.responderMensajeHTML(msg, "\uD83D\uDE22");
+                });
+                return false;
+            }
+            return true;
+        };
+        RegistrarAsistenciaReceiver.prototype.validarDistanciaRegistroAsistencia = function (msg, asignatura) {
+            var _this = this;
+            var horario = this.getHorarioRegistroAsistencia(asignatura);
+            var latitudLongitudHorario = horario.coordenadasAula.split(",");
+            var latitudHorario = parseFloat(latitudLongitudHorario[0]);
+            var longitudHorario = parseFloat(latitudLongitudHorario[1]);
+            //Distancia en km
+            var distancia = this.distanciaEntreDosGeolocalizaciones(latitudHorario, longitudHorario, msg.location.latitude, msg.location.longitude, "K");
+            distancia = distancia * 1000; //Convertir a metros
+            if (distancia <=
+                this.estadoGlobal.settings.radioMaxDistanciaAsistenciaMetros) {
+                return true;
+            }
+            this.botSender
+                .responderMensajeHTML(msg, "Est\u00E1s muy lejos <b>(" + distancia.toFixed(1) + " metros)</b> aproximadamente del sal\u00F3n de clases")
+                .then(function () {
+                _this.botSender.responderMensajeHTML(msg, "\uD83D\uDE1E");
+            });
+            return false;
+        };
+        RegistrarAsistenciaReceiver.prototype.distanciaEntreDosGeolocalizaciones = function (lat1, lon1, lat2, lon2, unit) {
+            if (lat1 == lat2 && lon1 == lon2) {
+                return 0;
+            }
+            else {
+                var radlat1 = (Math.PI * lat1) / 180;
+                var radlat2 = (Math.PI * lat2) / 180;
+                var theta = lon1 - lon2;
+                var radtheta = (Math.PI * theta) / 180;
+                var dist = Math.sin(radlat1) * Math.sin(radlat2) +
+                    Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+                if (dist > 1) {
+                    dist = 1;
+                }
+                dist = Math.acos(dist);
+                dist = (dist * 180) / Math.PI;
+                dist = dist * 60 * 1.1515;
+                if (unit == "K") {
+                    dist = dist * 1.609344;
+                }
+                if (unit == "N") {
+                    dist = dist * 0.8684;
+                }
+                return dist;
+            }
+        };
+        RegistrarAsistenciaReceiver.prototype.getHorarioRegistroAsistencia = function (asignatura) {
+            var horario;
+            var fechaHoy = new Date();
+            for (var codigoHorario in asignatura.horarios) {
+                horario = asignatura.horarios[codigoHorario];
+                if (core_1.Constants.DiasSemana.get(fechaHoy.getDay()) == horario.dia) {
+                    return horario;
+                }
+            }
+            return {};
         };
         RegistrarAsistenciaReceiver.prototype.enviarOpcionesInscripcionAsignaturas = function () {
             this.enviarMensajeAReceiver(this.indexMain.inscribirAsignaturaReceiver, this.indexMain.inscribirAsignaturaReceiver
@@ -172,6 +279,9 @@ var RegistrarAsistencia;
             });
         };
         RegistrarAsistenciaReceiver.prototype.enviarOpcionRegistrarAsistenciaUnaAsignatura = function (msg, asignatura, fechaHoy) {
+            if (!this.validarHorarioRegistroAsistencia(msg, asignatura)) {
+                return;
+            }
             this.estadoGlobal.infoUsuarioMensaje.estudiante.tempData =
                 asignatura.codigo;
             this.enviarMensajeKeyboardMarkup(msg, "Hoy es <b>" + core_1.Constants.DiasSemana.get(fechaHoy.getDay()) + "</b>. Deseas reportar asistencia en la asignatura <b>" + asignatura.nombre + "\u2753 </b>", this.seleccionarAsignaturaInlineOpts, Comandos.SeleccionarComandoInlineOptsEnum.SeleccionarAsignaturaByDefault);

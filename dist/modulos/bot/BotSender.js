@@ -22,7 +22,7 @@ var BotSender = /** @class */ (function () {
         var chatUserId = msgEntrante.chat
             ? msgEntrante.chat.id
             : msgEntrante.from.id;
-        return initBot_1.bot.sendMessage(chatUserId, "\uD83D\uDE14 " + htmlText, messageOptions);
+        return initBot_1.bot.sendMessage(chatUserId, htmlText + " \uD83D\uDE14", messageOptions);
     };
     BotSender.prototype.responderKeyboardMarkup = function (msgEntrante, label, opcionesKeyboard) {
         var messageOptions = {

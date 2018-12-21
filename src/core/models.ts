@@ -6,6 +6,7 @@ export interface Settings {
   celularDocente: string;
   periodoActual: string;
   idUsuarioChatDocente:number;
+  radioMaxDistanciaAsistenciaMetros:number;
 }
 
 export interface InformacionContexto {

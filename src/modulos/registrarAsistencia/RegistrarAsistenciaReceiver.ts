@@ -2,19 +2,14 @@ import { Message } from "../../bot/Message";
 import { BotReceiver } from "../bot/BotReceiver";
 
 import * as Data from "../../data";
-import {
-  EstadoGlobal,
-  Asignatura,
-  Constants,
-  Horario,
-  AsignaturasDeEstudiante
-} from "../../core";
+import { EstadoGlobal, Asignatura, Constants, Horario } from "../../core";
 import { MainReceiverContract } from "../indexContracts";
 import { ApiMessage } from "../../api/ApiMessage";
 import { InlineKeyboardButton } from "../../bot/InlineKeyboardButton";
 import { KeyboardButton } from "../../bot/KeyboardButton";
 import { InscribirAsignatura } from "../InscribirAsignatura/InscribirAsignaturaReceiver";
-import { MenuPrincipal } from "../menuPrincipal/MenuPrincipalReceiver";
+
+let dateFormat = require("dateformat");
 
 export namespace RegistrarAsistencia {
   export namespace Comandos {
@@ -41,7 +36,7 @@ export namespace RegistrarAsistencia {
           text:
             Comandos.SeleccionarComandoInlineOptsEnum
               .SeleccionarAsignaturaByDefault,
-              request_location:true
+          request_location: true
         }
       ],
       [
@@ -122,36 +117,217 @@ export namespace RegistrarAsistencia {
       }
     }
 
-    onChosenInlineResult(msg: ApiMessage & Message) {      
-      if (this.estaComandoEnContexto(Comandos.SeleccionarAsignaturaAsistenciaOPts.SeleccionarAsignatura)
+    onChosenInlineResult(msg: ApiMessage & Message) {
+      if (
+        this.estaComandoEnContexto(
+          Comandos.SeleccionarAsignaturaAsistenciaOPts.SeleccionarAsignatura
+        )
       ) {
         this.guardarAsignaturaSeleccionadaTemporal(msg);
       }
     }
-    
+
     //#endregion
 
-    private guardarAsignaturaSeleccionadaTemporal(msg: ApiMessage & Message){
+    private guardarAsignaturaSeleccionadaTemporal(msg: ApiMessage & Message) {
       this.estadoGlobal.infoUsuarioMensaje.estudiante.tempData = msg.result_id;
-      Data.Estudiantes.actualizarChat(msg, this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante).then(()=>{
-        Data.Asignacion.getAsignaturaByCodigo(this.estadoGlobal, msg.result_id).then((asignatura:Asignatura)=>{
-          this.enviarOpcionRegistrarAsistenciaUnaAsignatura(msg, asignatura, new Date());
+      Data.Estudiantes.actualizarChat(
+        msg,
+        this.estadoGlobal,
+        this.estadoGlobal.infoUsuarioMensaje.estudiante
+      ).then(() => {
+        Data.Asignacion.getAsignaturaByCodigo(
+          this.estadoGlobal,
+          msg.result_id
+        ).then((asignatura: Asignatura) => {
+          this.enviarOpcionRegistrarAsistenciaUnaAsignatura(
+            msg,
+            asignatura,
+            new Date()
+          );
         });
       });
     }
 
     private guardarAsistencia(msg: Message & ApiMessage) {
-      Data.Asignacion.registrarAsistencia(
-        msg,
+      Data.Asignacion.getAsignaturaByCodigo(
         this.estadoGlobal,
         this.estadoGlobal.infoUsuarioMensaje.estudiante.tempData
-      ).then(() => {
-        this.botSender
-          .responderMensajeHTML(msg, `✅ Has registrado asistencia con éxito`)
-          .then(() => {
-            this.irAMenuPrincipal(msg);
-          });
+      ).then((asignatura: Asignatura) => {
+        if (!this.validarHorarioRegistroAsistencia(msg, asignatura)) {
+          this.irAMenuPrincipal(msg);
+          return;
+        }
+
+        if (!this.validarDistanciaRegistroAsistencia(msg, asignatura)) {
+          return;
+        }
+
+        Data.Asignacion.registrarAsistencia(
+          msg,
+          this.estadoGlobal,
+          this.estadoGlobal.infoUsuarioMensaje.estudiante.tempData
+        ).then(() => {
+          this.botSender
+            .responderMensajeHTML(msg, `✅ Has registrado asistencia con éxito`)
+            .then(() => {
+              this.irAMenuPrincipal(msg);
+            });
+        });
       });
+    }
+
+    //true: es válido
+    //false: no es válido
+    private validarHorarioRegistroAsistencia(
+      msg: Message & ApiMessage,
+      asignatura: Asignatura
+    ): boolean {
+      let fechaHoy: any = new Date();
+      let horario = this.getHorarioRegistroAsistencia(asignatura);
+      if (!horario) {
+        this.botSender.responderMensajeErrorHTML(
+          msg,
+          `Hoy no tienes ningún horario para registrar asistencia en ${
+            asignatura.nombre
+          }`
+        );
+        return false;
+      }
+
+      let horaHoy: any = dateFormat(fechaHoy, "HH:MM");
+
+      let horaMinutosInicioClase = horario.horaInicio.split(":");
+      let fechaHoraInicioClase: any = new Date();
+      fechaHoraInicioClase.setHours(parseInt(horaMinutosInicioClase[0], 10));
+      fechaHoraInicioClase.setMinutes(parseInt(horaMinutosInicioClase[1], 10));
+
+      let horaMinutosFinClase = horario.horaFin.split(":");
+      let fechaHoraFinClase: any = new Date();
+      fechaHoraFinClase.setHours(parseInt(horaMinutosFinClase[0], 10));
+      fechaHoraFinClase.setMinutes(parseInt(horaMinutosFinClase[1], 10));
+
+      let horasDiferencia;
+
+      if (horaHoy < horario.horaInicio) {
+        horasDiferencia = Math.abs(fechaHoraInicioClase - fechaHoy) / 36e5;
+        this.botSender
+          .responderMensajeHTML(
+            msg,
+            `Son las <b>${horaHoy}</b> y la clase <b>${
+              asignatura.nombre
+            }</b> inicia en <b>${horasDiferencia.toFixed(
+              2
+            )} horas</b> aproximadamente. Aún es muy temprano para registrar asistencia.`
+          )
+          .then(() => {
+            this.botSender.responderMensajeHTML(msg, `😅`);
+          });
+        return false;
+      } else if (horaHoy > horario.horaFin) {
+        horasDiferencia = Math.abs(fechaHoraFinClase - fechaHoy) / 36e5;
+        this.botSender
+          .responderMensajeHTML(
+            msg,
+            `Son las <b>${horaHoy}</b> y la clase <b>${
+              asignatura.nombre
+            }</b> terminó hace <b>${horasDiferencia.toFixed(
+              2
+            )} horas</b> aproximadamente. Ya es tarde para registrar asistencia.`
+          )
+          .then(() => {
+            this.botSender.responderMensajeHTML(msg, `😢`);
+          });
+        return false;
+      }
+
+      return true;
+    }
+
+    private validarDistanciaRegistroAsistencia(
+      msg: Message & ApiMessage,
+      asignatura: Asignatura
+    ) {
+      let horario: Horario = this.getHorarioRegistroAsistencia(asignatura);
+      let latitudLongitudHorario = horario.coordenadasAula.split(",");
+      let latitudHorario = parseFloat(latitudLongitudHorario[0]);
+      let longitudHorario = parseFloat(latitudLongitudHorario[1]);
+
+      //Distancia en km
+      let distancia = this.distanciaEntreDosGeolocalizaciones(
+        latitudHorario,
+        longitudHorario,
+        msg.location.latitude,
+        msg.location.longitude,
+        `K`
+      );
+      distancia = distancia * 1000; //Convertir a metros
+
+      if (
+        distancia <=
+        this.estadoGlobal.settings.radioMaxDistanciaAsistenciaMetros
+      ) {
+        return true;
+      }
+
+      this.botSender
+        .responderMensajeHTML(
+          msg,
+          `Estás muy lejos <b>(${distancia.toFixed(
+            1
+          )} metros)</b> aproximadamente del salón de clases`
+        )
+        .then(() => {
+          this.botSender.responderMensajeHTML(msg, `😞`);
+        });
+
+      return false;
+    }
+
+    private distanciaEntreDosGeolocalizaciones(
+      lat1: number,
+      lon1: number,
+      lat2: number,
+      lon2: number,
+      unit: string
+    ) {
+      if (lat1 == lat2 && lon1 == lon2) {
+        return 0;
+      } else {
+        let radlat1 = (Math.PI * lat1) / 180;
+        let radlat2 = (Math.PI * lat2) / 180;
+        let theta = lon1 - lon2;
+        let radtheta = (Math.PI * theta) / 180;
+        let dist =
+          Math.sin(radlat1) * Math.sin(radlat2) +
+          Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+        if (dist > 1) {
+          dist = 1;
+        }
+        dist = Math.acos(dist);
+        dist = (dist * 180) / Math.PI;
+        dist = dist * 60 * 1.1515;
+        if (unit == "K") {
+          dist = dist * 1.609344;
+        }
+        if (unit == "N") {
+          dist = dist * 0.8684;
+        }
+        return dist;
+      }
+    }
+
+    private getHorarioRegistroAsistencia(asignatura: Asignatura) {
+      let horario;
+      let fechaHoy: any = new Date();
+      for (let codigoHorario in asignatura.horarios) {
+        horario = asignatura.horarios[codigoHorario];
+        if (Constants.DiasSemana.get(fechaHoy.getDay()) == horario.dia) {
+          return horario;
+        }
+      }
+
+      return {} as Horario;
     }
 
     private enviarOpcionesInscripcionAsignaturas() {
@@ -238,6 +414,10 @@ export namespace RegistrarAsistencia {
       asignatura: Asignatura,
       fechaHoy: Date
     ) {
+      if (!this.validarHorarioRegistroAsistencia(msg, asignatura)) {
+        return;
+      }
+
       this.estadoGlobal.infoUsuarioMensaje.estudiante.tempData =
         asignatura.codigo;
       this.enviarMensajeKeyboardMarkup(
@@ -272,15 +452,14 @@ export namespace RegistrarAsistencia {
     private enviarListaAsignaturasParaReportarAsistencia(
       msg: Message & ApiMessage
     ) {
-      
       this.getAsignaturasAsistenciaHoy(msg).then(
         (listadoAsignaturasDeEstudianteHoy: Array<Asignatura>) => {
-
           let opcionesListaAsignaturas = this.getAsignaturasFormatoInlineQuery(
             listadoAsignaturasDeEstudianteHoy
           );
-          this.botSender.responderInLineQuery(msg, opcionesListaAsignaturas);  
-        });
+          this.botSender.responderInLineQuery(msg, opcionesListaAsignaturas);
+        }
+      );
     }
   }
 }
