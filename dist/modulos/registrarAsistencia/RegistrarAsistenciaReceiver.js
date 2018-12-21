@@ -62,6 +62,7 @@ var RegistrarAsistencia;
                     }
                 ]
             ];
+            _this.distanciaEstudianteCentroAula = 0;
             _this.registrarAsistencia = _this.registrarAsistencia.bind(_this);
             _this.solicitarAsistenciaGPS = _this.solicitarAsistenciaGPS.bind(_this);
             return _this;
@@ -125,7 +126,7 @@ var RegistrarAsistencia;
                 }
                 Data.Asignacion.registrarAsistencia(msg, _this.estadoGlobal, _this.estadoGlobal.infoUsuarioMensaje.estudiante.tempData).then(function () {
                     _this.botSender
-                        .responderMensajeHTML(msg, "\u2705 Has registrado asistencia con \u00E9xito")
+                        .responderMensajeHTML(msg, "\u2705 Has registrado asistencia con \u00E9xito. Est\u00E1s ubicado a <b>" + _this.distanciaEstudianteCentroAula.toFixed(1) + " metros</b> aproximadamente del centro del sal\u00F3n de clase")
                         .then(function () {
                         _this.irAMenuPrincipal(msg);
                     });
@@ -181,6 +182,7 @@ var RegistrarAsistencia;
             //Distancia en km
             var distancia = this.distanciaEntreDosGeolocalizaciones(latitudHorario, longitudHorario, msg.location.latitude, msg.location.longitude, "K");
             distancia = distancia * 1000; //Convertir a metros
+            this.distanciaEstudianteCentroAula = distancia;
             if (distancia <=
                 this.estadoGlobal.settings.radioMaxDistanciaAsistenciaMetros) {
                 return true;

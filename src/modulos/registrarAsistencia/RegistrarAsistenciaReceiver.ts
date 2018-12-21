@@ -56,6 +56,8 @@ export namespace RegistrarAsistencia {
       ]
     ];
 
+    distanciaEstudianteCentroAula: number = 0;
+
     constructor(estadoGlobal: EstadoGlobal, indexMain: MainReceiverContract) {
       super(estadoGlobal, indexMain, nombreContexto);
 
@@ -169,14 +171,19 @@ export namespace RegistrarAsistencia {
           this.estadoGlobal.infoUsuarioMensaje.estudiante.tempData
         ).then(() => {
           this.botSender
-            .responderMensajeHTML(msg, `✅ Has registrado asistencia con éxito`)
+            .responderMensajeHTML(
+              msg,
+              `✅ Has registrado asistencia con éxito. Estás ubicado a <b>${
+                this.distanciaEstudianteCentroAula.toFixed(1)
+              } metros</b> aproximadamente del centro del salón de clase`
+            )
             .then(() => {
               this.irAMenuPrincipal(msg);
             });
         });
       });
-    }
-
+    }    
+    
     //true: es válido
     //false: no es válido
     private validarHorarioRegistroAsistencia(
@@ -262,6 +269,7 @@ export namespace RegistrarAsistencia {
         `K`
       );
       distancia = distancia * 1000; //Convertir a metros
+      this.distanciaEstudianteCentroAula = distancia;
 
       if (
         distancia <=
