@@ -207,7 +207,7 @@ var Docente;
                     htmlReporte += htmlRegistroEstudiante;
                 }
                 htmlReporte += "</table></div>";
-                _this.botSender.enviarHTMLComoDocumentoPDF(msg, "asistencia_" + resultadoReporteAsistencia.asignatura.nombre + ".pdf", htmlReporte, "Reporte asistencia");
+                _this.botSender.enviarHTMLComoDocumentoPDF(msg, "asistencia_" + resultadoReporteAsistencia.asignatura.codigo + ".pdf", htmlReporte, "Reporte asistencia");
             });
         };
         DocenteReceiver.prototype.enviarConfirmacionGeoreferenciarAsignatura = function (msg) {

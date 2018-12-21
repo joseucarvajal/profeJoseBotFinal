@@ -345,7 +345,7 @@ export namespace Docente {
 
           this.botSender.enviarHTMLComoDocumentoPDF(
             msg,
-            `asistencia_${resultadoReporteAsistencia.asignatura.nombre}.pdf`,
+            `asistencia_${resultadoReporteAsistencia.asignatura.codigo}.pdf`,
             htmlReporte,
             `Reporte asistencia`
           );
