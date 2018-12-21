@@ -114,7 +114,7 @@ export namespace InscribirAsignatura {
           this.botSender
             .responderMensajeHTML(
               msg,
-              `✉️ Se ha enviado la <b>solicitud</b> al profe Jose de manera satisfactoria. Recibirás un mensaje cuando el profe haya aprobado o rechazdo la solicitud`
+              `✉️ Se ha enviado la <b>solicitud</b> al profe Jose de manera satisfactoria. Recibirás un mensaje cuando el profe haya aprobado o rechazado la solicitud`
             )
             .then(() => {
               this.irAMenuPrincipal(msg);

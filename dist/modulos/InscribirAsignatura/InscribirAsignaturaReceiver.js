@@ -80,7 +80,7 @@ var InscribirAsignatura;
                 .enviarSolicitudInscribirAsignatura(msg, this.estadoGlobal.infoUsuarioMensaje.estudiante, msg.from.id, msg.result_id)
                 .then(function () {
                 _this.botSender
-                    .responderMensajeHTML(msg, "\u2709\uFE0F Se ha enviado la <b>solicitud</b> al profe Jose de manera satisfactoria. Recibir\u00E1s un mensaje cuando el profe haya aprobado o rechazdo la solicitud")
+                    .responderMensajeHTML(msg, "\u2709\uFE0F Se ha enviado la <b>solicitud</b> al profe Jose de manera satisfactoria. Recibir\u00E1s un mensaje cuando el profe haya aprobado o rechazado la solicitud")
                     .then(function () {
                     _this.irAMenuPrincipal(msg);
                 });

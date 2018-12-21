@@ -89,20 +89,21 @@ export class BotSender {
   enviarHTMLComoDocumentoPDF(msg: Message & ApiMessage, nombreDocumento: string, html:string, description:string): Promise<any> {
     return new Promise<any>(resolve => {
 
-      let patDocumento = `./dist/tmp/${nombreDocumento}`;
+      let pathDocumento = `./dist/tmp/${nombreDocumento}`;
 
       let messageOptions = {
         caption: description,
         parse_mode: "HTML",
       };
 
-      var config = { format: "A4" };
+      var config = { format: "A4" };      
 
-      pdf.create(html, config).toFile(patDocumento, (err: any, res: any) => {
+      pdf.create(html, config).toFile(pathDocumento, (err: any, res: any) => {
         if (err) {
           return console.error(`Generating PDF`, err);
         }
-        bot.sendDocument(msg.from.id, patDocumento, messageOptions, {}).then(() => {
+        bot.sendDocument(msg.from.id, pathDocumento, messageOptions, {}).then(() => {
+          fs.unlinkSync(pathDocumento);
           resolve();
         });
       });

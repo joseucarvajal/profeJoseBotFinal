@@ -58,17 +58,18 @@ var BotSender = (function () {
     };
     BotSender.prototype.enviarHTMLComoDocumentoPDF = function (msg, nombreDocumento, html, description) {
         return new Promise(function (resolve) {
-            var patDocumento = "./dist/tmp/" + nombreDocumento;
+            var pathDocumento = "./dist/tmp/" + nombreDocumento;
             var messageOptions = {
                 caption: description,
                 parse_mode: "HTML",
             };
             var config = { format: "A4" };
-            pdf.create(html, config).toFile(patDocumento, function (err, res) {
+            pdf.create(html, config).toFile(pathDocumento, function (err, res) {
                 if (err) {
                     return console.error("Generating PDF", err);
                 }
-                initBot_1.bot.sendDocument(msg.from.id, patDocumento, messageOptions, {}).then(function () {
+                initBot_1.bot.sendDocument(msg.from.id, pathDocumento, messageOptions, {}).then(function () {
+                    fs.unlinkSync(pathDocumento);
                     resolve();
                 });
             });
