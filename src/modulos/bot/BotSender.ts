@@ -82,41 +82,73 @@ export class BotSender {
     coleccionElementos: Array<any>
   ): Promise<any> {
     return bot.answerInlineQuery(msg.id, coleccionElementos, {
-      cache_time: "0",      
+      cache_time: "0"
     });
   }
 
-  enviarHTMLComoDocumentoPDF(msg: Message & ApiMessage, nombreDocumento: string, html:string, description:string): Promise<any> {
+  enviarHTMLComoDocumentoPDF(
+    msg: Message & ApiMessage,
+    nombreDocumento: string,
+    html: string,
+    description: string
+  ): Promise<any> {
     return new Promise<any>(resolve => {
-
       let pathDocumento = `./dist/tmp/${nombreDocumento}`;
 
-      let messageOptions = {
-        caption: description,
-        parse_mode: "HTML",
-      };
+      fs.stat(pathDocumento, (err: any, stats: any) => {
 
-      var config = { format: "A4" };      
-
-      pdf.create(html, config).toFile(pathDocumento, (err: any, res: any) => {
         if (err) {
-          return console.error(`Generating PDF`, err);
+          this.createPDFAndSendAsMessage(msg, description, html, pathDocumento).then(()=>{
+            resolve();
+          });
+          return;
         }
-        bot.sendDocument(msg.from.id, pathDocumento, messageOptions, {}).then(() => {
-          fs.unlinkSync(pathDocumento);
-          resolve();
+
+        fs.unlink(pathDocumento, (err: any) => {
+          this.createPDFAndSendAsMessage(msg, description, html, pathDocumento).then(()=>{
+            resolve();
+          });
         });
       });
     });
   }
 
+  private createPDFAndSendAsMessage(msg: Message & ApiMessage, description:string, html:string, pathDocumento:string):Promise<any>{
+    return new Promise<any>((resolve, reject)=>{
+      let messageOptions = {
+        caption: description,
+        parse_mode: "HTML"
+      };
+  
+      var config = { format: "A4" };
+      pdf
+        .create(html, config)
+        .toFile(pathDocumento, (err: any, res: any) => {
+          if (err) {
+            return console.error(`Generating PDF`, err);
+          }
+          bot
+            .sendDocument(msg.from.id, pathDocumento, messageOptions, {})
+            .then(() => {
+              resolve();
+            });
+        });    
+    });
+  }
+
   //https://github.com/yagop/node-telegram-bot-api/blob/release/doc/api.md#TelegramBot+sendChatAction
-  public enviarAction(msg: Message & ApiMessage, action:string, options?:any):Promise<any>{
+  public enviarAction(
+    msg: Message & ApiMessage,
+    action: string,
+    options?: any
+  ): Promise<any> {
     return bot.sendChatAction(msg.from.id, action, options);
   }
 
-  public enviarActionTyping(msg: Message & ApiMessage, options?:any):Promise<any>{
-    return bot.sendChatAction(msg.from.id, 'typing', options);
+  public enviarActionTyping(
+    msg: Message & ApiMessage,
+    options?: any
+  ): Promise<any> {
+    return bot.sendChatAction(msg.from.id, "typing", options);
   }
-
 }

@@ -53,23 +53,44 @@ var BotSender = (function () {
     };
     BotSender.prototype.responderInLineQuery = function (msg, coleccionElementos) {
         return initBot_1.bot.answerInlineQuery(msg.id, coleccionElementos, {
-            cache_time: "0",
+            cache_time: "0"
         });
     };
     BotSender.prototype.enviarHTMLComoDocumentoPDF = function (msg, nombreDocumento, html, description) {
+        var _this = this;
         return new Promise(function (resolve) {
             var pathDocumento = "./dist/tmp/" + nombreDocumento;
+            fs.stat(pathDocumento, function (err, stats) {
+                if (err) {
+                    _this.createPDFAndSendAsMessage(msg, description, html, pathDocumento).then(function () {
+                        resolve();
+                    });
+                    return;
+                }
+                fs.unlink(pathDocumento, function (err) {
+                    _this.createPDFAndSendAsMessage(msg, description, html, pathDocumento).then(function () {
+                        resolve();
+                    });
+                });
+            });
+        });
+    };
+    BotSender.prototype.createPDFAndSendAsMessage = function (msg, description, html, pathDocumento) {
+        return new Promise(function (resolve, reject) {
             var messageOptions = {
                 caption: description,
-                parse_mode: "HTML",
+                parse_mode: "HTML"
             };
             var config = { format: "A4" };
-            pdf.create(html, config).toFile(pathDocumento, function (err, res) {
+            pdf
+                .create(html, config)
+                .toFile(pathDocumento, function (err, res) {
                 if (err) {
                     return console.error("Generating PDF", err);
                 }
-                initBot_1.bot.sendDocument(msg.from.id, pathDocumento, messageOptions, {}).then(function () {
-                    fs.unlinkSync(pathDocumento);
+                initBot_1.bot
+                    .sendDocument(msg.from.id, pathDocumento, messageOptions, {})
+                    .then(function () {
                     resolve();
                 });
             });
@@ -80,7 +101,7 @@ var BotSender = (function () {
         return initBot_1.bot.sendChatAction(msg.from.id, action, options);
     };
     BotSender.prototype.enviarActionTyping = function (msg, options) {
-        return initBot_1.bot.sendChatAction(msg.from.id, 'typing', options);
+        return initBot_1.bot.sendChatAction(msg.from.id, "typing", options);
     };
     return BotSender;
 }());
