@@ -119,7 +119,7 @@ export abstract class BotReceiver {
     this.apiMessage = msg;
   }
 
-  private estaEnContextoActual(contexto?: string): boolean {
+  protected estaEnContextoActual(contexto?: string): boolean {
     if (!this.estadoGlobal.infoUsuarioMensaje.estudiante) {
       return false;
     }

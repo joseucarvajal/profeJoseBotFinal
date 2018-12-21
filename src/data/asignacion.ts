@@ -12,7 +12,8 @@ import {
   AsignaturaAsignadaAEstudiante,
   ListadoEstudiantes,
   ListadoAsistenciaAsignatura,
-  ListadoAsistenciaFecha
+  ListadoAsistenciaFecha,
+  HorarioAsignatura
 } from "../core/models";
 import { ApiMessage } from "../api/ApiMessage";
 import { Constants } from "../core";
@@ -37,6 +38,46 @@ export namespace Asignacion {
       .catch((error: any) => {
         console.log("Asignaturas/getAsignaturasXPeriodoAndDocente" + error);
       });
+  };
+
+  export const getAsignaturasXPeriodoAndDocenteAsArray = (
+    estadoGlobal: EstadoGlobal
+  ): Promise<Array<Asignatura>> => {
+    return new Promise<Array<Asignatura>>((resolve, reject) => {
+      getAsignaturasXPeriodoAndDocente(estadoGlobal).then(
+        (listadoAsignaturas: ListadoAsignaturas) => {
+          let listadoAsignaturasArray = new Array<Asignatura>();
+          for (let codigoAsignatura in listadoAsignaturas) {
+            listadoAsignaturasArray.push(listadoAsignaturas[codigoAsignatura]);
+          }
+          resolve(listadoAsignaturasArray);
+        }
+      );
+    });
+  };
+
+  export const getTodosHorariosYAsignaturasDocente = (
+    estadoGlobal: EstadoGlobal
+  ): Promise<Array<HorarioAsignatura>> => {
+    return new Promise<Array<HorarioAsignatura>>((resolve, reject) => {
+      getAsignaturasXPeriodoAndDocente(estadoGlobal).then(
+        (listadoAsignaturas: ListadoAsignaturas) => {
+          let listaHorarioAsignatura = new Array<HorarioAsignatura>();
+          let asignatura: Asignatura;
+          for (let codigoAsignatura in listadoAsignaturas) {
+            asignatura = listadoAsignaturas[codigoAsignatura];
+            for (let codigoHorario in asignatura.horarios) {
+              asignatura.horarios[codigoHorario].id = codigoAsignatura+'#|@'+codigoHorario;
+              listaHorarioAsignatura.push({
+                asignatura: asignatura,
+                horario: asignatura.horarios[codigoHorario]
+              } as HorarioAsignatura);
+            }
+          }
+          resolve(listaHorarioAsignatura);
+        }
+      );
+    });
   };
 
   export const asociarEstudianteAAsignatura = (
@@ -147,7 +188,7 @@ export namespace Asignacion {
 
   export const getEstudiantesInscritosEnAsignatura = (
     estadoGlobal: EstadoGlobal,
-    codigoAsignatura:string
+    codigoAsignatura: string
   ): Promise<ListadoEstudiantes> => {
     return dataBase
       .ref(
@@ -155,8 +196,8 @@ export namespace Asignacion {
           estadoGlobal.settings.periodoActual +
           "/asignacion/" +
           estadoGlobal.settings.celularDocente +
-          "/asignatura_estudiante/"
-          + codigoAsignatura
+          "/asignatura_estudiante/" +
+          codigoAsignatura
       )
       .once("value")
       .then((snapshot: any) => {
@@ -167,7 +208,6 @@ export namespace Asignacion {
       });
   };
 
-  
   export const getAsignaturasByEstudianteCodigo = (
     estadoGlobal: EstadoGlobal,
     codigoEstudiante: string
@@ -252,7 +292,8 @@ export namespace Asignacion {
               let asignatura: Asignatura;
               for (let codigoAsignatura in listadoEstudianteAsignatura) {
                 asignatura = listadoTodasAsignaturas[codigoAsignatura];
-                asignatura.estado = listadoEstudianteAsignatura[codigoAsignatura].estado;
+                asignatura.estado =
+                  listadoEstudianteAsignatura[codigoAsignatura].estado;
                 listaAsignaturasDeEstudiante.push(asignatura);
               }
 
@@ -305,7 +346,7 @@ export namespace Asignacion {
     } as Asistencia;
 
     let fechaAsistencia = new Date(Utils.getRealDate(msg.date));
-    fechaAsistencia.setHours(0, 0, 0, 0);    
+    fechaAsistencia.setHours(0, 0, 0, 0);
 
     return dataBase
       .ref(
@@ -342,7 +383,7 @@ export namespace Asignacion {
 
   export const getListadoAsistenciaByAsignatura = (
     estadoGlobal: EstadoGlobal,
-    asignatura:Asignatura
+    asignatura: Asignatura
   ): Promise<ListadoAsistenciaFecha> => {
     return dataBase
       .ref(
@@ -362,4 +403,25 @@ export namespace Asignacion {
       });
   };
 
+  export const actualizarGeoreferenciaAsignatura = (
+    msg: Message,
+    estadoGlobal: EstadoGlobal,
+    codigoAsignatura:string,
+    codigoHorario:string,
+  ): Promise<any> => {
+    return dataBase    
+      .ref(
+        "periodosAcademicos/" +
+          estadoGlobal.settings.periodoActual +
+          "/asignacion/" +
+          estadoGlobal.settings.celularDocente +
+          "/asignaturas/" + 
+          codigoAsignatura +
+          "/horarios/"           
+      )
+      .child(codigoHorario)
+      .update({
+        coordenadasAula:msg.location.latitude + "," + msg.location.longitude
+      });
+  };
 }

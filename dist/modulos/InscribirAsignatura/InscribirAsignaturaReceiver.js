@@ -72,8 +72,7 @@ var InscribirAsignatura;
             }
         };
         InscribirAsignaturaReceiver.prototype.onChosenInlineResult = function (msg) {
-            if (!this.estaComandoEnContexto(Comandos.OpcionesInscripcionAsignaturasOptsEnum
-                .InscribirOtraAsignatura)) {
+            if (this.estaComandoEnContexto(Comandos.EsperandoInscripcionAsignaturasRpta)) {
                 this.enviarSolicitudInscribirAsignaturaADocente(msg);
             }
         };

@@ -20,6 +20,36 @@ var Asignacion;
             console.log("Asignaturas/getAsignaturasXPeriodoAndDocente" + error);
         });
     };
+    Asignacion.getAsignaturasXPeriodoAndDocenteAsArray = function (estadoGlobal) {
+        return new Promise(function (resolve, reject) {
+            Asignacion.getAsignaturasXPeriodoAndDocente(estadoGlobal).then(function (listadoAsignaturas) {
+                var listadoAsignaturasArray = new Array();
+                for (var codigoAsignatura in listadoAsignaturas) {
+                    listadoAsignaturasArray.push(listadoAsignaturas[codigoAsignatura]);
+                }
+                resolve(listadoAsignaturasArray);
+            });
+        });
+    };
+    Asignacion.getTodosHorariosYAsignaturasDocente = function (estadoGlobal) {
+        return new Promise(function (resolve, reject) {
+            Asignacion.getAsignaturasXPeriodoAndDocente(estadoGlobal).then(function (listadoAsignaturas) {
+                var listaHorarioAsignatura = new Array();
+                var asignatura;
+                for (var codigoAsignatura in listadoAsignaturas) {
+                    asignatura = listadoAsignaturas[codigoAsignatura];
+                    for (var codigoHorario in asignatura.horarios) {
+                        asignatura.horarios[codigoHorario].id = codigoAsignatura + '#|@' + codigoHorario;
+                        listaHorarioAsignatura.push({
+                            asignatura: asignatura,
+                            horario: asignatura.horarios[codigoHorario]
+                        });
+                    }
+                }
+                resolve(listaHorarioAsignatura);
+            });
+        });
+    };
     Asignacion.asociarEstudianteAAsignatura = function (estadoGlobal, estudiante, codigoAsignatura) {
         return new Promise(function (resolve, reject) {
             Asignacion.registrarAsignaturaEstudiante(estadoGlobal, estudiante, codigoAsignatura).then(function () {
@@ -84,8 +114,8 @@ var Asignacion;
             estadoGlobal.settings.periodoActual +
             "/asignacion/" +
             estadoGlobal.settings.celularDocente +
-            "/asignatura_estudiante/"
-            + codigoAsignatura)
+            "/asignatura_estudiante/" +
+            codigoAsignatura)
             .once("value")
             .then(function (snapshot) {
             return snapshot.val();
@@ -149,7 +179,8 @@ var Asignacion;
                     var asignatura;
                     for (var codigoAsignatura in listadoEstudianteAsignatura) {
                         asignatura = listadoTodasAsignaturas[codigoAsignatura];
-                        asignatura.estado = listadoEstudianteAsignatura[codigoAsignatura].estado;
+                        asignatura.estado =
+                            listadoEstudianteAsignatura[codigoAsignatura].estado;
                         listaAsignaturasDeEstudiante.push(asignatura);
                     }
                     resolve(listaAsignaturasDeEstudiante);
@@ -215,6 +246,20 @@ var Asignacion;
         })
             .catch(function (error) {
             console.log("asignacion/getListadoAsistenciaByAsignatura" + error);
+        });
+    };
+    Asignacion.actualizarGeoreferenciaAsignatura = function (msg, estadoGlobal, codigoAsignatura, codigoHorario) {
+        return initDatabase_1.dataBase
+            .ref("periodosAcademicos/" +
+            estadoGlobal.settings.periodoActual +
+            "/asignacion/" +
+            estadoGlobal.settings.celularDocente +
+            "/asignaturas/" +
+            codigoAsignatura +
+            "/horarios/")
+            .child(codigoHorario)
+            .update({
+            coordenadasAula: msg.location.latitude + "," + msg.location.longitude
         });
     };
 })(Asignacion = exports.Asignacion || (exports.Asignacion = {}));

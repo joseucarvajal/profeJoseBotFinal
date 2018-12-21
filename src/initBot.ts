@@ -3,6 +3,8 @@ import {
 } from './initBotToken';
 import { Constants } from './core';
 
+let dateFormat = require('dateformat');
+
 const TelegramBot = require('node-telegram-bot-api');
 
 let bot:any = null;
@@ -41,3 +43,17 @@ if (process.env.NODE_ENV.trim() == 'development') {
 export {
   bot,
 }
+
+dateFormat.i18n = {
+    dayNames: [
+        'Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab',
+        'Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'
+    ],
+    monthNames: [
+        'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic',
+        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Deciembre'
+    ],
+    timeNames: [
+        'a', 'p', 'am', 'pm', 'A', 'P', 'AM', 'PM'
+    ]
+};

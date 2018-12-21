@@ -43,6 +43,7 @@ export interface Horario {
   horaFin:string;
   aula:string;
   coordenadasAula:string;
+  id?:string; //Sólo se llena en memoria con el id Firebase del horario
 }
 
 
@@ -123,4 +124,9 @@ export interface ResultadoReporteAsistencia{
   listaResultadoAsistenciasIndxByEstCodigo:ListaResultadoAsistenciasIndxByEstCodigo;
 }
 
+
+export interface HorarioAsignatura {
+  horario:Horario;
+  asignatura:Asignatura;
+}
 //#endregion

@@ -53,7 +53,7 @@ var BotSender = /** @class */ (function () {
     };
     BotSender.prototype.responderInLineQuery = function (msg, coleccionElementos) {
         return initBot_1.bot.answerInlineQuery(msg.id, coleccionElementos, {
-            cache_time: "0"
+            cache_time: "0",
         });
     };
     BotSender.prototype.enviarHTMLComoDocumentoPDF = function (msg, nombreDocumento, html, description) {

@@ -92,11 +92,7 @@ export namespace InscribirAsignatura {
     }
 
     onChosenInlineResult(msg: ApiMessage & Message) {      
-      if (
-        !this.estaComandoEnContexto(
-          Comandos.OpcionesInscripcionAsignaturasOptsEnum
-            .InscribirOtraAsignatura
-        )
+      if (this.estaComandoEnContexto(Comandos.EsperandoInscripcionAsignaturasRpta)
       ) {
         this.enviarSolicitudInscribirAsignaturaADocente(msg);
       }

@@ -82,7 +82,7 @@ export class BotSender {
     coleccionElementos: Array<any>
   ): Promise<any> {
     return bot.answerInlineQuery(msg.id, coleccionElementos, {
-      cache_time: "0"
+      cache_time: "0",      
     });
   }
 

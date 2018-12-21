@@ -41,6 +41,7 @@ export namespace RegistrarAsistencia {
           text:
             Comandos.SeleccionarComandoInlineOptsEnum
               .SeleccionarAsignaturaByDefault,
+              request_location:true
         }
       ],
       [
@@ -120,7 +121,24 @@ export namespace RegistrarAsistencia {
         this.enviarListaAsignaturasParaReportarAsistencia(msg);
       }
     }
+
+    onChosenInlineResult(msg: ApiMessage & Message) {      
+      if (this.estaComandoEnContexto(Comandos.SeleccionarAsignaturaAsistenciaOPts.SeleccionarAsignatura)
+      ) {
+        this.guardarAsignaturaSeleccionadaTemporal(msg);
+      }
+    }
+    
     //#endregion
+
+    private guardarAsignaturaSeleccionadaTemporal(msg: ApiMessage & Message){
+      this.estadoGlobal.infoUsuarioMensaje.estudiante.tempData = msg.result_id;
+      Data.Estudiantes.actualizarChat(msg, this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante).then(()=>{
+        Data.Asignacion.getAsignaturaByCodigo(this.estadoGlobal, msg.result_id).then((asignatura:Asignatura)=>{
+          this.enviarOpcionRegistrarAsistenciaUnaAsignatura(msg, asignatura, new Date());
+        });
+      });
+    }
 
     private guardarAsistencia(msg: Message & ApiMessage) {
       Data.Asignacion.registrarAsistencia(
@@ -156,7 +174,7 @@ export namespace RegistrarAsistencia {
           if (listadoAsignaturasDeEstudianteHoy.length == 0) {
             this.enviarOpcionesRegistrarAsistenciaNoAsignaturas(msg);
           } else if (listadoAsignaturasDeEstudianteHoy.length == 1) {
-            this.enviarOpcionesRegistrarAsistenciaUnaAsignatura(
+            this.enviarOpcionRegistrarAsistenciaUnaAsignatura(
               msg,
               listadoAsignaturasDeEstudianteHoy[0],
               fechaHoy
@@ -215,7 +233,7 @@ export namespace RegistrarAsistencia {
         });
     }
 
-    private enviarOpcionesRegistrarAsistenciaUnaAsignatura(
+    private enviarOpcionRegistrarAsistenciaUnaAsignatura(
       msg: Message & ApiMessage,
       asignatura: Asignatura,
       fechaHoy: Date

@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var initBotToken_1 = require("./initBotToken");
 var core_1 = require("./core");
+var dateFormat = require('dateformat');
 var TelegramBot = require('node-telegram-bot-api');
 var bot = null;
 exports.bot = bot;
@@ -25,3 +26,16 @@ else {
     var url = core_1.Constants.UrlServidor + "/dist/index.js";
     bot.setWebHook(url + "/bot" + initBotToken_1.token);
 }
+dateFormat.i18n = {
+    dayNames: [
+        'Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab',
+        'Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'
+    ],
+    monthNames: [
+        'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic',
+        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Deciembre'
+    ],
+    timeNames: [
+        'a', 'p', 'am', 'pm', 'A', 'P', 'AM', 'PM'
+    ]
+};

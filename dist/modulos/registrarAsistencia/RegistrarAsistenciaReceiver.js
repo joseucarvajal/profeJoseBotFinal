@@ -44,6 +44,7 @@ var RegistrarAsistencia;
                     {
                         text: Comandos.SeleccionarComandoInlineOptsEnum
                             .SeleccionarAsignaturaByDefault,
+                        request_location: true
                     }
                 ],
                 [
@@ -96,7 +97,21 @@ var RegistrarAsistencia;
                 this.enviarListaAsignaturasParaReportarAsistencia(msg);
             }
         };
+        RegistrarAsistenciaReceiver.prototype.onChosenInlineResult = function (msg) {
+            if (this.estaComandoEnContexto(Comandos.SeleccionarAsignaturaAsistenciaOPts.SeleccionarAsignatura)) {
+                this.guardarAsignaturaSeleccionadaTemporal(msg);
+            }
+        };
         //#endregion
+        RegistrarAsistenciaReceiver.prototype.guardarAsignaturaSeleccionadaTemporal = function (msg) {
+            var _this = this;
+            this.estadoGlobal.infoUsuarioMensaje.estudiante.tempData = msg.result_id;
+            Data.Estudiantes.actualizarChat(msg, this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante).then(function () {
+                Data.Asignacion.getAsignaturaByCodigo(_this.estadoGlobal, msg.result_id).then(function (asignatura) {
+                    _this.enviarOpcionRegistrarAsistenciaUnaAsignatura(msg, asignatura, new Date());
+                });
+            });
+        };
         RegistrarAsistenciaReceiver.prototype.guardarAsistencia = function (msg) {
             var _this = this;
             Data.Asignacion.registrarAsistencia(msg, this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante.tempData).then(function () {
@@ -119,7 +134,7 @@ var RegistrarAsistencia;
                     _this.enviarOpcionesRegistrarAsistenciaNoAsignaturas(msg);
                 }
                 else if (listadoAsignaturasDeEstudianteHoy.length == 1) {
-                    _this.enviarOpcionesRegistrarAsistenciaUnaAsignatura(msg, listadoAsignaturasDeEstudianteHoy[0], fechaHoy);
+                    _this.enviarOpcionRegistrarAsistenciaUnaAsignatura(msg, listadoAsignaturasDeEstudianteHoy[0], fechaHoy);
                 }
                 else {
                     _this.enviarOpcionRegistrarAsistenciaMultiplesAsignaturas(msg, listadoAsignaturasDeEstudianteHoy, fechaHoy);
@@ -156,7 +171,7 @@ var RegistrarAsistencia;
                 _this.irAMenuPrincipal(msg);
             });
         };
-        RegistrarAsistenciaReceiver.prototype.enviarOpcionesRegistrarAsistenciaUnaAsignatura = function (msg, asignatura, fechaHoy) {
+        RegistrarAsistenciaReceiver.prototype.enviarOpcionRegistrarAsistenciaUnaAsignatura = function (msg, asignatura, fechaHoy) {
             this.estadoGlobal.infoUsuarioMensaje.estudiante.tempData =
                 asignatura.codigo;
             this.enviarMensajeKeyboardMarkup(msg, "Hoy es <b>" + core_1.Constants.DiasSemana.get(fechaHoy.getDay()) + "</b>. Deseas reportar asistencia en la asignatura <b>" + asignatura.nombre + "\u2753 </b>", this.seleccionarAsignaturaInlineOpts, Comandos.SeleccionarComandoInlineOptsEnum.SeleccionarAsignaturaByDefault);
