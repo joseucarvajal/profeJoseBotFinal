@@ -83,16 +83,17 @@ export namespace InscribirAsignatura {
       }
     }
 
-    public onRecibirInlineQuery(msg: Message & ApiMessage) {      
+    public onRecibirInlineQuery(msg: Message & ApiMessage) {
       if (
         this.estaComandoEnContexto(Comandos.EsperandoInscripcionAsignaturasRpta)
       ) {
         this.enviarAsignaturasQueNoTieneInscritasElEstudiante(msg);
-      }      
+      }
     }
 
-    onChosenInlineResult(msg: ApiMessage & Message) {      
-      if (this.estaComandoEnContexto(Comandos.EsperandoInscripcionAsignaturasRpta)
+    onChosenInlineResult(msg: ApiMessage & Message) {
+      if (
+        this.estaComandoEnContexto(Comandos.EsperandoInscripcionAsignaturasRpta)
       ) {
         this.enviarSolicitudInscribirAsignaturaADocente(msg);
       }
@@ -137,7 +138,9 @@ export namespace InscribirAsignatura {
         this.estadoGlobal,
         this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo
       ).then((listadoAsignaturas: Array<Asignatura>) => {
-        let opcionesListaAsignaturas = this.getAsignaturasFormatoInlineQuery(listadoAsignaturas);
+        let opcionesListaAsignaturas = this.getAsignaturasFormatoInlineQuery(
+          listadoAsignaturas
+        );
         this.botSender.responderInLineQuery(msg, opcionesListaAsignaturas);
       });
     }
@@ -336,11 +339,19 @@ Presiona <b>"${
           }
         }
 
-        let mensaje = `
-💡  Ya has inscrito las siguientes asignaturas:
-${mensajeListadoAsignaturas}
-
-Si deseas puedes enviarle al profe Jose una <b>solicitud</b> para inscribir otra asignatura`;
+        let mensaje;
+        if (listaAsignaturas.length == 0) {
+          mensaje = `Presiona el botón <b>${
+            Comandos.OpcionesInscripcionAsignaturasOptsEnum
+              .InscribirOtraAsignatura
+          }</b>, y selecciona una asignatura para enviar una solictud al profe Jose`;
+        } else {
+          mensaje = `
+          💡  Ya has inscrito las siguientes asignaturas:
+          ${mensajeListadoAsignaturas}
+          
+          Si deseas puedes enviarle al profe Jose una <b>solicitud</b> para inscribir otra asignatura`;
+        }
 
         this.enviarOpcionesInscribirOtrasAsignaturas(
           msg,

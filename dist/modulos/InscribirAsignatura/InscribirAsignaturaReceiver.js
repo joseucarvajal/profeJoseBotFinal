@@ -203,7 +203,14 @@ var InscribirAsignatura;
                         mensajeListadoAsignaturas += "\n" + (i + 1) + ". <b>" + asignatura.nombre + "</b>, grupo <b>" + asignatura.grupo + "</b>";
                     }
                 }
-                var mensaje = "\n\uD83D\uDCA1  Ya has inscrito las siguientes asignaturas:\n" + mensajeListadoAsignaturas + "\n\nSi deseas puedes enviarle al profe Jose una <b>solicitud</b> para inscribir otra asignatura";
+                var mensaje;
+                if (listaAsignaturas.length == 0) {
+                    mensaje = "Presiona el bot\u00F3n <b>" + Comandos.OpcionesInscripcionAsignaturasOptsEnum
+                        .InscribirOtraAsignatura + "</b>, y selecciona una asignatura para enviar una solictud al profe Jose";
+                }
+                else {
+                    mensaje = "\n          \uD83D\uDCA1  Ya has inscrito las siguientes asignaturas:\n          " + mensajeListadoAsignaturas + "\n          \n          Si deseas puedes enviarle al profe Jose una <b>solicitud</b> para inscribir otra asignatura";
+                }
                 _this.enviarOpcionesInscribirOtrasAsignaturas(msg, mensaje, opcionesMenuInscripcion);
             });
         };
