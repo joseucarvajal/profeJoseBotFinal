@@ -341,7 +341,7 @@ Presiona <b>"${
 
         let mensaje;
         if (listaAsignaturas.length == 0) {
-          mensaje = `Presiona el botón <b>${
+          mensaje = `No apareces matriculado en ninguna de las asignaturas del profe Jose. Presiona el botón <b>${
             Comandos.OpcionesInscripcionAsignaturasOptsEnum
               .InscribirOtraAsignatura
           }</b>, y selecciona una asignatura para enviar una solictud al profe Jose`;
