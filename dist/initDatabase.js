@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var firebase = require('firebase');
 // Initialize Firebase
 var config = {
-    apiKey: "AIzaSyCyqfZZVUgeSwwbHUxITIzcJ6kSI3xgdjU",
+    apiKey: "AIzaSyBRuC6JBrzUpvL7wEaiPIpXBsSYpJ63SyM",
     authDomain: "profejosebot-94c5e.firebaseapp.com",
     databaseURL: "https://profejosebot-94c5e.firebaseio.com",
     projectId: "profejosebot-94c5e",
