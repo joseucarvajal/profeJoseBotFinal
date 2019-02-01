@@ -205,7 +205,7 @@ var InscribirAsignatura;
                 }
                 var mensaje;
                 if (listaAsignaturas.length == 0) {
-                    mensaje = "Presiona el bot\u00F3n <b>" + Comandos.OpcionesInscripcionAsignaturasOptsEnum
+                    mensaje = "No apareces matriculado en ninguna de las asignaturas del profe Jose. Presiona el bot\u00F3n <b>" + Comandos.OpcionesInscripcionAsignaturasOptsEnum
                         .InscribirOtraAsignatura + "</b>, y selecciona una asignatura para enviar una solictud al profe Jose";
                 }
                 else {
