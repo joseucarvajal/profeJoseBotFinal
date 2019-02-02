@@ -2,7 +2,7 @@ import { Message } from "../../bot/Message";
 import { BotReceiver } from "../bot/BotReceiver";
 
 import * as Data from "../../data";
-import { EstadoGlobal, Asignatura, Constants, Horario } from "../../core";
+import { EstadoGlobal, Asignatura, Constants, Horario, AsignaturasDeEstudiante } from "../../core";
 import { MainReceiverContract } from "../indexContracts";
 import { ApiMessage } from "../../api/ApiMessage";
 import { InlineKeyboardButton } from "../../bot/InlineKeyboardButton";
@@ -369,32 +369,69 @@ export namespace RegistrarAsistencia {
     private getAsignaturasAsistenciaHoy(
       msg: Message & ApiMessage
     ): Promise<Array<Asignatura>> {
-      return new Promise<Array<Asignatura>>((resolve, reject) => {
-        let fechaHoy = new Date();
+      return new Promise<Array<Asignatura>>((resolve, reject) => {        
 
         Data.Asignacion.getAsignaturasInscritasPorEstudianteCachedInfoCompleta(
           this.estadoGlobal,
           this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo
-        ).then((listadoAsignaturasDeEstudiante: Array<Asignatura>) => {
-          let asignatura: Asignatura;
-          let horario: Horario;
-          let listadoAsignaturasDeEstudianteHoy = new Array<Asignatura>();
-          for (let i = 0; i < listadoAsignaturasDeEstudiante.length; i++) {
-            asignatura = listadoAsignaturasDeEstudiante[i];
-            for (let codigoHorario in asignatura.horarios) {
-              horario = asignatura.horarios[codigoHorario];
-              if (
-                Constants.DiasSemana.get(fechaHoy.getDay()) == horario.dia &&
-                asignatura.estado == Constants.EstadoEstudianteAsignatura.Activa
-              ) {
-                listadoAsignaturasDeEstudianteHoy.push(asignatura);
+        ).then((listaAsignaturasCache: Array<Asignatura>) => {
+
+          if(listaAsignaturasCache == null || listaAsignaturasCache.length == 0){
+            this.getAsignaturasEstudianteNoCache(msg).then((listaAsignaturasNOCache:Array<Asignatura>)=>{
+              let listaAsignaturasHoy:Array<Asignatura> = this.getSoloAsignaturasDeHoy(listaAsignaturasNOCache);
+
+              for(let i=0; i<listaAsignaturasHoy.length; i++){
+                Data.Asignacion.asociarEstudianteAAsignatura(this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante, listaAsignaturasHoy[i].codigo);
               }
-            }
+
+              resolve(listaAsignaturasHoy);
+            });
           }
-          resolve(listadoAsignaturasDeEstudianteHoy);
+          else{
+            resolve(this.getSoloAsignaturasDeHoy(listaAsignaturasCache));
+          }
         });
       });
     }
+
+    private getSoloAsignaturasDeHoy(listadoAsignaturasDeEstudiante:Array<Asignatura>):Array<Asignatura>{
+      let fechaHoy = new Date();
+      let asignatura: Asignatura;
+      let horario: Horario;
+      let listadoAsignaturasDeEstudianteHoy = new Array<Asignatura>();
+      for (let i = 0; i < listadoAsignaturasDeEstudiante.length; i++) {
+        asignatura = listadoAsignaturasDeEstudiante[i];
+        for (let codigoHorario in asignatura.horarios) {
+          horario = asignatura.horarios[codigoHorario];
+          if (
+            Constants.DiasSemana.get(fechaHoy.getDay()) == horario.dia
+          ) {
+            listadoAsignaturasDeEstudianteHoy.push(asignatura);
+          }
+        }
+      }
+
+      return listadoAsignaturasDeEstudianteHoy;
+    }
+
+    private getAsignaturasEstudianteNoCache(msg: Message & ApiMessage): Promise<Array<Asignatura>> {
+      return new Promise<Array<Asignatura>>((resolve, reject) => {
+        Data.Asignacion.getAsignaturasByEstudianteCodigo(
+          this.estadoGlobal,
+          this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo
+        ).then((asignaturasDeEstudiante: AsignaturasDeEstudiante) => {
+          if (!asignaturasDeEstudiante.result) {
+            this.botSender.responderMensajeErrorHTML(
+              msg,
+              asignaturasDeEstudiante.message
+            );
+            reject();
+          }
+          resolve(asignaturasDeEstudiante.listaAsignaturas);
+        });  
+      });
+    }
+
 
     private enviarOpcionesRegistrarAsistenciaNoAsignaturas(
       msg: Message & ApiMessage

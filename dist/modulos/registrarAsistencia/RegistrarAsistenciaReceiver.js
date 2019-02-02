@@ -247,22 +247,47 @@ var RegistrarAsistencia;
         RegistrarAsistenciaReceiver.prototype.getAsignaturasAsistenciaHoy = function (msg) {
             var _this = this;
             return new Promise(function (resolve, reject) {
-                var fechaHoy = new Date();
-                Data.Asignacion.getAsignaturasInscritasPorEstudianteCachedInfoCompleta(_this.estadoGlobal, _this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo).then(function (listadoAsignaturasDeEstudiante) {
-                    var asignatura;
-                    var horario;
-                    var listadoAsignaturasDeEstudianteHoy = new Array();
-                    for (var i = 0; i < listadoAsignaturasDeEstudiante.length; i++) {
-                        asignatura = listadoAsignaturasDeEstudiante[i];
-                        for (var codigoHorario in asignatura.horarios) {
-                            horario = asignatura.horarios[codigoHorario];
-                            if (core_1.Constants.DiasSemana.get(fechaHoy.getDay()) == horario.dia &&
-                                asignatura.estado == core_1.Constants.EstadoEstudianteAsignatura.Activa) {
-                                listadoAsignaturasDeEstudianteHoy.push(asignatura);
+                Data.Asignacion.getAsignaturasInscritasPorEstudianteCachedInfoCompleta(_this.estadoGlobal, _this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo).then(function (listaAsignaturasCache) {
+                    if (listaAsignaturasCache == null || listaAsignaturasCache.length == 0) {
+                        _this.getAsignaturasEstudianteNoCache(msg).then(function (listaAsignaturasNOCache) {
+                            var listaAsignaturasHoy = _this.getSoloAsignaturasDeHoy(listaAsignaturasNOCache);
+                            for (var i = 0; i < listaAsignaturasHoy.length; i++) {
+                                Data.Asignacion.asociarEstudianteAAsignatura(_this.estadoGlobal, _this.estadoGlobal.infoUsuarioMensaje.estudiante, listaAsignaturasHoy[i].codigo);
                             }
-                        }
+                            resolve(listaAsignaturasHoy);
+                        });
                     }
-                    resolve(listadoAsignaturasDeEstudianteHoy);
+                    else {
+                        resolve(_this.getSoloAsignaturasDeHoy(listaAsignaturasCache));
+                    }
+                });
+            });
+        };
+        RegistrarAsistenciaReceiver.prototype.getSoloAsignaturasDeHoy = function (listadoAsignaturasDeEstudiante) {
+            var fechaHoy = new Date();
+            var asignatura;
+            var horario;
+            var listadoAsignaturasDeEstudianteHoy = new Array();
+            for (var i = 0; i < listadoAsignaturasDeEstudiante.length; i++) {
+                asignatura = listadoAsignaturasDeEstudiante[i];
+                for (var codigoHorario in asignatura.horarios) {
+                    horario = asignatura.horarios[codigoHorario];
+                    if (core_1.Constants.DiasSemana.get(fechaHoy.getDay()) == horario.dia) {
+                        listadoAsignaturasDeEstudianteHoy.push(asignatura);
+                    }
+                }
+            }
+            return listadoAsignaturasDeEstudianteHoy;
+        };
+        RegistrarAsistenciaReceiver.prototype.getAsignaturasEstudianteNoCache = function (msg) {
+            var _this = this;
+            return new Promise(function (resolve, reject) {
+                Data.Asignacion.getAsignaturasByEstudianteCodigo(_this.estadoGlobal, _this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo).then(function (asignaturasDeEstudiante) {
+                    if (!asignaturasDeEstudiante.result) {
+                        _this.botSender.responderMensajeErrorHTML(msg, asignaturasDeEstudiante.message);
+                        reject();
+                    }
+                    resolve(asignaturasDeEstudiante.listaAsignaturas);
                 });
             });
         };
