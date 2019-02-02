@@ -2,7 +2,7 @@ const firebase = require('firebase');
 
 // Initialize Firebase
 var config = {
-    apiKey: "AIzaSyBRuC6JBrzUpvL7wEaiPIpXBsSYpJ63SyM",
+    apiKey: "AIzaSyCU9AvEF_dbdjMpbKNc9BJbIIFTAa_vW0s",
     authDomain: "profejosebot-94c5e.firebaseapp.com",
     databaseURL: "https://profejosebot-94c5e.firebaseio.com",
     projectId: "profejosebot-94c5e",
