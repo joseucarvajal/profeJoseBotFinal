@@ -2,7 +2,13 @@ import { Message } from "../../bot/Message";
 import { BotReceiver } from "../bot/BotReceiver";
 
 import * as Data from "../../data";
-import { EstadoGlobal, Asignatura, Constants, Horario, AsignaturasDeEstudiante } from "../../core";
+import {
+  EstadoGlobal,
+  Asignatura,
+  Constants,
+  Horario,
+  AsignaturasDeEstudiante
+} from "../../core";
 import { MainReceiverContract } from "../indexContracts";
 import { ApiMessage } from "../../api/ApiMessage";
 import { InlineKeyboardButton } from "../../bot/InlineKeyboardButton";
@@ -69,13 +75,19 @@ export namespace RegistrarAsistencia {
         return;
       }
 
-      if(!this.estadoGlobal.infoUsuarioMensaje.estudiante.inscripcionAsignaturasConfirmado){
+      if (
+        !this.estadoGlobal.infoUsuarioMensaje.estudiante
+          .inscripcionAsignaturasConfirmado
+      ) {
         this.botSender
-          .responderMensajeErrorHTML(msg, `Primero debes <b>Inscribir asignaturas</b>`)
+          .responderMensajeErrorHTML(
+            msg,
+            `Primero debes <b>Inscribir asignaturas</b>`
+          )
           .then(() => {
             this.irAMenuPrincipal(msg);
           });
-        
+
         return;
       }
 
@@ -224,6 +236,17 @@ export namespace RegistrarAsistencia {
 
       if (horaHoy < horario.horaInicio) {
         horasDiferencia = Math.abs(fechaHoraInicioClase - fechaHoy) / 36e5;
+
+        this.enviarMensajeErrorHTMLAProfesor(
+          `El estudiante <b>${
+            this.estadoGlobal.infoUsuarioMensaje.estudiante.nombre
+          }</b>, código: ${
+            this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo
+          } intentó registrar asistencia muy temprano. Asignatura ${
+            asignatura.nombre
+          }`
+        );
+
         this.botSender
           .responderMensajeHTML(
             msg,
@@ -239,6 +262,17 @@ export namespace RegistrarAsistencia {
         return false;
       } else if (horaHoy > horario.horaFin) {
         horasDiferencia = Math.abs(fechaHoraFinClase - fechaHoy) / 36e5;
+
+        this.enviarMensajeErrorHTMLAProfesor(
+          `El estudiante <b>${
+            this.estadoGlobal.infoUsuarioMensaje.estudiante.nombre
+          }</b>, código: ${
+            this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo
+          } intentó registrar asistencia muy tarde. Asignatura ${
+            asignatura.nombre
+          }`
+        );
+        
         this.botSender
           .responderMensajeHTML(
             msg,
@@ -273,11 +307,10 @@ export namespace RegistrarAsistencia {
         msg.location.latitude,
         msg.location.longitude,
         `K`
-      );      
+      );
 
       if (
-        distanciaKm <=
-        this.estadoGlobal.settings.radioMaxDistanciaAsistenciaKm
+        distanciaKm <= this.estadoGlobal.settings.radioMaxDistanciaAsistenciaKm
       ) {
         return true;
       }
@@ -285,9 +318,18 @@ export namespace RegistrarAsistencia {
       this.botSender
         .responderMensajeHTML(
           msg,
-          `No te encuentras cerca del salón de clases. La asistencia no ha sido registrada`
+          `No te encuentras cerca del salón de clases. La asistencia <b>no ha sido registrada</b>`
         )
         .then(() => {
+          this.enviarMensajeErrorHTMLAProfesor(
+            `El estudiante <b>${
+              this.estadoGlobal.infoUsuarioMensaje.estudiante.nombre
+            }</b>, código: ${
+              this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo
+            } intentó registrar asistencia fuera del salón de clase. Asignatura ${
+              asignatura.nombre
+            }`
+          );
           this.botSender.responderMensajeHTML(msg, `😞`);
         });
 
@@ -379,32 +421,42 @@ export namespace RegistrarAsistencia {
     private getAsignaturasAsistenciaHoy(
       msg: Message & ApiMessage
     ): Promise<Array<Asignatura>> {
-      return new Promise<Array<Asignatura>>((resolve, reject) => {        
-
+      return new Promise<Array<Asignatura>>((resolve, reject) => {
         Data.Asignacion.getAsignaturasInscritasPorEstudianteCachedInfoCompleta(
           this.estadoGlobal,
           this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo
         ).then((listaAsignaturasCache: Array<Asignatura>) => {
+          if (
+            listaAsignaturasCache == null ||
+            listaAsignaturasCache.length == 0
+          ) {
+            this.getAsignaturasEstudianteNoCache(msg).then(
+              (listaAsignaturasNOCache: Array<Asignatura>) => {
+                let listaAsignaturasHoy: Array<
+                  Asignatura
+                > = this.getSoloAsignaturasDeHoy(listaAsignaturasNOCache);
 
-          if(listaAsignaturasCache == null || listaAsignaturasCache.length == 0){
-            this.getAsignaturasEstudianteNoCache(msg).then((listaAsignaturasNOCache:Array<Asignatura>)=>{
-              let listaAsignaturasHoy:Array<Asignatura> = this.getSoloAsignaturasDeHoy(listaAsignaturasNOCache);
+                for (let i = 0; i < listaAsignaturasHoy.length; i++) {
+                  Data.Asignacion.asociarEstudianteAAsignatura(
+                    this.estadoGlobal,
+                    this.estadoGlobal.infoUsuarioMensaje.estudiante,
+                    listaAsignaturasHoy[i].codigo
+                  );
+                }
 
-              for(let i=0; i<listaAsignaturasHoy.length; i++){
-                Data.Asignacion.asociarEstudianteAAsignatura(this.estadoGlobal, this.estadoGlobal.infoUsuarioMensaje.estudiante, listaAsignaturasHoy[i].codigo);
+                resolve(listaAsignaturasHoy);
               }
-
-              resolve(listaAsignaturasHoy);
-            });
-          }
-          else{
+            );
+          } else {
             resolve(this.getSoloAsignaturasDeHoy(listaAsignaturasCache));
           }
         });
       });
     }
 
-    private getSoloAsignaturasDeHoy(listadoAsignaturasDeEstudiante:Array<Asignatura>):Array<Asignatura>{
+    private getSoloAsignaturasDeHoy(
+      listadoAsignaturasDeEstudiante: Array<Asignatura>
+    ): Array<Asignatura> {
       let fechaHoy = new Date();
       let asignatura: Asignatura;
       let horario: Horario;
@@ -413,9 +465,7 @@ export namespace RegistrarAsistencia {
         asignatura = listadoAsignaturasDeEstudiante[i];
         for (let codigoHorario in asignatura.horarios) {
           horario = asignatura.horarios[codigoHorario];
-          if (
-            Constants.DiasSemana.get(fechaHoy.getDay()) == horario.dia
-          ) {
+          if (Constants.DiasSemana.get(fechaHoy.getDay()) == horario.dia) {
             listadoAsignaturasDeEstudianteHoy.push(asignatura);
           }
         }
@@ -424,7 +474,9 @@ export namespace RegistrarAsistencia {
       return listadoAsignaturasDeEstudianteHoy;
     }
 
-    private getAsignaturasEstudianteNoCache(msg: Message & ApiMessage): Promise<Array<Asignatura>> {
+    private getAsignaturasEstudianteNoCache(
+      msg: Message & ApiMessage
+    ): Promise<Array<Asignatura>> {
       return new Promise<Array<Asignatura>>((resolve, reject) => {
         Data.Asignacion.getAsignaturasByEstudianteCodigo(
           this.estadoGlobal,
@@ -438,10 +490,9 @@ export namespace RegistrarAsistencia {
             reject();
           }
           resolve(asignaturasDeEstudiante.listaAsignaturas);
-        });  
+        });
       });
     }
-
 
     private enviarOpcionesRegistrarAsistenciaNoAsignaturas(
       msg: Message & ApiMessage

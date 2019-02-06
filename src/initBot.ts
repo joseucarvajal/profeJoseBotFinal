@@ -24,7 +24,7 @@ if (process.env.NODE_ENV.trim() == 'development') {
 
 } else {
 
-  console.log('prod stage v2.2');
+  console.log('prod stage v2.3');
 
   // Create a bot that uses 'polling' to fetch new updates
   const prodOptions = {

@@ -69,7 +69,8 @@ var RegistrarAsistencia;
             if (!this.validarQueEstudianteHayaIngresadoDatosBasicos(msg)) {
                 return;
             }
-            if (!this.estadoGlobal.infoUsuarioMensaje.estudiante.inscripcionAsignaturasConfirmado) {
+            if (!this.estadoGlobal.infoUsuarioMensaje.estudiante
+                .inscripcionAsignaturasConfirmado) {
                 this.botSender
                     .responderMensajeErrorHTML(msg, "Primero debes <b>Inscribir asignaturas</b>")
                     .then(function () {
@@ -160,6 +161,7 @@ var RegistrarAsistencia;
             var horasDiferencia;
             if (horaHoy < horario.horaInicio) {
                 horasDiferencia = Math.abs(fechaHoraInicioClase - fechaHoy) / 36e5;
+                this.enviarMensajeErrorHTMLAProfesor("El estudiante <b>" + this.estadoGlobal.infoUsuarioMensaje.estudiante.nombre + "</b>, c\u00F3digo: " + this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo + " intent\u00F3 registrar asistencia muy temprano. Asignatura " + asignatura.nombre);
                 this.botSender
                     .responderMensajeHTML(msg, "Son las <b>" + horaHoy + "</b> y la clase <b>" + asignatura.nombre + "</b> inicia en <b>" + horasDiferencia.toFixed(2) + " horas</b>. A\u00FAn es muy temprano para registrar asistencia.")
                     .then(function () {
@@ -169,6 +171,7 @@ var RegistrarAsistencia;
             }
             else if (horaHoy > horario.horaFin) {
                 horasDiferencia = Math.abs(fechaHoraFinClase - fechaHoy) / 36e5;
+                this.enviarMensajeErrorHTMLAProfesor("El estudiante <b>" + this.estadoGlobal.infoUsuarioMensaje.estudiante.nombre + "</b>, c\u00F3digo: " + this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo + " intent\u00F3 registrar asistencia muy tarde. Asignatura " + asignatura.nombre);
                 this.botSender
                     .responderMensajeHTML(msg, "Son las <b>" + horaHoy + "</b> y la clase <b>" + asignatura.nombre + "</b> termin\u00F3 hace <b>" + horasDiferencia.toFixed(2) + " horas</b> aproximadamente. Ya es tarde para registrar asistencia.")
                     .then(function () {
@@ -186,13 +189,13 @@ var RegistrarAsistencia;
             var longitudHorario = parseFloat(latitudLongitudHorario[1]);
             //Distancia en km
             var distanciaKm = this.distanciaEntreDosGeolocalizaciones(latitudHorario, longitudHorario, msg.location.latitude, msg.location.longitude, "K");
-            if (distanciaKm <=
-                this.estadoGlobal.settings.radioMaxDistanciaAsistenciaKm) {
+            if (distanciaKm <= this.estadoGlobal.settings.radioMaxDistanciaAsistenciaKm) {
                 return true;
             }
             this.botSender
-                .responderMensajeHTML(msg, "No te encuentras cerca del sal\u00F3n de clases. La asistencia no ha sido registrada")
+                .responderMensajeHTML(msg, "No te encuentras cerca del sal\u00F3n de clases. La asistencia <b>no ha sido registrada</b>")
                 .then(function () {
+                _this.enviarMensajeErrorHTMLAProfesor("El estudiante <b>" + _this.estadoGlobal.infoUsuarioMensaje.estudiante.nombre + "</b>, c\u00F3digo: " + _this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo + " intent\u00F3 registrar asistencia fuera del sal\u00F3n de clase. Asignatura " + asignatura.nombre);
                 _this.botSender.responderMensajeHTML(msg, "\uD83D\uDE1E");
             });
             return false;
@@ -257,7 +260,8 @@ var RegistrarAsistencia;
             var _this = this;
             return new Promise(function (resolve, reject) {
                 Data.Asignacion.getAsignaturasInscritasPorEstudianteCachedInfoCompleta(_this.estadoGlobal, _this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo).then(function (listaAsignaturasCache) {
-                    if (listaAsignaturasCache == null || listaAsignaturasCache.length == 0) {
+                    if (listaAsignaturasCache == null ||
+                        listaAsignaturasCache.length == 0) {
                         _this.getAsignaturasEstudianteNoCache(msg).then(function (listaAsignaturasNOCache) {
                             var listaAsignaturasHoy = _this.getSoloAsignaturasDeHoy(listaAsignaturasNOCache);
                             for (var i = 0; i < listaAsignaturasHoy.length; i++) {
