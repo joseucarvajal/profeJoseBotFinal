@@ -15,7 +15,7 @@ if (process.env.NODE_ENV.trim() == 'development') {
     exports.bot = bot = new TelegramBot(initBotToken_1.token, devOptions);
 }
 else {
-    console.log('prod stage v2.4');
+    console.log('prod stage v2.5');
     // Create a bot that uses 'polling' to fetch new updates
     var prodOptions = {
         webHook: {
