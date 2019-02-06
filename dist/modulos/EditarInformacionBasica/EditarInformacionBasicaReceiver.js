@@ -12,6 +12,7 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var BotReceiver_1 = require("../bot/BotReceiver");
 var Data = require("../../data");
+var MenuPrincipalReceiver_1 = require("../menuPrincipal/MenuPrincipalReceiver");
 var EditarInformacionBasica;
 (function (EditarInformacionBasica) {
     var Comandos;
@@ -41,6 +42,9 @@ var EditarInformacionBasica;
             this.enviarMensajeHTML(msg, Comandos.IngresaTuCodigo, "Ingresa tu código");
         };
         EditarInformacionBasicaReceiver.prototype.onRecibirMensaje = function (msg) {
+            if (msg.text == MenuPrincipalReceiver_1.MenuPrincipal.Comandos.MenuPrincipalEstudianteOpts.EditarInfoBasica) {
+                return;
+            }
             if (this.estaComandoEnContexto(Comandos.IngresaTuCodigo)) {
                 this.actualizarCodigo(msg);
             }

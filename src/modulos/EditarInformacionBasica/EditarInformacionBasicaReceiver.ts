@@ -4,6 +4,7 @@ import * as Data from "../../data";
 import { EstadoGlobal } from "../../core";
 import { MainReceiverContract } from "../indexContracts";
 import { ApiMessage } from "../../api/ApiMessage";
+import { MenuPrincipal } from "../menuPrincipal/MenuPrincipalReceiver";
 
 export namespace EditarInformacionBasica {
   export namespace Comandos {
@@ -45,6 +46,11 @@ export namespace EditarInformacionBasica {
     }
 
     protected onRecibirMensaje(msg: Message & ApiMessage) {
+
+      if(msg.text == MenuPrincipal.Comandos.MenuPrincipalEstudianteOpts.EditarInfoBasica){
+        return;
+      }
+
       if (this.estaComandoEnContexto(Comandos.IngresaTuCodigo)) {
         this.actualizarCodigo(msg);
       } else if (this.estaComandoEnContexto(Comandos.VerificaTuCodigo)) {
