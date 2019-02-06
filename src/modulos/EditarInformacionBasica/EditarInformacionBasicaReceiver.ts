@@ -28,7 +28,7 @@ export namespace EditarInformacionBasica {
 
     public responderEditarInformacionBasica(msg: Message & ApiMessage) {
 
-      if(!this.estadoGlobal.infoUsuarioMensaje.estudiante.inscripcionAsignaturasConfirmado){
+      if(!this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo){
         this.solicitarCodigo(msg);
         return;
       }
@@ -70,6 +70,11 @@ export namespace EditarInformacionBasica {
     }
 
     private solicitarVerificarCodigo(msg: Message & ApiMessage) {
+      
+      if(!this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo){
+        return;
+      }
+
       this.enviarMensajeHTML(
         msg,
         Comandos.VerificaTuCodigo,

@@ -31,7 +31,7 @@ var EditarInformacionBasica;
             return _this;
         }
         EditarInformacionBasicaReceiver.prototype.responderEditarInformacionBasica = function (msg) {
-            if (!this.estadoGlobal.infoUsuarioMensaje.estudiante.inscripcionAsignaturasConfirmado) {
+            if (!this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo) {
                 this.solicitarCodigo(msg);
                 return;
             }
@@ -65,6 +65,9 @@ var EditarInformacionBasica;
             });
         };
         EditarInformacionBasicaReceiver.prototype.solicitarVerificarCodigo = function (msg) {
+            if (!this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo) {
+                return;
+            }
             this.enviarMensajeHTML(msg, Comandos.VerificaTuCodigo, Comandos.VerificaTuCodigo);
         };
         EditarInformacionBasicaReceiver.prototype.verificarCodigo = function (msg) {
