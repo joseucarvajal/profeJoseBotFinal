@@ -62,7 +62,7 @@ var BotReceiver = (function () {
             !this.estadoGlobal.infoUsuarioMensaje.estudiante.nombre ||
             !this.estadoGlobal.infoUsuarioMensaje.estudiante.email) {
             this.botSender
-                .responderMensajeErrorHTML(msg, "No se puede responder la solicitud, primero actualiza tus datos b\u00E1sicos")
+                .responderMensajeErrorHTML(msg, "No se puede responder la solicitud, primero debes <b>Actualizar tus datos b\u00E1sicos</b>")
                 .then(function () {
                 _this.irAMenuPrincipal(msg);
             });
@@ -95,7 +95,7 @@ var BotReceiver = (function () {
     };
     BotReceiver.prototype.estaComandoEnContexto = function (comando, contexto) {
         return (this.estaEnContextoActual(contexto) &&
-            this.estadoGlobal.infoUsuarioMensaje.estudiante.comando == comando);
+            this.estadoGlobal.infoUsuarioMensaje.estudiante.comando === comando);
     };
     BotReceiver.prototype.enviarMensajeAReceiver = function (instanciaReceiver, fn, msg, comandoARegistrarEstudiante) {
         this.estadoGlobal.infoUsuarioMensaje.estudiante.contexto =

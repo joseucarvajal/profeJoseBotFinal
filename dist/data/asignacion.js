@@ -90,7 +90,7 @@ var Asignacion;
         }
         return initDatabase_1.dataBase
             .ref("periodosAcademicos/" + estadoGlobal.settings.periodoActual + "/asignacion/" + estadoGlobal.settings.celularDocente + "/estudiante_asignatura/")
-            .set(estudianteAsignaturas);
+            .update(estudianteAsignaturas);
         var _a;
     };
     Asignacion.getTodasAsignaturasYSusEstudiantes = function (estadoGlobal) {

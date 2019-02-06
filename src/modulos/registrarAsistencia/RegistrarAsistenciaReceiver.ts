@@ -69,6 +69,16 @@ export namespace RegistrarAsistencia {
         return;
       }
 
+      if(!this.estadoGlobal.infoUsuarioMensaje.estudiante.inscripcionAsignaturasConfirmado){
+        this.botSender
+          .responderMensajeErrorHTML(msg, `Primero debes <b>Inscribir asignaturas</b>`)
+          .then(() => {
+            this.irAMenuPrincipal(msg);
+          });
+        
+        return;
+      }
+
       this.enviarOpcionesInscripcionAsignaturas();
     }
 
@@ -221,7 +231,7 @@ export namespace RegistrarAsistencia {
               asignatura.nombre
             }</b> inicia en <b>${horasDiferencia.toFixed(
               2
-            )} horas</b> aproximadamente. Aún es muy temprano para registrar asistencia.`
+            )} horas</b>. Aún es muy temprano para registrar asistencia.`
           )
           .then(() => {
             this.botSender.responderMensajeHTML(msg, `😅`);

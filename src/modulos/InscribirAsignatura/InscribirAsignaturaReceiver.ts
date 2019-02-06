@@ -172,7 +172,7 @@ export namespace InscribirAsignatura {
             this.enviarMensajeHTML(
               msg,
               "",
-              `✅ Se han registrado tus asignaturas con éxito`
+              `✅ Se han registrado tus asignaturas con éxito. <b>💡 Ya puedes registrar asistencia</b>`
             ).then(() => {
               this.irAMenuPrincipal(msg);
             });

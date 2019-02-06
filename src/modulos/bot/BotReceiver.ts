@@ -90,7 +90,7 @@ export abstract class BotReceiver {
       this.botSender
         .responderMensajeErrorHTML(
           msg,
-          `No se puede responder la solicitud, primero actualiza tus datos básicos`
+          `No se puede responder la solicitud, primero debes <b>Actualizar tus datos básicos</b>`
         )
         .then(() => {
           this.irAMenuPrincipal(msg);
@@ -146,7 +146,7 @@ export abstract class BotReceiver {
   protected estaComandoEnContexto(comando: string, contexto?: string): boolean {
     return (
       this.estaEnContextoActual(contexto) &&
-      this.estadoGlobal.infoUsuarioMensaje.estudiante.comando == comando
+      this.estadoGlobal.infoUsuarioMensaje.estudiante.comando === comando
     );
   }
 

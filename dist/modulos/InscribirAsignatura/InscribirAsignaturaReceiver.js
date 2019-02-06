@@ -108,7 +108,7 @@ var InscribirAsignatura;
                 _this.estadoGlobal.infoUsuarioMensaje.estudiante.inscripcionAsignaturasConfirmado = true;
                 Data.Estudiantes.actualizarChat(msg, _this.estadoGlobal, _this.estadoGlobal.infoUsuarioMensaje.estudiante).then(function () {
                     Data.Asignacion.registrarAsignaturasAEstudiante(msg, _this.estadoGlobal, asignaturasDeEstudiante.listaAsignaturas).then(function () {
-                        _this.enviarMensajeHTML(msg, "", "\u2705 Se han registrado tus asignaturas con \u00E9xito").then(function () {
+                        _this.enviarMensajeHTML(msg, "", "\u2705 Se han registrado tus asignaturas con \u00E9xito. <b>\uD83D\uDCA1 Ya puedes registrar asistencia</b>").then(function () {
                             _this.irAMenuPrincipal(msg);
                         });
                     });

@@ -65,7 +65,16 @@ var RegistrarAsistencia;
         }
         //#region public
         RegistrarAsistenciaReceiver.prototype.registrarAsistencia = function (msg) {
+            var _this = this;
             if (!this.validarQueEstudianteHayaIngresadoDatosBasicos(msg)) {
+                return;
+            }
+            if (!this.estadoGlobal.infoUsuarioMensaje.estudiante.inscripcionAsignaturasConfirmado) {
+                this.botSender
+                    .responderMensajeErrorHTML(msg, "Primero debes <b>Inscribir asignaturas</b>")
+                    .then(function () {
+                    _this.irAMenuPrincipal(msg);
+                });
                 return;
             }
             this.enviarOpcionesInscripcionAsignaturas();
@@ -152,7 +161,7 @@ var RegistrarAsistencia;
             if (horaHoy < horario.horaInicio) {
                 horasDiferencia = Math.abs(fechaHoraInicioClase - fechaHoy) / 36e5;
                 this.botSender
-                    .responderMensajeHTML(msg, "Son las <b>" + horaHoy + "</b> y la clase <b>" + asignatura.nombre + "</b> inicia en <b>" + horasDiferencia.toFixed(2) + " horas</b> aproximadamente. A\u00FAn es muy temprano para registrar asistencia.")
+                    .responderMensajeHTML(msg, "Son las <b>" + horaHoy + "</b> y la clase <b>" + asignatura.nombre + "</b> inicia en <b>" + horasDiferencia.toFixed(2) + " horas</b>. A\u00FAn es muy temprano para registrar asistencia.")
                     .then(function () {
                     _this.botSender.responderMensajeHTML(msg, "\uD83D\uDE05");
                 });

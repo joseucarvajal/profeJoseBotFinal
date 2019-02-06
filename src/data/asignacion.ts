@@ -163,7 +163,7 @@ export namespace Asignacion {
           estadoGlobal.settings.celularDocente
         }/estudiante_asignatura/`
       )
-      .set(estudianteAsignaturas);
+      .update(estudianteAsignaturas);
   };
 
   export const getTodasAsignaturasYSusEstudiantes = (

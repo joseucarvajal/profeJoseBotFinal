@@ -1,9 +1,8 @@
 import { Message } from "../../bot/Message";
 import { BotReceiver } from "../bot/BotReceiver";
 import * as Data from "../../data";
-import { EstadoGlobal, Estudiante } from "../../core";
+import { EstadoGlobal } from "../../core";
 import { MainReceiverContract } from "../indexContracts";
-import { MenuPrincipal } from "../menuPrincipal/MenuPrincipalReceiver";
 import { ApiMessage } from "../../api/ApiMessage";
 
 export namespace EditarInformacionBasica {
@@ -28,13 +27,13 @@ export namespace EditarInformacionBasica {
     }
 
     public responderEditarInformacionBasica(msg: Message & ApiMessage) {
-      if(!this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo){
+
+      if(!this.estadoGlobal.infoUsuarioMensaje.estudiante.inscripcionAsignaturasConfirmado){
         this.solicitarCodigo(msg);
         return;
       }
       
       this.solicitarNombreCompleto(msg);
-
     }
 
     private solicitarCodigo(msg: Message & ApiMessage) {
@@ -137,9 +136,16 @@ export namespace EditarInformacionBasica {
     }
 
     private enviarMensajeDatosActualizadosConExito(msg: Message & ApiMessage): Promise<any> {
+
+      let complementoMensaje = "";
+      
+      if(!this.estadoGlobal.infoUsuarioMensaje.estudiante.inscripcionAsignaturasConfirmado){
+        complementoMensaje = "<b>💡 Ya puedes Inscribir asignaturas</b>";
+      }
+
       return this.botSender.responderMensajeHTML(
         msg,
-        `✅ Has actualizado tus datos con éxito`
+        `✅ Has actualizado tus datos con éxito. ${complementoMensaje}`
       );
     }
   }

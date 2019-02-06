@@ -13,4 +13,3 @@ export namespace Settings {
             });
     }
 }
-

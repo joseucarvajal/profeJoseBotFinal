@@ -31,7 +31,7 @@ var EditarInformacionBasica;
             return _this;
         }
         EditarInformacionBasicaReceiver.prototype.responderEditarInformacionBasica = function (msg) {
-            if (!this.estadoGlobal.infoUsuarioMensaje.estudiante.codigo) {
+            if (!this.estadoGlobal.infoUsuarioMensaje.estudiante.inscripcionAsignaturasConfirmado) {
                 this.solicitarCodigo(msg);
                 return;
             }
@@ -108,7 +108,11 @@ var EditarInformacionBasica;
             });
         };
         EditarInformacionBasicaReceiver.prototype.enviarMensajeDatosActualizadosConExito = function (msg) {
-            return this.botSender.responderMensajeHTML(msg, "\u2705 Has actualizado tus datos con \u00E9xito");
+            var complementoMensaje = "";
+            if (!this.estadoGlobal.infoUsuarioMensaje.estudiante.inscripcionAsignaturasConfirmado) {
+                complementoMensaje = "<b>💡 Ya puedes Inscribir asignaturas</b>";
+            }
+            return this.botSender.responderMensajeHTML(msg, "\u2705 Has actualizado tus datos con \u00E9xito. " + complementoMensaje);
         };
         return EditarInformacionBasicaReceiver;
     }(BotReceiver_1.BotReceiver));
